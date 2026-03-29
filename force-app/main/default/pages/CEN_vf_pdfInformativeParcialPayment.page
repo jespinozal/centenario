@@ -1,0 +1,711 @@
+<!--
+ * Name: CEN_vf_pdfInformativeParcialPayment
+ * Version: 1.0
+ * Descripción: plantilla PDF de pagos totales
+ * Fecha: 28/06/2020
+ * TestClass: ...
+ * ClassController: CEN_cls_pdfInformativeParcialPayment_vf
+-->
+<apex:page applyHtmlTag="false"
+  applyBodyTag="false"
+  showHeader="false"
+  renderAs="pdf"
+  standardController="Opportunity"
+  extensions="CEN_cls_pdfInformativeParcialPayment_vf"
+  title="PDF Cotización"
+>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <style type="text/css">
+
+      @import url('http://fonts.cdnfonts.com/css/trebuchet-ms-2');
+
+      @page {
+        size: A4 portrait;
+        margin: 20px 30px 20px 30px;
+        padding: 80px 0 20px 0;
+        font-family: Trebuchet-MS;
+        @top-center {
+          content: element(header);
+        }
+        @bottom-center {
+          content: element(footer);
+        }
+      }
+
+
+      div.header {
+        position: running(header);
+      }
+
+      div.footer {
+        display: block;
+        padding: 2px 2px 2px 2px;
+        margin: 0 0 0 0;
+        width: 100%;
+        text-align: center;
+        position: running(footer);
+      }
+
+      .pagenumber:before {
+        content: counter(page);
+      }
+
+      .pagecount:before {
+        content: counter(pages);
+      }
+
+      .content {
+        margin: 0 0 0 0;
+        padding: 0 0 0 0;
+      }
+
+      .bodyStyle {
+        font-family: "Trebuchet MS", sans-serif;
+        font-size: 12px;
+      }
+
+      .headerData {
+        margin: 0 0 0 0;
+        padding: 15px 0 15px 0;
+        font-size: 14px;
+      }
+
+      .tableHeaderData {
+        width: 100%;
+        height: 80px;
+        margin-bottom: 20px;
+        margin-left: 5px;
+      }
+
+      .tableHeaderData td {
+        width: 30%;
+        font-weight: bold;
+        color: rgb(131, 131, 130);
+      }
+
+      .tableDatosProyectoData {
+        width: 100%;
+        font-size: 22px;
+        font-weight: bold;
+        max-height: 70px;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+      }
+
+      .tableDatosProyectoData td {
+        text-align: center;
+        border: 2px solid #f2f2f2;
+      }
+
+      .roundedBorder {
+        border-radius: 15px;
+      }
+
+      .tableDatosCliente {
+        width: 100%;
+        font-size: 10px;
+        border: 1px solid #f2f2f2;
+        ;
+        margin: 0 0 0 0;
+        padding: 0 0 0 0;
+        border-collapse: collapse;
+        text-transform: uppercase;
+        border: 2px solid #f2f2f2 !important;
+      }
+
+      .tableDatosCliente tr td {
+        width: 25%;
+        font-weight: normal;
+        text-align: center;
+        color: rgb(131, 131, 130);
+        background: #f2f2f2;
+        border: 2px solid #f2f2f2;
+        height: 15px;
+      }
+
+      .tableDatosCliente tr th {
+        width: 25%;
+        font-weight: bold;
+        color: rgb(230, 51, 35);
+        text-align: center;
+        border: 2px solid #f2f2f2;
+        ;
+      }
+
+      .encabezadoRojoTextoBlanco {
+        width: 100%;
+        padding: 0 0 0 0;
+        margin: 0 0 0 0;
+      }
+
+      .encabezadoRojoTextoBlanco p {
+        background: #f64d46;
+        color: #ffffff;
+        padding: 4px 0 4px 0;
+        margin: 5px 0 5px 0;
+        font-weight: bold;
+        font-size: 12px;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      .tableLotes {
+        width: 100%;
+        border: 2px solid #f2f2f2;
+        text-align: center;
+        border-collapse: collapse;
+        margin: 0 0 0 0;
+        padding: 0 0 0 0;
+        text-transform: uppercase;
+        font-size: 10px;
+      }
+
+      .tableLotes tr td {
+        width: 12.5%;
+        padding: 3px 0 3px 0;
+        color: rgb(131, 131, 130);
+        border: 2px solid #f2f2f2;
+      }
+
+      .tableLotes tr th {
+        width: 12.5%;
+        padding: 3px 0 3px 0;
+        background: #ffffff;
+        font-weight: normal;
+        color: rgb(131, 131, 130);
+        border: 2px solid #f2f2f2;
+      }
+
+      .tableTotalLotes {
+        margin: 0 0 5px 0;
+        width: 100%;
+        border: 2px solid #f2f2f2;
+        text-align: center;
+        border-collapse: collapse;
+        font-size: 10px;
+        color: rgb(131, 131, 130);
+      }
+
+      .tableTotalLotes tr td {
+        width: 37.5%;
+        padding: 5px 0 5px 0;
+        color: rgb(131, 131, 130);
+        border: 2px solid #f2f2f2;
+        background: rgb(214, 214, 214);
+        font-weight: bold;
+      }
+
+      .tableTotalLotes tr th {
+        width: 12.5%;
+        padding: 5px 0 5px 0;
+        background: #ffffff;
+        font-weight: normal;
+        color: rgb(230, 51, 35);
+        border: 2px solid #f2f2f2;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+
+      .financiamientoLargoPlazo {
+        width: 100%;
+        border: 2px solid #f2f2f2;
+        border-collapse: collapse;
+        margin: 3px 0 10px 0;
+        padding: 0 0 0 0;
+        text-transform: uppercase;
+        font-size: 10px;
+      }
+
+      .financiamientoLargoPlazo tr td {
+        width: 20%;
+        padding: 3px 3px 3px 0;
+        color: rgb(131, 131, 130);
+        background: #f2f2f2;
+        text-align: right;
+        border-top: 2px solid #ffffff;
+        border-bottom: 2px solid #ffffff;
+        border-right: 2px solid #ffffff;
+      }
+
+      .financiamientoLargoPlazo tr td.item {
+        width: 5%;
+        max-width;
+        5%;
+        text-align: right;
+        padding: 3px 0 3px 0;
+        background: #ffffff;
+        color: rgb(131, 131, 130);
+        font-weight: normal;
+        border-top: 2px solid #f2f2f2;
+        border-bottom: 2px solid #f2f2f2;
+      }
+
+      .financiamientoLargoPlazo tr th {
+        text-align: left;
+        width: 75%;
+        padding: 3px 0 3px 5px;
+        background: #ffffff;
+        color: rgb(131, 131, 130);
+        font-weight: normal;
+        border-left: 2px solid #f2f2f2;
+        border-bottom: 2px solid #f2f2f2;
+        border-top: 2px solid #f2f2f2;
+      }
+
+      .tableAnotaciones {
+        width: 400px;
+        text-align: center;
+        border-collapse: collapse;
+        /* margin: 0 0 5px 0; */
+        margin-left: auto;
+        margin-right: auto;
+        border: 2px solid #f2f2f2;
+        font-size: 10px;
+      }
+
+      .tableAnotaciones td {
+        width: 20%;
+        padding: 2px 5px 2px 5px;
+        border: 2px solid #f2f2f2;
+        color: rgb(131, 131, 130);
+        ;
+      }
+
+      .tableAnotaciones th {
+        text-transform: uppercase;
+        width: 20%;
+        padding: 2px 5px 2px 5px;
+        border: 2px solid #f2f2f2;
+        /*color: rgb(230, 51, 35);*/
+        font-weight: bold;
+      }
+
+      .contenidoTextual {
+        width: 100%;
+        text-align: justify;
+        font-size: 10px;
+        border: 2px solid #f2f2f2;
+        margin: 0 0 5px 0;
+        color: rgb(131, 131, 130);
+      }
+
+      .tituloContenido {
+        width: 100%;
+        text-align: justify;
+        font-size: 14px;
+        font-weight: bold;
+        padding: 5px 10px 0 10px;
+      }
+
+      .contenidoTextual ul li {
+        padding: 5px 10px 5px 10px;
+      }
+
+      .contenidoTextual ol {
+        padding: 5px 10px 5px 10px;
+      }
+
+      .contenidoTextual p {
+        padding: 0 10px 0 10px;
+      }
+
+      .tableFormasPago {
+        min-height: 60px;
+        width: 100%;
+        padding-left: 0px;
+        margin-left: 0px;
+        border: 0px;
+      }
+    </style>
+  </head>
+  <!--Header PDF-->
+  <div class="header bodyStyle">
+    <div class="headerData">
+      <table class="tableHeaderData">
+        <tr>
+          <td style="width: 75%; vertical-align: center; text-align: center">
+            <table style="border-collapse: collapse; width: 100%">
+              <tr>
+                <td
+                  style="
+                    width: 25%;
+                    text-align: center;
+                    border: 2px solid #f2f2f2;
+                  "
+                >
+                  Nro:&nbsp;
+                </td>
+                <td
+                  style="
+                    width: 25%;
+                    text-align: center;
+                    border: 2px solid #f2f2f2;
+                  "
+                >
+                  <apex:outputText value="{!Cotizacion.QuoteNumber}"
+                  ></apex:outputText>
+                </td>
+                <td
+                  style="
+                    width: 25%;
+                    text-align: center;
+                    border: 2px solid #f2f2f2;
+                  "
+                >
+                  Fecha:&nbsp;
+                </td>
+                <td
+                  style="
+                    width: 25%;
+                    text-align: center;
+                    border: 2px solid #f2f2f2;
+                  "
+                >
+                  <apex:outputText value="{0,date,dd'/'MM'/'yyyy}">
+                    <apex:param value="{!Cotizacion.CreatedDate}"
+                  /></apex:outputText>
+                </td>
+              </tr>
+            </table>
+          </td>
+
+          <td style="width: 25%; text-align: right">
+            <img src="{!$Resource.CEN_sr_logoCentenario_2020}" height="80px" />
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer bodyStyle">
+    <div>
+      <span class="pagenumber" /> de
+      <span class="pagecount" />
+    </div>
+  </div>
+
+  <div class="content bodyStyle">
+    <!--Datos del proyecto-->
+    <table class="tableDatosProyectoData">
+      <tr>
+        <td style="width: 20%">
+          <p
+            class="roundedBorder"
+            style="
+              color: rgb(230, 51, 35);
+              margin: 0 3px 0 0;
+              padding: 20px 0 20px 0;
+            "
+          >
+            Proyecto
+          </p>
+        </td>
+        <td class="roundedBorder" style="width: 60%">
+          <p
+            class="roundedBorder"
+            style="
+              color: rgb(131, 131, 130);
+              margin: 0 3px 0 3px;
+              padding: 20px 0 20px 0;
+            "
+          >
+            <apex:outputText value="{!Proyecto.Name}" />
+          </p>
+        </td>
+        <td style="width: 20%; vertical-align: middle">
+          <div
+            style="display: {!If(ISNULL(LogoProyecto.Id),'none','visible') }"
+          >
+            <img
+              src="{!'/servlet/servlet.FileDownload?file='+LogoProyecto.Id}"
+              style="max-height: 60px; max-width: 20px"
+              height="60px"
+            />
+          </div>
+        </td>
+      </tr>
+    </table>
+    <!--Datos del cliente-->
+    <div class="encabezadoRojoTextoBlanco">
+      <p>CLIENTE</p>
+    </div>
+    <table class="tableDatosCliente">
+      <tr>
+        <th style="width: 45%">Nombres</th>
+        <th style="width: 20%">Tipo de Documento</th>
+        <th style="width: 20%">Nro de Documento</th>
+        <th style="width: 15%">Celular</th>
+      </tr>
+      <tr>
+        <td style="width: 45%; border-right: 2px solid #ffffff">
+          <!-- <apex:outputText value="{!Cotizacion.CEN_fld_nombres__c+' '+Cotizacion.CEN_fld_apellidos__c}" -->
+            <apex:outputText value="{!cliente.name}"/>
+          <!-- /> -->
+        </td>
+        <td
+          style="
+            width: 20%;
+            border-left: 2px solid #ffffff;
+            border-right: 2px solid #ffffff;
+          "
+        >
+          <!-- <apex:outputText value="{!Cotizacion.CEN_fld_tipoDocumento__c}" /> -->
+          <apex:outputText value="{!tipoDocumento}" />
+        </td>
+        <td
+          style="
+            width: 20%;
+            border-left: 2px solid #ffffff;
+            border-right: 2px solid #ffffff;
+          "
+        >
+          <!-- <apex:outputText value="{!Cotizacion.CEN_fld_nroDocumento__c}" /> -->
+          <apex:outputText value="{!documento}" />
+        </td>
+        <td style="width: 15%; border-left: 2px solid #ffffff">
+          <!-- <apex:outputText value="{!Cotizacion.CEN_fld_celular__c}" /> -->
+          <apex:outputText value="{!telefono}" />
+        </td>
+      </tr>
+    </table>
+    <!--Datos de los lotes -->
+    <div class="encabezadoRojoTextoBlanco">
+      <p>LOTES</p>
+    </div>
+    <apex:repeat value="{!LotesCotizados}" var="lote" id="tableLotesCotizados">
+      <table class="tableLotes">
+        <tr>
+          <th>Manzana</th>
+          <td>
+            <apex:outputText value="{!lote.CEN_manzana_del_lote__c}" />
+          </td>
+          <th>Lote</th>
+          <td>
+            <apex:outputText value="{!lote.CEN_lote__c}" />
+          </td>
+          <th>Tipología</th>
+          <td style="width: 37.5%">
+            <apex:outputText value="{!lote.CEN_tipologia_del_lote__c}" />
+          </td>
+        </tr>
+        <tr>
+          <th>Área</th>
+          <td colspan="3" style="background: #f2f2f2">
+            <apex:outputText value="{0, Number, ###,###,##0.00}">
+              <apex:param value="{!lote.CEN_area_del_lote__c}" />
+            </apex:outputText>
+          </td>
+          <th>Precio</th>
+          <td style="width: 37.5%; background: #f2f2f2">
+            <apex:outputText value="{0, Number, ###,###,##0.00}">
+              <apex:param value="{!lote.CEN_fld_precioVentaDscto__c}" />
+            </apex:outputText>
+          </td>
+        </tr>
+        <tr style="height: 10px; max-height: 10px">
+          <td
+            colspan="6"
+            style="
+              height: 10px;
+              max-height: 10px;
+              background: rgb(214, 214, 214);
+              padding: 10px 0 0 0;
+              border: 2px solid rgb(214, 214, 214);
+            "
+          ></td>
+        </tr>
+      </table>
+    </apex:repeat>
+    <table class="tableTotalLotes">
+      <tr>
+        <th>Total Área</th>
+        <td>
+          <apex:outputText value="{0, Number, ###,###,##0.00 m2}">
+            <apex:param value="{!Cotizacion.CEN_Area__c}" />
+          </apex:outputText>
+        </td>
+        <th>PRECIO FINAL</th>
+        <td>
+          <apex:outputText value="{!Cotizacion.CEN_Moneda__c}"/>
+          <apex:outputText value="{0, Number, ###,###,##0.00}">
+            <apex:param value="{!Cotizacion.CEN_Precio_de_venta_con_descuento__c}"
+            />
+          </apex:outputText>
+        </td>
+      </tr>
+    </table>
+    <!--Datos del Financiamiento a largo plazo-->
+    <div class="encabezadoRojoTextoBlanco">
+      <p>CONDICIONES DE LA VENTA</p>
+    </div>
+    <table class="financiamientoLargoPlazo">
+      <tr>
+        <th>MODALIDAD DE VENTA</th>
+        <td class="item">&nbsp;</td>
+        <td>          
+            <apex:outputText value="{!oportunidadsd.CEN_Tipo_de_venta__c}" />          
+        </td>
+      </tr>
+      <tr>
+        <th>INICIAL</th>
+        <td class="item"><apex:outputText value="{!Cotizacion.CEN_Moneda__c}"/></td>
+        <td>
+          <apex:outputText value="{0, Number, ###,###,##0.00}">
+            <apex:param value="{!inicial}" />
+          </apex:outputText>
+        </td>
+      </tr>
+      <tr>
+        <th>INICIAL PORCENTAJE</th>
+        <td class="item">%</td>
+        <td>
+          <apex:outputText value="{0, Number, ###,###,##0}">
+            <apex:param value="{!inicialPorcentage}" />
+          </apex:outputText>
+        </td>
+      </tr>
+      <tr>
+        <th>NÚMERO DE CUOTAS DE LA INICIAL</th>
+        <td class="item">&nbsp;</td>
+        <td>
+          <apex:outputText value="{0, Number, ###,###,##0}">
+            <apex:param value="{!numeroCuotaInicial}"
+            />
+          </apex:outputText>
+        </td>
+      </tr>
+      <tr>
+        <th>MONTO DE LAS CUOTAS DE LA INICIAL</th>
+        <td class="item"><apex:outputText value="{!Cotizacion.CEN_Moneda__c}"/></td>
+        <td>
+          <apex:outputText value="{0, Number, ###,###,##0.00}">
+            <apex:param value="{!montoCuotaInicial}"
+            />
+          </apex:outputText>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          <apex:outputText value="{!montoFinanciar}" />
+        </th>
+        <td class="item"><apex:outputText value="{!Cotizacion.CEN_Moneda__c}"/></td>
+        <td>
+          <apex:outputText value="{0, Number, ###,###,##0.00}">
+            <apex:param value="{!montoFraccionar}" />
+          </apex:outputText>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          <apex:outputText value="{!numCuotas}" />
+        </th>
+        <td class="item">&nbsp;</td>
+        <td>
+          <apex:outputText value="{0, Number, ###,###,##0}">
+            <apex:param value="{!numeroCuota}"
+            />
+          </apex:outputText>
+        </td>
+      </tr>
+      <tr>
+        <th>TASA DE INTERES COMPENSATORIO</th>
+        <td class="item">%</td>
+        <td>
+          <apex:outputText value="{0, Number, ###,###,##0.00}">
+            <apex:param value="{!tasaInteresCompensatorio}"
+            />
+          </apex:outputText>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          <apex:outputText value="{!montoCuotas}" />
+        </th>
+        <td class="item"><apex:outputText value="{!Cotizacion.CEN_Moneda__c}"/></td>
+        <td>
+          <apex:outputText value="{0, Number, ###,###,##0.00}">
+            <apex:param value="{!montoCuota}"
+            />
+          </apex:outputText>
+        </td>
+      </tr>
+      <tr>
+        <th>MONTO A PAGAR PARA LA FIRMA DEL CONTRATO</th>
+        <td class="item"><apex:outputText value="{!Cotizacion.CEN_Moneda__c}"/></td>
+        <td>
+          <apex:outputText value="{0, Number, ###,###,##0.00}">
+            <apex:param value="{!ROUND(oportunidads.CEN_Monto_cuota_de_inicial_de_precio__c,2)}"/>
+          </apex:outputText>
+        </td>
+      </tr>
+    </table>
+    <!--TERMINOS Y CONDICIONES-->
+    <div class="encabezadoRojoTextoBlanco">
+      <p>DETALLE DE PAGOS</p>
+    </div>
+    <div class="contenidoTextual">
+        <div>
+          <p>  
+            ¡Felicidades!, has pagado&nbsp;<apex:outputText value="{!Cotizacion.CEN_Moneda__c}"/><apex:outputText value="{!montoPagarContrato}" />, te informamos que tienes hasta el
+            <apex:outputText value="{0, date, dd'/'MM'/'yyyy}">
+                <apex:param value="{!fechaPago}" /> 
+            </apex:outputText>
+            para completar el MONTO A PAGAR PARA LA FIRMA DE CONTRATO. A continuación detallamos tus pagos:
+            </p>
+        </div> 
+        <table class="tableAnotaciones">
+            <tr>
+            <th>FECHA</th>
+            <th>MONTO</th>
+            </tr>
+            <apex:repeat value="{!payments}" var="pagos">
+            <tr>
+                <td>
+                    <!-- <apex:outputText value="{!pagos.CEN_CreationDateFrom__c}" /> -->
+                    <apex:outputText value="{0, date, dd'/'MM'/'yyyy}">
+                        <apex:param value="{!pagos.CEN_PaymentDate__c}" /> 
+                    </apex:outputText>
+                </td>
+                <td><apex:outputText value="{!Cotizacion.CEN_Moneda__c}"/><apex:outputText value="{!pagos.CEN_Amount__c}" /></td>
+            </tr>
+            </apex:repeat>
+        </table>
+
+        <div>
+            <table class="tableAnotaciones">
+                <tr>
+                    <th>Total Pagado</th>
+                    <td><apex:outputText value="{!Cotizacion.CEN_Moneda__c}"/><apex:outputText value="{!montoPagarContrato}" /></td>
+                </tr>
+            </table>
+        </div>
+
+        <div>
+            <p>  
+              Para mayor información te invitamos a revisar los términos y condiciones que te entregamos el 
+              <apex:outputText value="{0, date, dd'/'MM'/'yyyy}">
+                <apex:param value="{!cotizacion.CEN_fld_fechaCreacion__c}" /> 
+              </apex:outputText>
+            </p>
+        </div> 
+    </div>
+    <!-- <div style="page-break-after: always"/> -->
+    <p><br/></p>
+    <p style="color: rgb(131, 131, 130); font-weight: bold"><apex:outputText value="{!writeToday}" /><apex:outputText value="{!CASE(MONTH(DATEVALUE(NOW())),
+      1, 'Enero',
+      2, 'Febrero',
+      3, 'Marzo', 
+      4, 'Abril', 
+      5, 'Mayo', 
+      6, 'Junio',
+      7, 'Julio',
+      8, 'Agosto',
+      9, 'Setiembre',
+      10, 'Octubre',
+      11, 'Noviembre',
+      12, 'Diciembre',
+      '-')}" /><apex:outputText value="{!writeTodayB}" /></p>
+    <p><br/></p>
+  </div>
+</apex:page>

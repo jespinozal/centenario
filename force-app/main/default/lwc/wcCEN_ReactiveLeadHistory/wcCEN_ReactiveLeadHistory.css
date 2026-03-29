@@ -1,0 +1,29 @@
+.lgc-bg {
+    background-color: rgb(242, 242, 242);
+}
+
+.lgc-bg-inverse {
+    background-color: rgb(22, 50, 92);
+}
+
+[aria-expanded=true]>.slds-tree__item .slds-button__icon{
+    transform: rotate(0deg);
+}
+
+.slds-popover{
+    max-width: 100%;
+    width: auto;
+}
+
+.slds-popover.slds-nubbin_bottom-left{
+    position: absolute;
+    bottom:100%;
+  }
+
+.slds-resizable__divider{
+    z-index: 0;
+}
+
+.cen-colorbackground{
+    background-color: #f3f3f3;
+}

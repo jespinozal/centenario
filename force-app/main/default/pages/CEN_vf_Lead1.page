@@ -1,0 +1,2 @@
+<apex:page applyHtmlTag="false" showHeader="false" standardController="Lead" action="{!attach}" extensions="CEN_cls_LeadAttach">
+</apex:page>

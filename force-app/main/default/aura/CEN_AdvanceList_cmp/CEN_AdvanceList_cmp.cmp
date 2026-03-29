@@ -1,0 +1,104 @@
+<aura:component controller="CEN_AdvanceList_ctr" implements="lightning:availableForFlowScreens,force:hasRecordId,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome"
+                access="global">
+    <aura:import library="lightning:confirm" property="LightningConfirm" />
+    <aura:attribute name="recordId" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="isLoading" type="Boolean" default="true" />
+    <aura:attribute name="modalActivado" type="Boolean" default="false" />
+    <aura:attribute name="selectedRowsCount" type="Integer" default="0"/>
+    <aura:attribute name="selectedRowsDetails" type="Object" />
+    <aura:attribute name="txtMesagge" type="String" />
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute type="CEN_AdvanceList_ctr.wrapAccount" name="respWrapAccount" default=""/>
+    <aura:attribute type="String" name="society" default=""/>
+    <aura:attribute name="dataSuccess" type="Object"/>
+    <aura:attribute name="columnsSuccess" type="List"/>
+    <aura:attribute name="dataSuccessActivado" type="Boolean" default="false" />
+    <aura:attribute name="mesaggeActivado" type="Boolean" default="false" />
+    <aura:if isTrue="{!v.isLoading}">
+        <div class="slds-spinner_container">
+            <div role="status" class="slds-spinner slds-spinner_large slds-spinner_brand">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <aura:if isTrue="{!v.modalActivado}">
+        <lightning:card iconName="standard:account" title="Cuenta">
+            <lightning:layout >
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <div class="header-column">
+                        <lightning:input name="WrapAccount_name" readonly="true" value="{!v.respWrapAccount.name}" label="Nombre" />
+                    </div>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <div class="header-column">
+                        <lightning:input name="WrapAccount_documenttype" readonly="true" value="{!v.respWrapAccount.documenttype}" label="Tipo de documento" />
+                    </div>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <div class="header-column">
+                        <lightning:input name="WrapAccount_documentnumber" readonly="true" value="{!v.respWrapAccount.documentnumber}" label="Número de documento" />
+                    </div>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <div class="header-column">
+                        <lightning:input name="WrapAccount_society" readonly="true" value="{!v.respWrapAccount.society}" label="Sociedad" />
+                    </div>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </lightning:card>
+        <lightning:card iconName="custom:custom40" title="Listado de Anticipos">
+            <div class="slds-card__body">
+                <br></br>
+                <div style="height: 300px">
+                    <lightning:datatable keyField="BELNR"
+                                         data="{! v.data }"
+                                         columns="{! v.columns }"
+                                         hideCheckboxColumn="false"
+                                         onrowselection="{!c.handleSelectedRow}"/>
+                </div>
+            </div>
+        </lightning:card>
+        <footer class="slds-card__footer">
+            <div class="slds-float_right">
+                <button class="slds-button slds-button_neutral" onclick="{!c.btnCancel}">Cancelar</button>
+                <button class="slds-button slds-button_brand" onclick="{!c.btnSave}">Guardar</button>
+            </div>
+        </footer>
+        <br></br>        
+        <aura:set attribute="else">
+            <aura:if isTrue="{!v.mesaggeActivado}">
+                <lightning:card iconName="standard:capacity_plan" title="Resultado">
+                    <div class="slds-card__body">
+                        <lightning:layout >
+                            <lightning:layoutItem padding="around-small">
+                                <div class="header-column">
+                                    {!v.txtMesagge}
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        <br></br>
+                        <aura:if isTrue="{!v.dataSuccessActivado}">
+                            <div style="height: 300px">
+                                <lightning:datatable keyField="BELNR"
+                                                     data="{! v.dataSuccess }"
+                                                     columns="{! v.columnsSuccess }"
+                                                     hideCheckboxColumn="true"
+                                                     onrowaction="{! c.handleRowAction }"/>
+                            </div>
+                        </aura:if>
+                    </div>
+                </lightning:card>
+            </aura:if>
+            <footer class="slds-card__footer">
+                <div class="slds-float_right">
+                    <button class="slds-button slds-button_brand" onclick="{!c.btnDone}">Finalizar</button>
+                </div>
+            </footer>
+            <br></br>
+        </aura:set>
+    </aura:if> 
+</aura:component>

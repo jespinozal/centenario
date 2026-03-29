@@ -1,0 +1,215 @@
+<apex:page applyHtmlTag="false"
+  applyBodyTag="false"
+  showHeader="false"
+  renderAs="pdf"
+  standardController="Account"
+  title="Declaracion Jurada Domiciliaria"
+  extensions="CEN_pdfDeclaracionJuradaDomiciliaria"
+>
+
+<head>
+  <style type="text/css">
+    html,
+    body {
+        font: 400 18px Roboto, Arial, sans-serif;
+        font-size: 12px;
+        height: 90%;
+        margin: 20px 30px 20px 30px;
+        padding: 0;
+        /*padding: 80px 0 20px 0;*/
+    }
+    table , td, th {
+      border: 1px solid #595959;
+      border-collapse: collapse;
+    }
+
+    td, th {
+      padding: 5px 3px;
+      
+    }
+    
+    .even {
+      background: #fbf8f0;
+    }
+
+    .odd {
+      background: #fefcf9;
+    }
+
+    .centerText{
+      text-align: center;
+    }
+
+    .w-10{
+      width: 10%;
+    }
+
+    .w-5{
+      width: 5%;
+    }
+
+    .myImg {
+      margin: 5px 7px 5px;;
+    }
+
+    .center {
+      text-align: center;
+      width: 70%;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 10%;
+    }
+
+    .noBorder {
+      border: 1px solid white;
+    }
+
+    .spac {
+      padding-left: 15%;
+      padding-right: 15%;
+    }
+  </style>
+</head>
+
+
+  <h2 class="centerText">DECLARACIÓN JURADA DOMICILIARIA</h2>
+  <p>Conste por el presente documento,</p>
+
+  <p>
+    <b>Yo, &nbsp; <apex:outputText value="{!Account.Name}"/> de Nacionalidad Peruana en el pleno goce de los Derechos Constitucionales</b>
+  </p>
+
+  <h4>DECLARO BAJO JURAMENTO: </h4>
+  <p>
+    Que, <b>la dirección que señalo en este documento, es mi domicilio real, actual, efectivo y verdadero</b>, donde tengo vivencia real, física y permanente; en caso de comprobarse falsedad alguna, la Autoridad correspondiente podrá someterme a las sanciones contempladas en el Art. 427° del Código Penal. 
+  </p>
+
+  <!-- Tabla Domicilio -->
+  <table>
+    <tbody>
+      <tr class="centerText">
+        <th colspan="6">Apellidos</th>
+        <th colspan="6">Nombres</th>
+      </tr>
+      <tr class="centerText">
+        <td colspan="6"><apex:outputText value="{!Account.LastName}"/></td>
+        <td colspan="6"><apex:outputText value="{!Account.FirstName}"/></td>
+      </tr>
+      <tr>
+        <th><apex:outputText value="{!Account.CEN_Tipo_de_documento__pc}"/></th>
+        <th colspan="3">Nº Doc Ident:</th>
+        <td class="centerText"><apex:outputText value="{!Account.CEN_N_mero_de_documento__pc}"/></td>
+        <th colspan="3">Sexo</th>
+        <td colspan="2" class="centerText">M <apex:image value="{!If(Account.CEN_Sexo__pc == "Masculino", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/> </td>
+        <td colspan="2" class="centerText">F <apex:image value="{!If(Account.CEN_Sexo__pc == "Femenino", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/> </td>
+      </tr>
+      <tr>
+        <th>Nacionalidad</th>
+        <td colspan="3" class="centerText"><apex:outputField value="{!Account.CEN_Nacionalidad__pc}"/></td>
+        <td colspan="4"></td>
+        <td colspan="4"></td>
+      </tr> 
+      <tr class="centerText">
+        <td colspan="4"></td>
+        <th colspan="2">Distrito</th>
+        <th colspan="2">Provincia</th>
+        <th colspan="2">Departamento</th>
+        <th colspan="2">País</th>
+      </tr>
+      <tr class="centerText">
+        <td colspan="4"></td>
+        <td colspan="2"><apex:outputText value="{!Account.CEN_Distrito__pr.Name}"/></td>
+        <td colspan="2"><apex:outputText value="{!Account.CEN_Distrito__pr.Provincia__c}"/></td>
+        <td colspan="2"><apex:outputText value="{!Account.CEN_Distrito__pr.Departamento__c}"/></td>
+        <td colspan="2">Perú</td>
+      </tr>
+      <tr>
+        <th colspan="4">Dirección: 
+          Av. <apex:image value="{!If(Account.CEN_Tipo_Via__c == "Av.", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/>
+          Calle <apex:image value="{!If(Account.CEN_Tipo_Via__c == "Calle", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/>
+          Jr. <apex:image value="{!If(Account.CEN_Tipo_Via__c == "Jr.", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/> &nbsp;
+          Psje. <apex:image value="{!If(Account.CEN_Tipo_Via__c == "Psje.", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/>
+          Urb. <apex:image value="{!If(Account.CEN_Tipo_Via__c == "Urb.", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/>
+          Lote <apex:image value="{!If(Account.CEN_Tipo_Via__c == "Lote", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/>
+        </th>
+        <td colspan="8" class="centerText"><apex:outputText value="{!Account.CEN_Direccion__pc}"/></td>
+      </tr>
+      <tr>
+        <th colspan="4">Referencia</th>
+        <td colspan="8" class="centerText"><apex:outputText value="{!Account.CEN_Referencia_direccion__c}"/></td>
+      </tr>
+      <tr>
+        <th colspan="4">Correo Electrónico</th>
+        <th colspan="2">Situación de Vivienda:</th>
+        <td class="centerText">Propia</td>
+        <td><apex:image value="{!If(Account.CEN_Situacion_vivienda__c == "Propia", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/></td>
+        <td class="centerText">Alquilada  </td>
+        <td><apex:image value="{!If(Account.CEN_Situacion_vivienda__c == "Alquilada", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/></td>
+        <td class="centerText">Familiar </td>
+        <td class="w-5"><apex:image value="{!If(Account.CEN_Situacion_vivienda__c == "Familiar", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/></td>
+        
+      </tr>
+      <tr>
+        <td colspan="12"><apex:outputText value="{!Account.PersonEmail}"/></td>
+      </tr>
+      <tr>
+        <th colspan="2">Tiempo Residencia:</th>
+        <td class="centerText"><apex:outputText value="{!If(Account.CEN_Tiempo_de_Residencia__c == "Años", "Años" , "Meses")}"/></td>
+        <td class="w-10"><apex:outputText value="{!Account.CEN_Numero_Tiempo_Residencia__c}"/></td>
+        <th colspan="2">Estado Civil:</th>
+        <td colspan="3" class="centerText"><apex:outputText value="{!If(Account.CEN_Estado_civil__pc == "Divorc", "Divorciado" ,
+            If(Account.CEN_Estado_civil__pc == "Separa", "Separado" ,
+            If(Account.CEN_Estado_civil__pc == "Conviv", "Conviviente" ,
+            If(Account.CEN_Estado_civil__pc == "PRsep", "Proceso de separación" , Account.CEN_Estado_civil__pc) ) ) )}"/>
+        </td>
+        
+        <td colspan="3"></td>
+      </tr>
+      <tr>
+        <th colspan="2">Teléfono Fijo</th>
+        <td colspan="2" class="centerText"><apex:outputText value="{!Account.Phone}"/></td>
+        <th colspan="2" >Celular 1</th>
+        <td colspan="2" class="centerText"><apex:outputText value="{!Account.PersonMobilePhone}"/></td>
+        <th colspan="2">Celular 2</th>
+        <td colspan="2" class="centerText"><apex:outputText value="{!Account.PersonOtherPhone}"/></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <br></br>
+
+  <!-- Tabla de fecha -->
+  <table>
+    <tbody>
+      <tr>
+        <th>Ciudad</th>
+        <td><apex:outputText value="{!Account.CEN_Distrito__pr.Departamento__c}"/></td>
+      </tr>
+      <tr>
+        <th>Día</th>
+        <td class="centerText"><apex:outputText value="{!DAY(TODAY())}"/></td>
+      </tr>
+      <tr>
+        <th>Mes</th>
+        <td class="centerText"><apex:outputText value="{!MONTH(TODAY())}"/></td>
+      </tr>
+      <tr>
+        <th>Año</th>
+        <td class="centerText"><apex:outputText value="{!YEAR(TODAY())}"/></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="center noBorder">
+    <tbody>
+      <tr class="centerText">
+        <td class="noBorder">___________________</td>
+        <td class="noBorder">___________________</td>
+      </tr>
+      <tr class="centerText">
+        <td class="noBorder">Firma</td>
+        <td class="noBorder">Huella Digital</td>
+      </tr>
+    </tbody>
+  </table>
+</apex:page>

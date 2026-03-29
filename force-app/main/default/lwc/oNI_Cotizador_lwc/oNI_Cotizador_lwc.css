@@ -1,0 +1,30 @@
+.slds-modal__container{
+    margin: 0 auto;
+    width: 80%;
+    max-width: 80rem;
+    min-width: 20rem;
+}
+
+.not-good{
+    color: red;
+}
+.good{
+    color: green;
+}
+
+
+.flex-container-cell {
+  display: flex; /* Makes the td a flex container */
+  width: 100%; /* Ensures the container takes up the full td width */
+}
+
+.element {
+  flex: 1; /* This makes both elements grow/shrink equally to fill the space */
+  /* Optional: Add styling for visibility and spacing */
+  text-align: center;
+}
+
+/* Optional: Add space between elements */
+.flex-container-cell > .element:first-child {
+  margin-right: 10px; 
+}

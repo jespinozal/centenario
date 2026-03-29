@@ -1,0 +1,17 @@
+/* Establecer la altura uniforme para las filas de datos (tbody tr) */
+.force-height tbody tr {
+    height: 56px !important; /* Usamos !important para asegurar la prioridad */
+}
+
+
+
+/* Asegurar que la fila de encabezado (thead tr) mantenga su altura original */
+.force-height thead tr {
+    height: auto !important;
+}
+
+/* Opcional: Si quieres ajustar el padding general de las celdas de datos */
+.force-height tbody tr td {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}

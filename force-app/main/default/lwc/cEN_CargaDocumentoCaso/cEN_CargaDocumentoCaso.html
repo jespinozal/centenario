@@ -1,0 +1,150 @@
+<!--
+  @description       : 
+  @author            : Richard Villafana - NTT DATA
+  @group             : 
+  @last modified on  : 09-09-2024
+  @last modified by  : Richard Villafana - NTT DATA
+-->
+<template>
+
+  <template if:true={showModal}>
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+          <div class="modalContainer slds-modal__container"
+                >
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                            size="small"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Cargar archivos
+                    </h2>
+                </header>
+
+                <div id="content_87:1890;a" class="modal-body scrollable slds-modal__content slds-p-around--none" data-aura-rendered-by="114:1890;a" data-scoped-scroll="true">
+                  <div data-aura-rendered-by="41:1890;a">
+                    <div class="slds-table--bordered" data-aura-rendered-by="43:1890;a">
+                      <div class="slds-grid slds-grid--vertical-align-center slds-p-around--small" data-aura-rendered-by="46:1890;a">
+                        <div class="slds-size_6-of-12" data-aura-rendered-by="47:1890;a">
+                          <div class="slds-media slds-media_center" data-aura-rendered-by="48:1890;a">
+                            <div aria-hidden="true" class="slds-media__figure" data-aura-rendered-by="49:1890;a">
+                              <!--render facet: 52:1890;a-->
+                              <span data-aura-rendered-by="53:1890;a">
+                               
+                                    <lightning-icon icon-name="doctype:pdf" alternative-text="PDF file" title="PDF"></lightning-icon>
+                                    <span class="slds-assistive-text" lwc-4897l11qtae="">Adobe PDF</span>
+                               </span>
+                            </div>
+                            <div class="slds-media__body" data-aura-rendered-by="56:1890;a">
+                              <div class="fileName slds-truncate" data-aura-rendered-by="57:1890;a">{fileName}</div>
+                              <span class="slds-text-color--weak slds-text-body--small" data-aura-rendered-by="59:1890;a">
+                                <span data-aura-rendered-by="62:1890;a" class="forceChatterFileSize" data-aura-class="forceChatterFileSize">
+                                  <div class="fileSize" data-aura-rendered-by="63:1890;a">
+                                    <span class="fileSizeAmount uiOutputNumber" data-aura-rendered-by="66:1890;a" dir="auto" data-aura-class="uiOutputNumber">{fileSize}</span>&nbsp; <span class="fileSizeUnits uiOutputText" data-aura-rendered-by="71:1890;a" data-aura-class="uiOutputText">MB</span>
+                                  </div>
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="slds-col--padded slds-size_5-of-12" data-aura-rendered-by="72:1890;a">
+                          <lightning-progress-bar class="slds-progress-bar--medium slds-progress-bar--circular" value={progressValue} size="large"></lightning-progress-bar>
+                        </div>
+                        <div aria-live="polite" aria-atomic="true" class="slds-size_1-of-12 slds-text-align--center" data-aura-rendered-by="80:1890;a">
+                          <!--unrender facet: 81:1890;a-->
+                          
+                          <template if:true={uploading}>
+                            <lightning-icon icon-name="utility:success" alternative-text="Success" title="Success" ></lightning-icon>
+                            <span class="slds-assistive-text" lwc-4897l11qtae="">Success</span>
+                          </template>
+
+                          <template if:true={uploadSuccess}>
+                          <lightning-icon icon-name="utility:success" alternative-text="Success" title="Success" variant="success"></lightning-icon>
+                          <span class="slds-assistive-text" lwc-4897l11qtae="">Success</span>
+                          </template>
+                        
+                        </div>
+                      </div>
+                      <!--render facet: 85:1890;a-->
+                    </div>
+                  </div>
+                </div>
+                  
+                <div class="modal-footer slds-modal__footer" data-aura-rendered-by="117:1890;a">
+                  <div class="footerCmps forceContentPanelFooter" data-aura-rendered-by="17:1890;a" data-aura-class="forceContentPanelFooter">
+                    <!--render facet: 19:1890;a-->
+                    <span style="display:none" aria-live="assertive" class="slds-text-body--small slds-float--left slds-p-top--x-small header" data-aura-rendered-by="21:1890;a">1 of 1 file uploaded</span>
+                    <!--render facet: 23:1890;a-->
+                    <!--render facet: 24:1890;a-->
+                    <span class="slds-p-left--x-small" data-aura-rendered-by="26:1890;a">
+                      
+                      <lightning-button  variant="brand" label="Listo" disabled={uploading} onclick={closeModal}></lightning-button>
+                    </span>
+                    <!--render facet: 36:1890;a-->
+                    <!--render facet: 37:1890;a-->
+                    <!--render facet: 38:1890;a-->
+                  </div>
+                </div>
+              
+          </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+
+  </template>
+  
+  <lightning-card  variant="Narrow"  title="OnBase" icon-name="standard:logging">
+          <template if:true={error}>
+            <div slot="footer" style="color: red" >Ha ocurrido un error.</div>
+          </template>
+          
+          <lightning-input slot="footer" type="file" label=""   onchange={openFile} accept={formatos} ></lightning-input>
+          
+          <template if:true={never}>
+          <lightning-file-upload  slot="footer"
+            label=""
+            name="fileUploader"
+            accept={formatos}
+            record-id={myRecordId}
+            onuploadfinished={cargaDocumento}
+        >
+        
+        </lightning-file-upload>
+      </template>
+      <div class="slds-var-p-horizontal_medium">
+        <template if:true={showSpinner}>
+        <div class="exampleHolder">
+          <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+        </div>
+        </template>
+          <article class="slds-tile">
+            <div class="slds-tile__detail">
+              <dl class="slds-list_horizontal slds-wrap">
+                <dt class="slds-item_label slds-text-color_weak slds-truncate">Solicitud:</dt>
+                <dd class="slds-item_detail">{resumenTipoDeSolicitud}</dd>
+
+                <dt class="slds-item_label slds-text-color_weak slds-truncate">Documento:</dt>
+                <dd class="slds-item_detail">{resumenNumeroDocumento}</dd>
+
+                <dt class="slds-item_label slds-text-color_weak slds-truncate">Financiamiento:</dt>
+                <dd class="slds-item_detail">{resumenFinanciamiento}</dd>
+
+                <dt class="slds-item_label slds-text-color_weak slds-truncate">Estado:</dt>
+                <dd class="slds-item_detail">{resumenEstado}</dd>
+
+                <dt class="slds-item_label slds-text-color_weak slds-truncate">Url documentos:</dt>
+                <dd class="slds-item_detail"><a href={resumenUrl} target="_blank">Documentos</a></dd>
+
+                <dt class="slds-item_label slds-text-color_weak slds-truncate"> Fecha de Carga:</dt>
+                <dd class="slds-item_detail"> {resumenFechaDeCarga}</dd>
+
+                <dt class="slds-item_label slds-text-color_weak slds-truncate">Usuario:</dt>
+                <dd class="slds-item_detail">{resumenUsuario}</dd>
+              </dl>
+            </div>
+          </article>
+        </div>
+  </lightning-card>
+  
+</template>

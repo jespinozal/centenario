@@ -1,0 +1,113 @@
+<aura:component
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens,lightning:availableForFlowScreens"
+                access="global"
+                controller="CEN_cls_TratamientoDatosPersonales">
+
+    <aura:attribute name="Cuenta" type="Account" default=""/>
+
+    <aura:attribute name="Valor1" type="Boolean" default="false"/>
+    <aura:attribute name="Valor2" type="Boolean" default="false"/>
+    <aura:attribute name="Valor3" type="Boolean" default="false"/>
+
+	<aura:attribute name="record" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+    <aura:attribute name="simpleRecord" type="Object"/>
+
+    <!-- handler utilizado al desencadenar el componente hace llamado al controlador doInit -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <!-- force captura los valores del objeto que desencadena el componente -->
+    <force:recordData aura:id="record"
+                      layoutType="FULL"
+                      recordId="{!v.recordId}"
+                      targetError="{!v.recordError}"
+                      targetRecord="{!v.record}"
+                      targetFields="{!v.simpleRecord}"
+                      mode="VIEW"
+                      />
+
+    <br></br>
+    <div class="slds-grid slds-wrap">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12 colspan textCB">
+            <p>Enviarle publicidad de los distintos proyectos del
+                Grupo Centenario (Inversiones Centenario S.A.A.,
+                Centenario Desarrollo Urbano S.A.C., Centenario
+                Renta Inmobiliaria S.A.C., Multimercados Zonales
+                S.A.C., Promoción Inmobiliaria del Sur S.A.C.,
+                Nuevas Inversiones Centro Comercial Camino Real S.A.C.,
+                Inmobiliaria San Silvestre S.A.C.) que
+                pudieran resultar de interés del cliente.
+            </p>
+
+        </div>
+
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12 colspan casillaCB">
+            <lightning:input aura:id="CheckBox1"
+                             type="checkbox"
+                             label="Acepto"
+                             name="CheckBox1"
+                             value="{!v.Valor1}"
+                             onchange="{!c.handleCheck1}"/>
+        </div>
+    </div>
+
+    <br></br>
+
+    <div class="slds-grid slds-wrap">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12 colspan textCB">
+            <p>Perfilar a los clientes (con información brindada por estos y disponible en internet y/o en fuentes públicas)
+                para desarrollar estrategias comerciales y de marketing.</p>
+        </div>
+
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12 colspan casillaCB">
+            <lightning:input aura:id="CheckBox2"
+                             type="checkbox"
+                             label="Acepto"
+                             name="CheckBox2"
+                             value="{!v.Valor2}"
+                             onchange="{!c.handleCheck2}"/>
+        </div>
+    </div>
+
+    <br></br>
+
+    <div class="slds-grid slds-wrap">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12 colspan textCB">
+            <p>Para el tratamiento de sus datos, se utilizarán encargados como proveedores, servicios de
+                encuestas y call centers comerciales.</p>
+        </div>
+
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12 colspan casillaCB">
+            <lightning:input aura:id="CheckBox3"
+                             type="checkbox"
+                             label="Acepto"
+                             name="CheckBox3"
+                             value="{!v.Valor3}"
+                             onchange="{!c.handleCheck3}"/>
+        </div>
+    </div>
+
+    <br></br>
+
+    <!-- <div class="slds-grid slds-wrap"> -->
+        <div class="slds-clearfix">
+            <div class="fuentePeq slds-float_right slds-m-left_small">
+                <lightning:button
+                                value="nopresencial"
+                                label="Generar PDF no presencial"
+                                variant="brand"
+                                title="Click to Send"
+                                onclick="{!c.setPrivacidadController}"/>
+
+            </div>
+            <div class="fuentePeq slds-float_right slds-m-left_small">
+                <lightning:button
+                                value="presencial"
+                                label="Generar PDF presencial"
+                                variant="brand"
+                                title="Click to Send"
+                                onclick="{!c.setPrivacidadController}"/>
+            </div>
+        </div>
+    <!-- </div> -->
+</aura:component>

@@ -1,0 +1,12 @@
+.slds-gridd{
+    background-color: rgb(242 242 242);
+    /* height: 50px; */
+}
+
+.slds-p-left_small, .slds-p-left--small {
+    padding-left: 0;
+}
+
+.slds-p-right_small, .slds-p-right--small {
+    padding-right:0;
+}

@@ -1,0 +1,25 @@
+.THIS .ColorBlue {
+  background-color: rgb(0, 112, 210);
+  color: #fff;
+}
+
+.THIS .ColorBlue:hover {
+  background-color: rgb(0, 112, 210);
+  color: #fff;
+}
+
+.THIS .myCheckbox{
+  display: inline-block;
+  float: left;
+  padding: 8px;
+  margin-right: 10px;
+}
+
+.THIS .myinput{
+  height: 2px;
+  min-height: 30px;
+}
+
+.THIS .label-hidden > label {
+  display: none;
+}

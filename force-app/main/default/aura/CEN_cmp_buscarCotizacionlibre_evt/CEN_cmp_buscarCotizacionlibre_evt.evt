@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="Send actions">
+    <aura:attribute name="action" type="String"/>
+</aura:event>

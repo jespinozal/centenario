@@ -1,0 +1,60 @@
+<apex:page controller="ONI_EnviarBrochurePDF_cls" renderAs="pdf" applyBodyTag="false">
+    <head>
+        <style>
+            @page{
+                size: Legal landscape;
+                margin:0; 
+                padding: 0;
+            }            
+            body {
+                width: 14in;
+                height: 8.5in;
+                margin:0; 
+                padding: 0;
+            }
+            .pagina {
+                width: 14in;
+                height: 8.5in;
+                margin:0; 
+                padding: 0;
+            }
+            .imagenFull {
+                width: 14in;
+                height: 8.5in;
+                margin:0; 
+                padding: 0;
+                display:block;
+            }
+        </style>
+    </head>
+    <body>
+        <center>
+            <!--div class="pagina">
+                <img src="{!URLFOR($Resource.OFI_str_CaratulaPdf)}"
+                    class="imagenFull"/>
+            </div-->
+            <apex:repeat value="{!openingResourceList}" var="open">
+                <div class="pagina">
+                    <img src="{!open}"
+                        class="imagenFull"/>
+                </div>
+            </apex:repeat>
+            <apex:repeat value="{!imagenesFiles}" var="img">
+                <div class="pagina">
+                    <img src="{!img.Imagen_URL__c}"
+                        class="imagenFull"/>
+                </div>
+            </apex:repeat>
+            <apex:repeat value="{!closureResourceList}" var="close">
+                <div class="pagina">
+                    <img src="{!close}"
+                        class="imagenFull"/>
+                </div>
+            </apex:repeat>
+            <!--div class="pagina">
+                <img src="{!URLFOR($Resource.OFI_str_CierrePdf)}"
+                    class="imagenFull"/>
+            </div-->
+        </center>
+    </body>
+</apex:page>

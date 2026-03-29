@@ -1,0 +1,1368 @@
+<aura:component
+  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens,lightning:availableForFlowScreens"
+  access="global"
+  controller="CEN_cls_VisorLotes"
+>
+  <aura:attribute name="recordId" type="string" />
+  <aura:attribute name="moneda" type="string" />
+  <aura:attribute name="proforma" type="string" />
+  <aura:attribute name="tipoVenta" type="string" />
+  <aura:attribute name="disabledPrimeraCuotaInicial" type="Boolean" default="false"/>
+  <aura:attribute name="idCotizacionSimulador" type="string" default="" />
+  <aura:attribute name="idOportunidadSimulador" type="string" default="" />
+  <aura:attribute name="lotesList" default="" type="List" />
+  <aura:attribute
+    name="codigosLotesRelOpp"
+    type="List"
+    description="Codigos de Lotes de OpportunityLineItem o QuoteLineItem relacionado a la Oportunidad cotizada"
+  /><!-- **************** SE AGREGO 20/07/2021 ****************** -->
+  <!--Tools-->
+  <aura:attribute name="proyecto" type="sObject" />
+  <!-- **************** SE AGREGO 25/02/2021 ****************** -->
+  <aura:attribute name="cmtTasas" type="List" />
+  <!-- **************** SE AGREGO 25/02/2021 ****************** -->
+  <aura:attribute name="pageCotizador" default="false" type="Boolean" />
+  <aura:attribute name="flagGenerarCotizacion" default="false" type="Boolean" />
+  <aura:attribute
+    name="flagCalcularCotizacion"
+    default="false"
+    type="Boolean"
+  />
+  <aura:attribute name="flagCalcularDescuento" default="false" type="Boolean" />
+  <aura:attribute name="flagCuotaFacilote" default="false" type="Boolean" />
+  <aura:attribute name="simulador" default="false" type="Boolean" />
+  <aura:attribute name="pdfCotizacionId" type="String" />
+  <aura:attribute name="pdfCotizacionBlob" type="Blob" />
+  <aura:attribute name="fileCotizacionBlob" type="Blob" />
+  <aura:attribute name="idRegistroCotizacion" type="String" />
+  <aura:attribute name="objDatosCliente" type="Object" />
+  <aura:attribute
+    name="disabledBtnGenerarFinanciamento"
+    type="boolean"
+    default="false"
+  />
+  <aura:attribute
+    name="disabledBtnCalcularFinanciamento"
+    type="boolean"
+    default="false"
+  />
+  <aura:attribute
+    name="disabledBtnSimuladorPrepago"
+    type="boolean"
+    default="false"
+  />
+  <aura:attribute
+    name="disabledBtnGestionDescuento"
+    type="boolean"
+    default="false"
+  />
+  <!-- Boton de periodos desactivado -->
+  <aura:attribute 
+    name="disabledPeriodos" 
+    type="Boolean" 
+    default="true"
+  />
+  
+  <!--Datos de la persona-->
+  <aura:attribute
+    name="inpDatosPersona"
+    type="CEN_cls_utilsQuote.DatosPersonaWrapper"
+    description="Datos de la persona cliente a quien se le cotiza"
+  />
+  <!--Anotaciones-->
+  <aura:attribute
+    name="inpAnotaciones"
+    type="List"
+    description="Anotaciones de la cotizacion"
+  />
+  <!--Escenarios de financiamiento-->
+  <aura:attribute
+    name="listaFinanciamiento"
+    type="List"
+    description="Escenarios de financiamiento"
+  />
+
+  <aura:attribute
+    name="seccionMontoCuotas"
+    default="false"
+    type="Boolean"
+  />
+
+  <aura:attribute
+    name="secEscenarioFin"
+    default="true"
+    type="Boolean"
+    description="Muestra la seccion de escenarios de financiamiento"
+  />
+
+  <aura:attribute
+    name="optionsTipoDocumento"
+    type="List"
+    description="Lista de tipos de documento del field en cotizacion"
+  />
+  <!--Financiamiento-->
+  <aura:attribute
+    name="CotizacionLibre"
+    type="Boolean"
+    default="false"
+    description="FLAG ES COTIZACION LIBRE"
+  />
+  <aura:attribute
+    name="monotocuotafinan"
+    type="decimal"
+    default="0"
+    description="MONTOS DE CUOTA"
+  />
+  <aura:attribute
+    name="montocuotarestfinan"
+    type="decimal"
+    default="0"
+    description="MONTOS DE CUOTA"
+  />
+  <aura:attribute
+    name="tasainter"
+    type="decimal"
+    default="0"
+    description="TASA DE INTERES COMPENSATORIO"
+  />
+  <!--<aura:attribute name="ncuotasfinanciar" type="Integer" default="60" description="NUMERO DE CUOTAS A FINANCIAR"/>-->
+  <aura:attribute
+    name="monotofinan"
+    type="decimal"
+    default="0"
+    description="MONTO A FINANCIAR"
+  />
+  <!--<aura:attribute name="ncuotasinicial" type="decimal" default="0" description="NUMERO DE CUOTA INICIAL"/>-->
+  <aura:attribute
+    name="iniporcentajevalue"
+    type="Integer"
+    default="20"
+    description="INICIAL PORCENTAJE"
+  />
+
+  <!-- Actualizado 21/07/2023 -->
+  <aura:attribute
+    name="iniPorcentajePrimeraCuota"
+    type="Integer"
+    default="0"
+    description="INICIAL PORCENTAJE"
+  />
+  <!-- 21/07/2023 -->
+  <aura:attribute
+    name="inicialvalue"
+    type="decimal"
+    default="0"
+    description="INICIAL"
+  />
+  <!--Datos totales de lotes-->
+  <aura:attribute
+    name="areavalue"
+    type="decimal"
+    default="0"
+    description="AREA TOTAL"
+  />
+  <aura:attribute
+    name="preciototalvalue"
+    type="decimal"
+    default="0"
+    description="PRECIO VENTA TOTAL"
+  />
+  <aura:attribute
+    name="precioTotalDscto"
+    type="decimal"
+    default="0"
+    description="PRECIO VENTA DSCTO TOTAL"
+  />
+  <!-- SELECT TIPO DE VENTA -->
+  <aura:attribute name="optionsTypeOfSale" type="List" />
+  <aura:attribute name="selectedTypeOfSale" type="String" />
+  <aura:attribute name="disabledTypeOfSale" type="boolean" default="false" />
+
+  <!-- FRECUENCIA -->
+  <aura:attribute name="selectedFrecuencia" type="String" />
+  <aura:attribute name="optionsFrecuencia" type="List" />
+  <aura:attribute name="flagDesembolso" type="boolean" default="false" />
+
+  <!-- OPCIONES -->
+  <aura:attribute name="optionsFecha" type="List" />
+  <aura:attribute name="selectedOpcionFecha" type="String" />
+  <aura:attribute name="opcionDesembolso" type="String" />
+  <aura:attribute name="fechaDesembolso" type="String" />
+  <aura:attribute name="disabledOpcion" type="Boolean" default="false" />
+
+  <!-- TASA -->
+  <aura:attribute name="data" type="Map" default="{}"/>
+  <aura:attribute name="tasa" type="String" />
+  <aura:attribute name="codTasa" type="String" />
+  <!-- <aura:attribute name="selectedCodTasa" type="String" />
+  <aura:attribute name="optionsTasa" type="List" />
+  <aura:attribute name="selectedTasa" type="String" />
+  <aura:attribute name="disabledTasa" type="boolean" default="false" /> -->
+
+  <!--DEPRECATED-->
+  <aura:attribute name="lotesJSON" default="" type="string" />
+  <aura:attribute name="lotesListOriginal" default="" type="List" />
+  <aura:attribute name="variableCambio" default="1" type="Decimal" />
+
+  <aura:attribute name="idlote" default="" type="string" />
+  <aura:attribute name="area" default="" type="integer" />
+  <aura:attribute name="preciom2" default="" type="integer" />
+  <aura:attribute name="IdOportunidad" type="string" />
+  <aura:attribute name="Lote" default="" type="string" />
+  <aura:attribute name="Manzana" default="" type="string" />
+  <aura:attribute name="Tipologia" default="" type="string" />
+  <aura:attribute name="Estado" default="" type="string" />
+  <aura:attribute name="isModalOpen" type="boolean" default="false" />
+<!--Prueba Elvis-->
+<!-- <aura:attribute name="isLoading" type="boolean" default="false"/> -->
+<!--Prueba Elvis-->
+  <aura:attribute name="DocCargado" default="false" type="Boolean" />
+  <aura:attribute name="BodyDocEmbed" default="" type="String" />
+  <aura:attribute
+    name="record"
+    type="Object"
+    description="The record object to be displayed"
+  />
+  <aura:attribute
+    name="simpleRecord"
+    type="Object"
+    description="A simplified view record object to be displayed"
+  />
+  <aura:attribute
+    name="recordError"
+    type="String"
+    description="An error message bound to force:recordData"
+  />
+  <aura:attribute
+    name="searchResult"
+    type="List"
+    description="use for store and display account list return from server"
+  />
+
+  <aura:attribute name="preciom2value" type="decimal" default="0" />
+  <aura:attribute name="tipocotizador" type="string" default="visorlote" />
+
+  <aura:attribute name="idProyecto" type="String" default="" />
+  <aura:attribute name="jsonProyectoAura" type="String" />
+
+  <!--************************** 19/04/2021 ***********************-->
+  <aura:attribute name="fecCuotaSaldoIni" type="String" />
+  <aura:attribute name="fecCuotaSaldoFin" type="String" />
+  <aura:attribute name="isFacilote" type="boolean" default="false" />
+  <aura:attribute name="nCuoInit" type="Integer" default="10" />
+  <aura:attribute name="numCuotasSI" type="Integer" default="0" />
+  <aura:attribute name="numCuotas" type="Integer" default="60" />
+  <aura:attribute
+    name="options"
+    type="List"
+    default="[
+                                                                     {'label': 'Con cuota facilote', 'value': 'cFacilote'},
+                                                                     {'label': 'Sin cuota facilote', 'value': 'sFacilote'},
+                                                                     ]"
+  />
+  <aura:attribute name="montoCuota" type="Decimal" default="0" />
+  <aura:attribute name="montoDeCuotas" type="Decimal" default="0" />
+  <aura:attribute name="porcentajeMontoCuota" type="Decimal" default="0" />
+  <aura:attribute name="montoCuotaAux" type="Decimal" default="0" />
+  <aura:attribute name="opcionFacilote" type="String" default="sFacilote" />
+  <!-- <aura:attribute name="montoCuotaPrimera" type="Integer" default=""/> -->
+  <aura:attribute name="nCuoFacilList" type="List" default="" />
+  <aura:attribute name="stringnCuoFacilList" type="String" default="" />
+
+  <aura:attribute name="cuotaIni" type="Decimal" default="" />
+
+  <!--<aura:attribute name="change" value="" action=""/>-->
+
+  <aura:attribute name="jsonPalancas" type="String" default="" />
+  <aura:attribute name="totalDiscount" type="String" default="0" />
+  <aura:attribute name="totalPercentage" type="String" default="0" />
+  <aura:attribute name="totalPercentage2" type="String" default="0" />
+  <aura:attribute name="filesUploaded" type="List" default="" />
+  <aura:attribute name="hasPermission" type="Boolean" default="false" />
+  <aura:attribute
+    name="hasPermissionAdditional"
+    type="Boolean"
+    default="false"
+  />
+
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+  <!--HANDLERS-->
+  <aura:handler
+    name="change"
+    value="{!v.pageCotizador}"
+    action="{!c.onChangeLotesList}"
+  />
+
+  <aura:handler
+    name="change"
+    value="{!v.flagGenerarCotizacion}"
+    action="{!c.Save}"
+  />
+
+  <aura:handler
+    name="change"
+    value="{!v.flagCalcularCotizacion}"
+    action="{!c.Save}"
+  />
+
+  <aura:handler
+    name="change"
+    value="{!v.IdOportunidad}"
+    action="{!c.onChangeDatosOportunidad}"
+  />
+
+  <!-- DESCUENTOS -->
+  <aura:attribute name="listDiscount" default="" type="Object" />
+  <aura:attribute name="listPalanca" default="" type="Object" />
+  <aura:attribute name="listMessage" default="" type="Object" />
+
+  <!-- ESTE HANDLER CARGARA LOS METADATOS DE TASA INTERES SEGUN EL PROYECTO-->
+  <aura:handler
+    name="change"
+    value="{!v.proyecto}"
+    action="{!c.onChangeProyecto}"
+  />
+
+  <!-- <aura:handler Felipe
+    name="change"
+    value="{!v.monotofinan}"
+    action="{!c.llenarCuotasFinanciamiento}"
+  /> -->
+
+  <div
+    class="slds-grid slds-grid_vertical"
+    style="height: 100%; width: 100%; overflow: auto"
+  >
+    <div class="slds-col slds-size_1_of_1">
+      <div
+        class="slds-page-header slds-m-bottom_xx-small"
+        style="color: #ffffff; background-color: #1b5297"
+      >
+        <div class="slds-page-header__title slds-text-heading_small">
+          Datos de la persona
+        </div>
+      </div>
+      <div class="slds-grid slds-wrap slds-p-around_xx-small">
+        <div
+          class="slds-col slds-size_1-of-1 slds-grid slds-p-horizontal_x-small"
+        >
+          <div class="slds-col slds-glutters slds-size_1-of-2 slds-grid">
+            <div
+              class="slds-col slds-size_6-of-12 slds-p-horizontal_x-small slds-p-vertical_xxx-small"
+              style="align-self: center"
+            >
+              Nombres
+            </div>
+            <div
+              class="slds-col slds-size_6-of-12 slds-p-horizontal_x-small slds-p-vertical_xxx-small"
+              style="align-self: center"
+            >
+              <ui:inputText
+                class="slds-input slds-text-align_left"
+                aura:id="inPersonaNombres"
+                value="{!v.inpDatosPersona.nombres}"
+              />
+            </div>
+          </div>
+          <div class="slds-col slds-glutters slds-size_1-of-2 slds-grid">
+            <div
+              class="slds-col slds-size_6-of-12 slds-p-horizontal_x-small slds-p-vertical_xxx-small"
+              style="align-self: center"
+            >
+              Apellidos
+            </div>
+            <div
+              class="slds-col slds-size_6-of-12 slds-p-horizontal_x-small slds-p-vertical_xxx-small"
+              style="align-self: center"
+            >
+              <ui:inputText
+                class="slds-input slds-text-align_left"
+                aura:id="inPersonaApellidos"
+                value="{!v.inpDatosPersona.apellidos}"
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          class="slds-col slds-size_1-of-1 slds-grid slds-p-horizontal_x-small"
+        >
+          <div class="slds-col slds-glutters slds-size_1-of-2 slds-grid">
+            <div
+              class="slds-col slds-size_6-of-12 slds-p-horizontal_x-small slds-p-vertical_xxx-small"
+              style="align-self: center"
+            >
+              Tipo de Documento
+            </div>
+            <div
+              class="slds-col slds-size_6-of-12 slds-p-horizontal_x-small slds-p-vertical_xxx-small"
+              style="align-self: center"
+            >
+              <ui:inputSelect
+                aura:id="search_tipoDocumento"
+                value="{!v.inpDatosPersona.tipoDocumento}"
+              >
+                <aura:iteration items="{!v.optionsTipoDocumento}" var="option">
+                  <ui:inputSelectOption
+                    text="{!option.value}"
+                    label="{!option.label}"
+                    value="{!option.selected}"
+                  />
+                </aura:iteration>
+              </ui:inputSelect>
+            </div>
+          </div>
+          <div class="slds-col slds-glutters slds-size_1-of-2 slds-grid">
+            <div
+              class="slds-col slds-size_6-of-12 slds-p-horizontal_x-small slds-p-vertical_xxx-small"
+              style="align-self: center"
+            >
+              Nro de Documento
+            </div>
+            <div
+              class="slds-col slds-size_6-of-12 slds-p-horizontal_x-small slds-p-vertical_xxx-small"
+              style="align-self: center"
+            >
+              <ui:inputText
+                class="slds-input slds-text-align_left"
+                aura:id="inPersonaNroDocumento"
+                value="{!v.inpDatosPersona.nroDocumento}"
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          class="slds-col slds-size_1-of-1 slds-grid slds-p-horizontal_x-small"
+        >
+          <div class="slds-col slds-glutters slds-size_1-of-2 slds-grid">
+            <div
+              class="slds-col slds-size_6-of-12 slds-p-horizontal_x-small slds-p-vertical_xxx-small"
+              style="align-self: center"
+            >
+              Celular
+            </div>
+            <div
+              class="slds-col slds-size_6-of-12 slds-p-horizontal_x-small slds-p-vertical_xxx-small"
+              style="align-self: center"
+            >
+              <ui:inputText
+                class="slds-input slds-text-align_left"
+                aura:id="inPersonaCelular"
+                value="{!v.inpDatosPersona.celular}"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slds-col slds-size_1_of_1">
+      <div
+        class="slds-page-header slds-m-bottom_xx-small"
+        style="color: #ffffff; background-color: #1b5297"
+      >
+        <div class="slds-page-header__title slds-text-heading_small">
+          Lote(s)
+        </div>
+      </div>
+      <table
+        class="slds-table slds-table_bordered slds-table_cell-buffer slds-p-vertical_xxx-small"
+      >
+        <thead>
+          <tr class="">
+            <th scope="col">
+              <div class="slds-truncate slds-text-align_center">&nbsp;</div>
+            </th>
+            <th scope="col">
+              <div class="slds-truncate slds-text-align_center">Manzana</div>
+            </th>
+            <th scope="col">
+              <div class="slds-truncate slds-text-align_center">Lote</div>
+            </th>
+            <th scope="col">
+              <div class="slds-truncate slds-text-align_center">Tipologia</div>
+            </th>
+            <th scope="col">
+              <div class="slds-truncate slds-text-align_center">Área m2</div>
+            </th>
+            <th scope="col">
+              <div class="slds-truncate slds-text-align_center">
+                Precio de venta
+              </div>
+            </th>
+            <!-- Se comento la cabezera de la tabla Precio con descuento % Descuento 21/07/23 -->
+            <!-- <th scope="col">
+                            <div class="slds-truncate slds-text-align_center">
+                                Precio con descuento
+                            </div>
+                        </th>
+                        <aura:if isTrue="{!v.hasPermission}">
+                        <th scope="col">
+                            <div class="slds-truncate slds-text-align_center">
+                                % Descuento
+                            </div>
+                        </th>
+                        </aura:if> -->
+          </tr>
+        </thead>
+        <tbody>
+          <aura:iteration items="{!v.lotesList}" var="obj">
+            <tr>
+              <td scope="col">
+                <div class="slds-truncate slds-text-align_center">
+                  <ui:outputText value="{!obj.Orden}" />
+                </div>
+              </td>
+              <td scope="col">
+                <div class="slds-truncate slds-text-align_center">
+                  <ui:outputText value="{!obj.Manzana}" />
+                </div>
+              </td>
+              <td scope="col">
+                <div class="slds-truncate slds-text-align_center">
+                  <ui:outputText value="{!obj.Descripcioncorta}" />
+                </div>
+              </td>
+              <td scope="col">
+                <div class="slds-truncate slds-text-align_center">
+                  <ui:outputText value="{!obj.FillerStr02}" />
+                </div>
+              </td>
+              <td scope="col">
+                <div class="slds-truncate" style="text-align: end">
+                  <ui:inputNumber
+                    disabled="true"
+                    format="#,###,###,##0.00"
+                    aura:id="areacmp"
+                    class="slds-input slds-text-align_center"
+                    value="{!obj.Area}"
+                  />
+                </div>
+              </td>
+              <td scope="col">
+                <div class="slds-truncate" style="text-align: end">
+                  <ui:inputNumber
+                    disabled="true"
+                    format="#,###,###,##0.00"
+                    aura:id="precioTotalcmp"
+                    class="slds-input slds-text-align_center"
+                    value="{!obj.Precioventafun}"
+                  />
+                </div>
+              </td>
+              <!-- Se comento el cuerpo de la tabla, Precio con descuento % Descuento 21/07/23 -->
+              <!-- <td scope="col">
+                                <div class="slds-truncate" style="text-align: end">
+                                    <ui:inputNumber
+                                                    disabled="{!v.hasPermission}"
+                                                    format="#,###,###,##0.00"
+                                                    aura:id="precioTotalDsctcmp"
+                                                    class="slds-input slds-text-align_center"
+                                                    value="{!obj.PrecioVentaDscto}"
+                                                    change="{!c.updatePreciosLote}"
+                                                    />
+                                </div>
+                            </td>
+                            <aura:if isTrue="{!v.hasPermission}">
+                            <td scope="col">
+                                <div class="slds-truncate" style="text-align: end">
+                                    <ui:inputNumber
+                                                    disabled="true"
+                                                    format="#,###,###,##0.00"
+                                                    aura:id="dsctcmp"
+                                                    class="slds-input slds-text-align_center"
+                                                    value="{!obj.Discount}"
+                                                    />
+                                </div>
+                            </td>
+                            </aura:if> -->
+            </tr>
+          </aura:iteration>
+
+          <tr>
+            <th scope="col" colspan="4">
+              <div class="slds-truncate slds-text-align_center">
+                <b>TOTAL</b>
+              </div>
+            </th>
+            <th scope="col">
+              <div class="slds-truncate" style="text-align: end">
+                <ui:inputNumber
+                  disabled="true"
+                  format="#,###,###,##0.00"
+                  aura:id="vtAreaTotal"
+                  class="slds-input slds-text-align_center"
+                  value="{!v.areavalue}"
+                />
+              </div>
+            </th>
+            <th scope="col">
+              <div class="slds-truncate" style="text-align: end">
+                <ui:inputNumber
+                  disabled="true"
+                  format="#,###,###,##0.00"
+                  aura:id="vtPrecioTotal"
+                  class="slds-input slds-text-align_center"
+                  value="{!v.preciototalvalue}"
+                />
+              </div>
+            </th>
+            <!-- Se comento el total, Precio con descuento % Descuento 21/07/23 -->
+            <!-- <th scope="col">
+                            <div class="slds-truncate" style="text-align: end">
+                                <ui:inputNumber
+                                                format="#,###,###,##0.00"
+                                                aura:id="vtPrecioTotalDscto"
+                                                class="slds-input slds-text-align_center"
+                                                value="{!v.precioTotalDscto}"
+                                                change="{!c.updatePreciosLote}"
+                                                disabled="true"
+                                                />
+                            </div>
+                        </th>
+                        <aura:if isTrue="{!v.hasPermission}">
+                        <th scope="col">
+                            <div class="slds-truncate" style="text-align: end">
+                                <ui:inputNumber
+                                                format="#,###,###,##0.00"
+                                                aura:id="vtTotalDiscount"
+                                                class="slds-input slds-text-align_center"
+                                                value="{!v.totalPercentage}"
+                                                disabled="true"
+                                                />
+                            </div>
+                        </th>
+                        </aura:if> -->
+          </tr>
+          
+          <aura:if isTrue="{!v.totalDiscount > 0}">
+            <tr>
+              <th scope="col" colspan="4">
+                <div class="slds-truncate slds-text-align_center">
+                  <b></b>
+                </div>
+              </th>
+              <aura:if isTrue="{!v.hasPermission}">
+                <th scope="col">
+                  <div class="slds-truncate" style="text-align: end">
+                    <ui:inputNumber
+                      format="#,###,###,##0.00%"
+                      aura:id="vtTotalDiscount"
+                      class="slds-input slds-text-align_center"
+                      value="{!v.totalPercentage/100}" 
+                      disabled="true"
+                    />
+                  </div>
+                </th>
+              </aura:if>
+              <th scope="col">
+                <div class="slds-truncate" style="text-align: end">
+                  <ui:inputNumber
+                    format="#,###,###,##0.00"
+                    aura:id="vtPrecioTotalDscto"
+                    class="slds-input slds-text-align_center"
+                    value="{!v.precioTotalDscto}"
+                    change="{!c.updatePreciosLote}"
+                    disabled="true"
+                  />
+                </div>
+              </th>
+            </tr>
+          </aura:if>
+          <!--
+                    -->
+        </tbody>
+      </table>
+    </div>
+    <div class="slds-col slds-size_1_of_1">
+      <div
+        class="slds-page-header slds-m-bottom_xx-small"
+        style="color: #ffffff; background-color: #1b5297"
+      >
+        <div class="slds-page-header__title slds-text-heading_small">
+          Pago Inicial
+        </div>
+      </div>
+      <table
+        class="slds-table slds-table_bordered slds-table_cell-buffer slds-m-bottom_small"
+        style="border: 0"
+      >
+        <tr>
+          <th style="width: 50%">
+            <ui:outputText class="slds-output" value="Tipo de Venta" />
+          </th>
+          <th style="width: 5%">&nbsp;</th>
+          <td style="width: 45%">
+            <lightning:select
+              aura:id="slcTypeOfSale"
+              name="slc_TypeOfSale"
+              title="Seleccione tipo de venta"
+              value="{!v.selectedTypeOfSale}"
+              onchange="{!c.onChangeTypeOfSale}"
+              disabled="{!v.disabledTypeOfSale}"
+            >
+              <aura:iteration items="{!v.optionsTypeOfSale}" var="option">
+                <option
+                  text="{!option.label}"
+                  value="{!option.value}"
+                  selected="{!option.selected}"
+                />
+              </aura:iteration>
+            </lightning:select>
+          </td>
+        </tr>
+        <tr>
+          <th style="width: 50%">
+            <ui:outputText class="slds-output" value="Inicial" />
+          </th>
+          <th style="width: 5%">
+            <b><ui:outputText value="{!v.moneda}" /></b>
+          </th>
+          <td style="width: 45%">
+            <ui:inputNumber
+              disabled="false"
+              format="#,###,###,##0.00"
+              aura:id="inicial"
+              class="slds-input slds-text-align_right"
+              value="{!v.inicialvalue}"
+              change="{!c.inputInicial}"
+            />
+          </td>
+        </tr>
+        <tr>
+          <th style="width: 50%">
+            <ui:outputText class="slds-output" value="Inicial porcentaje" />
+          </th>
+          <th style="width: 5%">
+            <b>%</b>
+          </th>
+          <td style="width: 45%">
+            <ui:inputNumber
+              aura:id="inicialporcentaje"
+              format="#,###,###,##0.00"
+              class="slds-input slds-text-align_right"
+              value="{!v.iniporcentajevalue}"
+              change="{!c.inputPorcentaje}"
+            />
+          </td>
+        </tr>
+
+        <tr>
+          <aura:if isTrue="{!v.flagCuotaFacilote}">
+          <th style="width: 50%">
+            <ui:outputText class="slds-output" value="Cuota facilote" />
+          </th>
+
+          <th style="width: 5%">
+            <b style="color: #fff">&nbsp;</b>
+          </th>
+
+          <td style="width: 45%">
+            <lightning:combobox
+              aura:id="cbFacilote"
+              value="sFacilote"
+              options="{!v.options}"
+              onchange="{!c.cambiaFacilote}"
+            />
+          </td>
+          </aura:if>
+        </tr>
+
+        <tr>
+          <th style="width: 50%">
+            <ui:outputText
+              class="slds-output"
+              value="Número de cuotas (Inicial)"
+            />
+          </th>
+
+          <th style="width: 5%">
+            <b style="color: #fff">&nbsp;</b>
+          </th>
+
+          <td style="width: 45%">
+            <ui:inputNumber
+              aura:id="ncuotasinicial"
+              format="#,###,###,##0"
+              class="slds-input slds-text-align_right"
+              value="{!v.nCuoInit}"
+              change="{!c.inputCuotas}"
+            />
+          </td>
+        </tr>
+
+        <tr>
+          <aura:if isTrue="{!v.flagDesembolso}">
+          <th style="width: 50%">
+            <ui:outputText
+              class="slds-output"
+              value="Frecuencia"
+            />
+          </th>
+
+          <th style="width: 5%">
+            <b style="color: #fff">&nbsp;</b>
+          </th>
+
+          <td style="width: 45%">
+            <lightning:select
+              name="slc_Frecuencia"
+              title="Seleccione frecuencia"
+              variant="label-hidden"
+              value="{!v.selectedFrecuencia}"
+              onchange="{!c.onChangeFrecuencia}"
+              class="label-hidden"
+            >
+            <aura:iteration items="{!v.optionsFrecuencia}" var="option">
+              <option
+                text="{!option.label}"
+                value="{!option.value}"
+                selected="{!option.selected}"
+                class="slds-text-align_right"
+              />
+            </aura:iteration>
+            <!-- <option value="0" class="slds-text-align_right">Selecciona una frecuencia</option>
+            <option value="1" class="slds-text-align_right">Mensual</option>
+            <option value="2" class="slds-text-align_right">Bimensual</option>
+            <option value="3" class="slds-text-align_right">Trimestral</option> -->
+            </lightning:select>
+          </td>
+          </aura:if>
+        </tr>
+
+        <tr>
+          <aura:if isTrue="{!v.flagDesembolso}">
+          <th style="width: 50%">
+            <ui:outputText
+              class="slds-output"
+              value="Opción fecha (desembolso)"
+            />
+          </th>
+
+          <th style="width: 5%">
+            <b style="color: #fff">&nbsp;</b>
+          </th>
+
+          <td style="width: 45%">
+            <lightning:select
+              name="slc_Opcion"
+              title="Seleccione opción"
+              variant="label-hidden"
+              class="label-hidden"
+              value="{!v.selectedOpcionFecha}"
+              onchange="{!c.onChangeOpcionFecha}"
+              disabled="{!v.disabledOpcion}"
+            >
+            <aura:iteration items="{!v.optionsFecha}" var="option">
+              <option
+                text="{!option.label}"
+                value="{!option.value}"
+                selected="{!option.selected}"
+                class="slds-text-align_right"
+              />
+            </aura:iteration>
+            </lightning:select>
+          </td>
+          </aura:if>
+        </tr>
+
+        <tr>
+          <aura:if isTrue="{!v.flagDesembolso}">
+          <th style="width: 50%">
+            <ui:outputText
+              class="slds-output"
+              value="Fecha (desembolso)"
+            />
+          </th>
+
+          <th style="width: 5%">
+            <b style="color: #fff">&nbsp;</b>
+          </th>
+
+          <td style="width: 45%">
+            <ui:inputText
+              aura:id="fechaDesembolso"
+              class="slds-text-align_right"
+              value="{!v.fechaDesembolso}"
+              disabled="true"
+            />
+          </td>
+          </aura:if>
+        </tr>
+
+        <tr>
+          <th style="width: 50%">&nbsp;</th>
+
+          <th style="width: 5%">&nbsp;</th>
+
+          <td style="width: 45%">
+            <ui:inputCheckbox
+              aura:id="checkboxCI"
+              change="{!c.onCheckCI}"
+              label=" Primera Cuota de la Inicial"
+              class="myCheckbox"
+              disabled="{!v.disabledPrimeraCuotaInicial}"
+              value="{!false}"
+            />
+          </td>
+        </tr>
+
+        <!-- Actulizado 21/07/23 -->
+        <tr>
+          <th style="width: 50%">
+            <ui:outputText
+              class="slds-output"
+              value="% Monto de la cuota (Inicial)"
+            />
+          </th>
+
+          <th style="width: 5%">
+            <b>%</b>
+          </th>
+
+          <td style="width: 45%">
+            <ui:inputNumber
+              format="#,###,###,##0.00"
+              aura:id="porcentajeMontoCuota"
+              disabled="true"
+              class="slds-input slds-text-align_right"
+              value="{!v.iniPorcentajePrimeraCuota}"
+              change="{!c.inputPorcentajeCuotaInicial}"
+            />
+          </td>
+        </tr>
+        <!-- 21/07/23 -->
+
+        <tr>
+          <th style="width: 50%">
+            <ui:outputText
+              class="slds-output"
+              value="Monto de la cuota (Inicial)"
+            />
+          </th>
+
+          <th style="width: 5%">
+            <b><ui:outputText value="{!v.moneda}" /></b>
+          </th>
+
+          <td style="width: 45%">
+            <ui:inputNumber
+              format="#,###,###,##0.00"
+              aura:id="montoCuota"
+              disabled="true"
+              class="slds-input slds-text-align_right"
+              value="{!v.montoCuota}"
+              change="{!c.inputMontoCuotas}"
+            />
+            <!-- <ui:inputNumber
+              format="#,###,###,##0.00"
+              aura:id="montoCuota"
+              disabled="true"
+              class="slds-input slds-text-align_right"
+              value="{!v.montoCuota}"
+              change="{!c.inputMontoCuotas}"
+            /> -->
+          </td>
+        </tr>
+
+        <tr>
+          <aura:if isTrue="{!v.seccionMontoCuotas}">
+            <th style="width: 50%">
+              <ui:outputText
+                class="slds-output"
+                value="{!'Monto de la cuotas de 2 - '+v.nCuoInit}"
+              />
+           </th>
+
+            <th style="width: 5%">
+              <b><ui:outputText value="{!v.moneda}" /></b>
+            </th>
+
+            <td style="width: 45%">
+              <ui:inputNumber
+                format="#,###,###,##0.00"
+                aura:id="montoDeCuotas"
+                disabled="true"
+                class="slds-input slds-text-align_right"
+                value="{!v.montoDeCuotas}"
+              />
+              <!-- <ui:inputNumber
+                format="#,###,###,##0.00"
+                aura:id="montoCuota"
+                disabled="true"
+                class="slds-input slds-text-align_right"
+                value="{!v.montoCuota}"
+                change="{!c.inputMontoCuotas}"
+              /> -->
+            </td>
+          </aura:if>
+        </tr>
+
+        <tr>
+          <th style="width: 50%">&nbsp;</th>
+
+          <th style="width: 5%">&nbsp;</th>
+
+          <td style="width: 45%">
+            <ui:inputCheckbox
+              aura:id="checkbox"
+              change="{!c.onCheck}"
+              label=" Activar Adelanto Pago"
+              class="myCheckbox"
+              disabled="{!false}"
+              value="{!false}"
+            />
+          </td>
+        </tr>
+
+        <tr>
+          <th style="width: 50%">
+            <ui:outputText class="slds-output" value="Monto Adelanto de pago" />
+          </th>
+
+          <th style="width: 5%">
+            <b><ui:outputText value="{!v.moneda}" /></b>
+          </th>
+
+          <td style="width: 45%">
+            <ui:inputNumber
+              format="#,###,###,##0.00"
+              aura:id="montoAdelanto"
+              disabled="true"
+              class="slds-input slds-text-align_right"
+              value="0.00"
+              change="{!c.inputMontoAdelanto}"
+            />
+          </td>
+        </tr>
+      </table>
+      <div
+        class="slds-page-header slds-m-bottom_xx-small"
+        style="color: #ffffff; background-color: #1b5297"
+      >
+        <div class="slds-page-header__title slds-text-heading_small">
+          <div class="slds-clearfix">
+            Financiamiento a largo plazo
+            <aura:if isTrue="{!v.proforma==null}">
+              <div class="slds-float_right slds-p-horizontal_small">
+                <lightning:button
+                  variant="Neutral"
+                  label="Simulador Prepago"
+                  title="Simulador Prepago"
+                  disabled="{!v.disabledBtnSimuladorPrepago}"
+                  onclick="{!c.callSimuladorPrepago }"
+                />
+              </div>
+            </aura:if>
+          </div>
+        </div>
+      </div>
+      <table
+        class="slds-table slds-table_bordered slds-table_cell-buffer slds-m-bottom_small"
+        style="border: 0"
+      >
+        <tr>
+          <th style="width: 50%">
+            <ui:outputText class="slds-output" value="Monto a financiar" />
+          </th>
+          <th style="width: 5%">
+            <b><ui:outputText value="{!v.moneda}" /></b>
+          </th>
+          <td style="width: 45%">
+            <ui:inputNumber
+              format="#,###,###,##0.00"
+              aura:id="montofinanciar"
+              disabled="true"
+              class="slds-input slds-text-align_right"
+              value="{!v.monotofinan}"
+            />
+          </td>
+        </tr>
+        <aura:if isTrue="{!v.numCuotasSI==0}">
+          <tr>
+            <th style="width: 50%">
+              <ui:outputText
+                class="slds-output"
+                value="Número de cuotas (Financiamiento)"
+              />
+            </th>
+            <th style="width: 5%">
+              <b style="color: #fff">&nbsp;</b>
+            </th>
+            <td style="width: 45%">
+              <ui:inputNumber
+                aura:id="ncuotasfinanciar"
+                format="#,###,###,##0"
+                class="slds-input slds-text-align_right"
+                value="{!v.numCuotas}"
+                change="{!c.inputCuotasFinanciar}"
+              />
+            </td>
+          </tr>
+        </aura:if>
+        <aura:if isTrue="{!v.numCuotasSI!=0}">
+          <tr>
+            <th style="width: 50%">
+              <ui:outputText
+                class="slds-output"
+                value="Número de cuotas Sin Intereses"
+              />
+            </th>
+            <th style="width: 5%">
+              <b style="color: #fff">&nbsp;</b>
+            </th>
+            <td style="width: 45%">
+              <ui:inputNumber
+                aura:id="nCuotasSI"
+                format="#,###,###,##0"
+                class="slds-input slds-text-align_right"
+                value="{!v.numCuotasSI}"
+                change="{!c.inputCuotasFinanciarSI}"
+              />
+            </td>
+          </tr>
+        </aura:if>
+        <tr>
+          <th style="width: 50%">
+            <ui:outputText
+              class="slds-output"
+              value="Tasa de interés compensatorio"
+            />
+          </th>
+          <th style="width: 5%">
+            <b>%</b>
+          </th>
+          <td style="width: 45%">
+            <!-- <lightning:select
+              aura:id="slcTasa"
+              name="slc_Tasa"
+              title="Seleccione tasa"
+              value="{!v.selectedTasa}"
+              onchange="{!c.onChangeTasa}"
+              disabled="{!v.disabledTasa}"
+              variant="label-hidden"
+            >
+              <aura:iteration items="{!v.optionsTasa}" var="option">
+                <option
+                  text="{!option.label}"
+                  value="{!option.value}"
+                  selected="{!option.selected}"
+                  class="slds-text-align_right"
+                />
+              </aura:iteration>
+            </lightning:select> -->
+            <ui:inputNumber
+              format="#,###,###,##0.00"
+              disabled="true"
+              aura:id="tasainteres"
+              class="slds-input slds-text-align_right"
+              value="{!v.tasainter}"
+            />
+          </td>
+        </tr>
+        <tr>
+          <th style="width: 50%">
+            <ui:outputText
+              class="slds-output"
+              value="Montos de la cuota (Financiamiento)"
+            />
+          </th>
+          <th style="width: 5%">
+            <b><ui:outputText value="{!v.moneda}" /></b>
+          </th>
+          <td style="width: 45%">
+            <ui:inputNumber
+              format="#,###,###,##0.00"
+              aura:id="monotocuotafinan"
+              disabled="true"
+              class="slds-input slds-text-align_right"
+              value="{!v.monotocuotafinan}"
+            />
+          </td>
+        </tr>
+      </table>
+    </div>
+    <!-- Anotaciones -->
+    <!-- <div class="slds-col slds-size_1_of_1">
+      <div
+        class="slds-page-header slds-m-bottom_xx-small"
+        style="color: #ffffff; background-color: #1b5297"
+      >
+        <div class="slds-page-header__title slds-text-heading_small">
+          Anotaciones
+        </div>
+      </div>
+      <table
+        class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered slds-p-vertical_xxx-small"
+        style="width: 100%"
+      >
+        <thead>
+          <tr class="">
+            <th scope="col ">
+              <div class="slds-truncate slds-text-align_center"></div>
+            </th>
+            <th scope="col ">
+              <div class="slds-truncate slds-text-align_center">Fecha</div>
+            </th>
+            <th scope="col ">
+              <div class="slds-truncate slds-text-align_center">
+                Monto de cuota
+              </div>
+            </th>
+            <th scope="col ">
+              <div class="slds-truncate slds-text-align_center">
+                Descripción
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <aura:iteration items="{!v.inpAnotaciones}" var="obj">
+            <tr>
+              <td scope="col slds-text-align_center" style="width: 5%">
+                <div class="slds-truncate" style="text-align: center">
+                  <ui:outputText value="{!obj.key}" />
+                </div>
+              </td>
+              <td scope="col" style="width: 15%">
+                <div class="slds-truncate" style="text-align: center">
+                  <ui:inputDate
+                    aura:id="expdate"
+                    label="Today's Date"
+                    labelClass="slds-hide"
+                    class="field slds-text-align_center"
+                    value="{!obj.fecha}"
+                    displayDatePicker="true"
+                  />
+                </div>
+              </td>
+              <td scope="col" style="width: 20%">
+                <div class="slds-truncate" style="text-align: center">
+                  <ui:inputNumber
+                    format="#,###,###,##0.00"
+                    class="slds-input slds-text-align_center"
+                    value="{!obj.monto}"
+                  />
+                </div>
+              </td>
+              <td scope="col" style="width: 60%">
+                <div class="slds-truncate">
+                  <ui:inputText
+                    class="slds-input slds-text-align_left"
+                    value="{!obj.anotaciones}"
+                  />
+                </div>
+              </td>
+            </tr>
+          </aura:iteration>
+        </tbody>
+      </table>
+    </div> -->
+    <!-- ESCENARIOS DE FINANCIAMIENTO -->
+    <aura:if isTrue="{!v.secEscenarioFin}">
+        <!-- Header -->
+        <div
+            class="slds-page-header slds-m-bottom_xx-small"
+            style="color:#ffffff; background-color:#1b5297"
+        >
+            <div class="slds-page-header__title slds-text-heading_small">
+                Escenarios de financiamiento
+                <div class="slds-float_right slds-text-heading_small">
+                    <lightning:button
+                        variant="Neutral"
+                        label="Calcular Escenarios"
+                        title="Calcular Escenarios"
+                        onclick="{!c.getPeriodos}"
+                        disabled="{!v.disabledPeriodos}"
+                    />
+                </div>
+            </div>
+        </div>
+        <!-- TABLA -->
+        <!-- <aura:if isTrue="{!not(v.isLoading)}"> -->
+            <table
+                class="slds-table slds-table_cell-buffer
+                      slds-table_bordered slds-table_col-bordered
+                      slds-p-vertical_xxx-small"
+                style="width:100%"
+            >
+                <thead>
+                    <tr>
+                        <th scope="col">
+                            <div class="slds-truncate slds-text-align_center">
+                                Cuotas por
+                            </div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate slds-text-align_center">
+                                Montos
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <aura:iteration items="{!v.listaFinanciamiento}" var="elemento">
+                        <tr>
+                            <td style="width:20%">
+                                <div class="slds-truncate slds-text-align_center">
+                                    <ui:inputNumber
+                                        class="slds-input slds-text-align_center myinput"
+                                        format="## Años"
+                                        value="{!elemento.anio}"
+                                        disabled="true"
+                                    />
+                                </div>
+                            </td>
+
+                            <td style="width:20%">
+                                <div class="slds-truncate slds-text-align_center">
+                                    <aura:if isTrue="{!elemento.monto == 0}">
+                                        <span class="slds-text-color_error slds-text-body_small">
+                                            {!elemento.mensajeError}
+                                        </span>
+                                        <aura:set attribute="else">
+                                            <span>S/ </span>
+                                            <lightning:formattedNumber
+                                                value="{!elemento.monto}"
+                                                minimumFractionDigits="2"
+                                                maximumFractionDigits="2"
+                                            />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </td>
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+        <!-- </aura:if> -->
+    </aura:if>
+    <!-- FIN ESCENARIOS DE FINANCIAMIENTO -->
+  </div>
+
+  <c:wcCEN_MessagePopUpWarning
+    aura:id="childLwcCompId"
+  ></c:wcCEN_MessagePopUpWarning>
+
+  <aura:if isTrue="{!v.proforma==null}">
+    <c:lwcSimuladorPrepago
+      aura:id="childSimuladorPrepago"
+      recordId="{!v.IdOportunidad}"
+      IdOportunidad="{!v.IdOportunidad}"
+      fecCuotaSaldoIni="{!v.fecCuotaSaldoIni}"
+      fecCuotaSaldoFin="{!v.fecCuotaSaldoFin}"
+      numCuotas="{!v.numCuotas}"
+      monotocuotafinan="{!v.monotocuotafinan}"
+    />
+  </aura:if>
+
+  <c:lwcGestionDescuento
+    aura:id="childGestionDescuento"
+    recordId="{!v.IdOportunidad}"
+    IdOportunidad="{!v.IdOportunidad}"
+    listDiscount="{!v.listDiscount}"
+    listPalanca="{!v.listPalanca}"
+    listMessage="{!v.listMessage}"
+    hasPermission="{!v.hasPermission}"
+    hasPermissionAdditional="{!v.hasPermissionAdditional}"
+    onvaluechange="{!c.getValueFromLwc}"
+  />
+</aura:component>

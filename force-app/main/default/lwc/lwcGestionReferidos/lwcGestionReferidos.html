@@ -1,0 +1,153 @@
+<template>
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+          <header class="slds-media slds-media_center slds-has-flexi-truncate">
+            <div class="slds-media__figure">
+              <span class="slds-icon_container slds-icon-standard-account" title="account">
+                <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                  <use xlink:href="/_slds/icons/standard-sprite/svg/symbols.svg#case"></use>
+                </svg>
+                <span class="slds-assistive-text">case</span>
+              </span>
+            </div>
+            <div class="slds-media__body">
+              <h2 class="slds-card__header-title">
+                <a href="#" class="slds-card__header-link slds-truncate" title="Accounts">
+                  <span>Información de SAP</span>
+                </a>
+              </h2>
+            </div>
+            <div class="slds-no-flex">
+                <!-- <span class={eligibleClass}>{eligibleText}</span> -->
+                <button class="slds-button slds-button_brand" onclick={updateClick}>Validar Referente</button>
+                <!-- <button class="slds-button slds-button_brand" onclick={dataValidate}>Validate</button> -->
+                <!-- <button class="slds-button slds-button_brand" onclick={beginRefresh}>Refresh</button> -->
+            </div>
+          </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+            <template if:true={nrofinanente}>
+                <template if:true={apto}>
+                <div class="slds-scoped-notification slds-media slds-media_center slds-theme_success slds-m-vertical_small" role="status">
+                    <div class="slds-media__figure">
+                    <span class="slds-icon_container slds-icon-utility-success" title="success">
+                        <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#success"></use>
+                        </svg>
+                        <span class="slds-assistive-text">success</span>
+                    </span>
+                    </div>
+                    <div class="slds-media__body">
+                    <p>{eligibleText}</p>
+                    </div>
+                </div>
+                </template>
+                <template if:false={apto}>
+                <div class="slds-scoped-notification slds-media slds-media_center slds-theme_error slds-m-vertical_small" role="status">
+                    <div class="slds-media__figure">
+                    <span class="slds-icon_container slds-icon-utility-error" title="error">
+                        <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#error"></use>
+                        </svg>
+                        <span class="slds-assistive-text">error</span>
+                    </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <p>{eligibleText}</p>
+                    </div>
+                </div>
+                </template>
+            
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col slds-size_1-of-2">
+                        <div class="slds-form-element slds-form-element_readonly">
+                            <span class="slds-form-element__label">Precio Venta Referente</span>
+                            <div class="slds-form-element__control">
+                                <div class="slds-form-element__static">{preciovtaente}</div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-form-element_readonly">
+                            <span class="slds-form-element__label">Fecha Cierre Venta Referente</span>
+                            <div class="slds-form-element__control">
+                                <div class="slds-form-element__static">{fechacvtaente}</div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-form-element_readonly">
+                            <span class="slds-form-element__label">Fecha Cierre Arras Referente</span>
+                            <div class="slds-form-element__control">
+                                <div class="slds-form-element__static">{fechacarrasente}</div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-form-element_readonly">
+                            <span class="slds-form-element__label">Subzona Referente</span>
+                            <div class="slds-form-element__control">
+                                <div class="slds-form-element__static">{subzonaente}</div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-form-element_readonly">
+                            <span class="slds-form-element__label">Número Financiamiento Referente</span>
+                            <div class="slds-form-element__control">
+                                <div class="slds-form-element__static">{nrofinanente}</div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-form-element_readonly">
+                            <span class="slds-form-element__label">Observación Referente</span>
+                            <div class="slds-form-element__control">
+                                <div class="slds-form-element__static">{obsente}</div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-form-element_readonly">
+                            <span class="slds-form-element__label">Deuda Referente</span>
+                            <div class="slds-form-element__control">
+                                <div class="slds-form-element__static">{deudaente}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <div class="slds-form-element slds-form-element_readonly">
+                            <span class="slds-form-element__label">Precio Venta Referido</span>
+                            <div class="slds-form-element__control">
+                                <div class="slds-form-element__static">{preciovtaido}</div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-form-element_readonly">
+                            <span class="slds-form-element__label">Fecha Cierre Venta Referido</span>
+                            <div class="slds-form-element__control">
+                                <div class="slds-form-element__static">{fechacvtaido}</div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-form-element_readonly">
+                            <span class="slds-form-element__label">Fecha Cierre Arras Referido</span>
+                            <div class="slds-form-element__control">
+                                <div class="slds-form-element__static">{fechacarrasido}</div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-form-element_readonly">
+                            <span class="slds-form-element__label">Subzona Referido</span>
+                            <div class="slds-form-element__control">
+                                <div class="slds-form-element__static">{subzonaido}</div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-form-element_readonly">
+                            <span class="slds-form-element__label">Número Financiamiento Referido</span>
+                            <div class="slds-form-element__control">
+                                <div class="slds-form-element__static">{nrofinanido}</div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-form-element_readonly">
+                            <span class="slds-form-element__label">Observación Referido</span>
+                            <div class="slds-form-element__control">
+                                <div class="slds-form-element__static">{obsido}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+        <template if:true={loaded}>
+            <div class="slds-spinner_container">
+                <lightning-spinner alternative-text="Loading"></lightning-spinner>
+            </div>
+        </template>
+    </article>
+  </template>

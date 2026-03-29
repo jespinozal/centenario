@@ -1,0 +1,5 @@
+.custom-data-table .highlight-last-row {
+    background-color: #f0f8ff; /* Color de fondo para resaltar */
+    font-weight: bold; /* Resaltar texto */
+    border: 2px solid #12f731; /* Opcional: borde */
+}

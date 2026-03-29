@@ -1,0 +1,41 @@
+<template>
+    <div class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-text-heading_small">Adjuntar Archivo</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+        
+        <div class="slds-card__body slds-card__body_inner">
+            <div class="slds-grid slds-gutters slds-wrap">
+                
+                <div class="slds-col slds-size_1-of-1">
+                    <lightning-combobox
+                        name="tipoDocumento"
+                        label="Tipo de documento"
+                        value={selectedTipoDocumento}
+                        placeholder="Seleccione un tipo..."
+                        options={picklistOptions}
+                        onchange={handlePicklistChange}
+                        required>
+                    </lightning-combobox>
+                </div>
+
+                <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+                    <lightning-file-upload
+                        label="Adjuntar Archivo"
+                        name="fileUploader"
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt,.xls,.xlsx,.msg,.eml"
+                        record-id={recordId}
+                        onuploadfinished={handleUploadFinished}
+                        disabled={isUploadDisabled}>
+                    </lightning-file-upload>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

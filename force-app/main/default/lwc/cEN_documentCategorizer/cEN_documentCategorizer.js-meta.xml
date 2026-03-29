@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>59.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <property name="documents" type="@salesforce/schema/CEN_Documento_de_Flujo__c[]" label="Documentos Seleccionados" description="Entrada: Colección de los documentos que el usuario seleccionó." role="inputOnly"/>
+            <property name="categorizedDocuments" type="@salesforce/schema/CEN_Documento_de_Flujo__c[]" label="Documentos Categorizados" description="Salida: Colección de documentos con la categoría asignada." role="outputOnly"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

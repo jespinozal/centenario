@@ -1,0 +1,108 @@
+<!-- 
+Developer: Jose Miguel Espinoza Mestanza
+Email: josemiguel.espinozamestanza@emeal.nttdata.com 
+-->
+<template>
+    <template if:true={picklistLoaded}>
+        <div>
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered cen-fixed">
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th scope="col" class="col-archivo"><div class="slds-truncate">Archivo</div></th>
+                        <th scope="col" class="col-documento"><div class="slds-truncate">Documento</div></th>
+                        <th scope="col" class="col-tipo"><div class="slds-truncate">Tipo Documento</div></th>
+                        <th scope="col" class="col-estado"><div class="slds-truncate">Estado</div></th>
+                        <th scope="col" class="col-archivado"><div class="slds-truncate">Archivado</div></th>
+                        <th scope="col" class="col-migrado"><div class="slds-truncate">Migrado</div></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={adjuntos} for:item="adjunto">
+                        <tr key={adjunto.Id} class={adjunto.rowClass}>
+                            <td data-label="Archivo" class="col-archivo">
+                                <template if:false={adjunto.CEN_Migrado__c}>
+                                    <a class="wrap-overflow"
+                                    href={adjunto.urlRegistro}
+                                    title={adjunto.CEN_NombreArchivo__c}>
+                                    {adjunto.CEN_NombreArchivo__c}
+                                    </a>
+                                </template>
+                                <template if:true={adjunto.CEN_Migrado__c}>
+                                    <span class="wrap-overflow slds-text-color_weak"
+                                        title={adjunto.CEN_NombreArchivo__c}>
+                                        {adjunto.CEN_NombreArchivo__c}
+                                    </span>
+                                </template>
+                            </td>
+                            <td data-label="Documento" class="col-documento">
+                                <lightning-formatted-rich-text
+                                    class="wrap-overflow"
+                                    value={adjunto.CEN_Documento__c}>
+                                </lightning-formatted-rich-text>
+                            </td>
+                            <td data-label="Tipo Documento" class="col-tipo">
+                                <lightning-combobox
+                                    class="wrap-overflow"
+                                    style="width:100%;"
+                                    value={adjunto.CEN_TipoDocumentoCaso__c}
+                                    options={picklistOptions}
+                                    onchange={handleFieldChange}
+                                    data-id={adjunto.Id}
+                                    data-field="CEN_TipoDocumentoCaso__c"
+                                    placeholder={placeholderTipo}
+                                    variant="label-hidden"
+                                    disabled={adjunto._disabled}>
+                                </lightning-combobox>
+                            </td>
+                            <td data-label="Estado" class="col-estado">
+                                <lightning-combobox
+                                    class="wrap-overflow"
+                                    style="width:100%;"
+                                    value={adjunto.CEN_EstadoDocumento__c}
+                                    options={picklistOptionsEstado}
+                                    onchange={handleFieldChange}
+                                    data-id={adjunto.Id}
+                                    data-field="CEN_EstadoDocumento__c"
+                                    placeholder="Seleccione estado…"
+                                    variant="label-hidden"
+                                    disabled={adjunto._disabled}>
+                                </lightning-combobox>
+                            </td>
+                            <td data-label="Archivado" class="col-archivado">
+                                <lightning-input 
+                                    type="checkbox" 
+                                    checked={adjunto.CEN_Archivado__c}
+                                    onchange={handleFieldChange}
+                                    data-id={adjunto.Id}
+                                    data-field="CEN_Archivado__c"
+                                    variant="label-hidden"
+                                    disabled={adjunto._disabled}>
+                                </lightning-input>
+                            </td>
+                            <td data-label="Migrado" class="col-migrado">
+                                <lightning-input 
+                                    type="checkbox" 
+                                    checked={adjunto.CEN_Migrado__c}
+                                    onchange={handleFieldChange}
+                                    data-id={adjunto.Id}
+                                    data-field="CEN_Migrado__c"
+                                    variant="label-hidden"
+                                    disabled={adjunto._disabled}>
+                                </lightning-input>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+            <template if:true={hasChanges}>
+                <div class="slds-m-top_medium slds-text-align_center">
+                    <lightning-button variant="brand" label="Guardar" onclick={guardar}></lightning-button>
+                    <lightning-button variant="neutral" label="Cancelar" onclick={cancelar} class="slds-m-right_small"></lightning-button>
+                </div>
+            </template>
+        </div>
+    </template>
+    <template if:false={picklistLoaded}>
+        <lightning-spinner alternative-text="Cargando…"></lightning-spinner>
+    </template>
+</template>

@@ -1,0 +1,26 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens,lightning:availableForFlowScreens" access="global" controller="CEN_SMS" >
+  
+    <aura:attribute name="resultado" type="string" default="false"/>
+    <aura:attribute name="mensaje" type="string" default="false"/>
+    <aura:attribute name="recordId2" type="string" default="false"/>
+    <lightning:flow aura:id="flujito"/>
+
+
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }" />
+    
+    <force:recordData aura:id="record"
+    		layoutType="FULL"
+    		recordId="{!v.recordId}"
+    		targetError="{!v.recordError}"
+    		targetRecord="{!v.record}"
+    		targetFields ="{!v.simpleRecord}"
+        mode="VIEW"/>
+    
+    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1"> 	
+    	<tr ><h2>{!v.mensaje}</h2></tr>
+        <br/>
+        <tr >Estado del SMS: {!v.resultado}</tr>
+    </div>
+    
+	
+</aura:component>

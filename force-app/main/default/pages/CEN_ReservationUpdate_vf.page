@@ -1,0 +1,227 @@
+<!--
+/********************************************************************* 
+* @author: @everis.com 
+* @date: 2021-06-26
+* @description: Visualforce para la generación de PDF del informe
+*               de solicitud de modificación de reserva.
+* ClassController: CEN_ReservationUpdate_ctr
+* 
+* VERSION      DATE                 AUTOR                   ACTION 
+* 0.1          2021-06-26           @everis.com             Creación 
+*  
+*********************************************************************/
+-->
+<apex:page applyHtmlTag="false" applyBodyTag="false" showHeader="false" renderAs="pdf" standardController="Opportunity" extensions="CEN_ReservationUpdate_ctr"
+  title="PDF Cons">
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <style type="text/css">
+      @page {
+        size: A4 portrait;
+        margin: 100px 100px 100px 100px;
+      }
+
+      body {
+        font-size: 12px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+      }
+
+      footer {
+        font-size: 12px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+      }
+
+      .tableReservation {
+        width: 100%;
+        border: 1px solid #000000;
+        border-collapse: collapse;
+        margin: auto;
+        font-size: 10px;
+      }
+
+      .tableReservation th {
+        border: 1px solid #000000;
+        color: rgb(255, 255, 255);
+        background-color: rgb(0, 0, 0);
+        text-align: center;
+        padding-top: 5px;
+      }
+
+      .tableReservation td {
+        border: 1px solid #000000;
+        color: rgb(0, 0, 0);
+        width: 50%;
+        padding-top: 10px;
+      }
+
+      .tablePayment {
+        width: 50%;
+        border: 1px solid #000000;
+        border-collapse: collapse;
+        text-align: center;
+        margin: auto;
+        font-size: 10px;
+      }
+
+      .tablePayment th {
+        border: 1px solid #000000;
+        color: rgb(255, 255, 255);
+        background-color: rgb(0, 0, 0);
+      }
+
+      .tablePayment td {
+        border: 1px solid #000000;
+        color: rgb(0, 0, 0);
+        width: 50%
+      }
+    </style>
+  </head>
+
+  <body>
+    <p style="text-align: center;">
+      <strong>SOLICITUD DE MODIFICACIÓN DE RESERVA</strong>
+    </p>
+    <br/>
+    <p>Conste por el presente documento la solicitud de modificación de reserva realizada por EL CLIENTE, en los términos y
+      condiciones detallados a continuación:</p>
+    <br/>
+    <p>
+      <strong>ANTECEDENTES:</strong>&nbsp;En el siguiente cuadro resumen se definen los términos y conceptos que han de utilizarse
+      en el presente documento:</p>
+    <br/>
+    <table class="tableReservation">
+      <thead>
+        <tr>
+          <th>
+            <div style="text-align: center;">TERMINOS</div>
+          </th>
+          <th style="">
+            <div style="text-align: center;">CONCEPTOS</div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>CLIENTE</td>
+          <td>{!cliente.Name}</td>
+        </tr>
+        <tr>
+          <td>DOCUMENTO DE IDENTIDAD</td>
+          <td>{!nroDocument}</td>
+        </tr>
+        <tr>
+          <td>CENTENARIO</td>
+          <td>{!societyName}</td>
+        </tr>
+        <tr>
+          <td>LOTE</td>
+          <td>
+            <apex:repeat value="{!LotesCotizados}" var="lote" id="tableLotesCotizados">
+              MANZANA:&nbsp;
+              <apex:outputText value="{!lote.CEN_manzana_del_lote__c}" />&nbsp;LOTE:&nbsp;
+              <apex:outputText value="{!lote.CEN_lote__c}" />
+              <br/>
+            </apex:repeat>
+          </td>
+        </tr>
+        <tr>
+          <td>COTIZACIÓN</td>
+          <td>
+            <apex:outputText value="{!Cotizacion.QuoteNumber}"></apex:outputText>
+          </td>
+        </tr>
+        <tr>
+          <td>FECHA DE COTIZACIÓN </td>
+          <td>
+            <apex:outputText value="{0,date,dd'/'MM'/'yyyy}">
+              <apex:param value="{!Cotizacion.CreatedDate}" /></apex:outputText>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <br/>
+    <p>Mediante la presente, el CLIENTE solicita la modificación de las condiciones detalladas en la COTIZACIÓN, para lo cual
+      acepta el levantamiento de la reserva del LOTE.</p>
+    <p>Asimismo, el CLIENTE declara que solicitará una nueva cotización y reserva a CENTENARIO, cuyos términos y condiciones
+      constarán en el documento que la sustente.</p>
+    <p>En ese sentido, autoriza a CENTENARIO a que traslade los abonos detallados en el
+      <strong>CUADRO 1</strong>, a fin de que sean utilizados como parte del MONTO A PAGAR PARA LA FIRMA DEL CONTRATO que constará
+      en la nueva cotización. </p>
+    <!--CONTENIDO TEXTO CONFIGURABLE-->
+    <strong>CUADRO 1</strong>
+    <br/>
+    <br/>
+    <table class="tablePayment">
+      <thead>
+        <tr>
+          <th>
+            <div style="text-align: center;">FECHA</div>
+          </th>
+          <th style="">
+            <div style="text-align: center;">MONTO</div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <apex:repeat value="{!lstPaymentOrder}" var="pay" id="tablePaymentOrder">
+          <tr style="display: {!If(lstPaymentOrder.size > 0 ,'visibility:visible !important;','visibility:hidden !important;')}">
+            <td>
+              <div style="text-align: center;">
+                <apex:outputText value="{0,date,dd'/'MM'/'yyyy}">
+                  <apex:param value="{!pay.CEN_PaymentDate__c}" />
+                </apex:outputText>
+              </div>
+            </td>
+            <td>
+              <div style="text-align: center;">
+                <apex:outputText value="{!oportunidads.CEN_Moneda__c}" />
+                <apex:outputText value="{!pay.CEN_Amount__c}" />
+              </div>
+            </td>
+          </tr>
+        </apex:repeat>
+        <tr style="display: {!If(lstPaymentOrder.size <= 0 ,'visibility:visible !important;','visibility:hidden !important;')}">
+          <td>
+            <div style="text-align: center;">-</div>
+          </td>
+          <td>
+            <div style="text-align: center;">-</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      <br/>
+    </p>
+    <table class="tablePayment">
+      <tbody>
+        <tr>
+          <td>
+            <div style="text-align: center; background-color: rgb(255, 255, 0);">
+              <strong>TOTAL PAGADO</strong>
+            </div>
+          </td>
+          <td>
+            <div style="text-align: center;">
+              <apex:outputText value="{!oportunidads.CEN_Moneda__c}" />
+              <apex:outputText value="{!totalAmount}" />
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <br/>
+    <br/>
+    <br/>
+  </body>
+  <footer>
+    <p>
+      <apex:outputText value="{!writeToday}" />
+    </p>
+    <br/>
+    <p style="text-align: center; text-transform: uppercase;">
+      <strong>{!cliente.Name}</strong>
+    </p>
+  </footer>
+</apex:page>

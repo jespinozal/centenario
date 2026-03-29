@@ -1,0 +1,26 @@
+<design:component >
+	 <design:attribute name="contact_image_url"
+           label="Contact Image URL Override" 
+           datasource="Blank.png,Male1.png,Male2.png,Male3.png,Female1.png,Female2.png,ChatterUser"
+           default="ChatterUser"
+           description="By default the component will use Picture_URL__c from contact. You can override by selecting from available images, set back to none to use contact picture url"
+      /> 
+    <design:attribute name="image_size" label="Image size" datasource="50px,75px,100px,150px,200px,300px" default="100px" description="Select Image Size, default 100px"/>
+    <design:attribute name="Icon_Template" label="Template Address Icon" datasource="B2C,B2B" default="B2B" description="Choose between the template icon"/>
+    <design:attribute name="Phone_To_Display" label="Phone to Display" datasource="Phone,Mobile" default="Phone" description="Select the phone number to display"/>
+    <design:attribute name="Display_Activity_Indicator" label="Display Activity Indicator" datasource="Yes,No" default="Yes" description="Choose to display Activity Indicator"/>
+    <design:attribute name="Display_CSAT" label="Display CSAT" datasource="Yes,No" default="Yes" description="Choose to display CSAT score"/>
+    <design:attribute name="Display_NPS" label="Display NPS" datasource="Yes,No" default="Yes" description="Choose to display NPS score"/>
+    <design:attribute name="Display_Case_Origin" label="Display Case Origin" datasource="Yes,No" default="Yes" description="Choose to display Case Origin Indicator"/>
+    <design:attribute name="GaugeLineWidth" label="Gauge Line Thickness" default="0.20" description="The line thickness of the gauge (between 0 and 1, default 0.20)"/>
+    <design:attribute name="SilvercCard" label="Silver Loyalty Card image" default="https://image.ibb.co/kVDAGn/ohana_Silver.png" description="Type the image source url for the Loyalty Silver Card image to overwrite default"/>
+    <design:attribute name="GoldCard" label="Gold Loyalty Card image" default="https://image.ibb.co/nrTjSH/ohana_Gold.png" description="Type the image source url for the Loyalty Gold card image to overwrite default"/>
+    <design:attribute name="PlatinumCard" label="Platinum Loyalty Card image" default="https://image.ibb.co/dMRtMc/ohana_Platinum.png" description="Type the image source url for the Loyalty Platinum Card image to overwrite default"/>
+    <design:attribute name="Padding" label="Padding/Spacing around the component" default="x-small" datasource="none,xxx-small,xx-small,x-small,small,medium,large,x-large,xx-large" description="Choose the Padding/Spacing around the component"/>
+    
+    <sfdc:objects >
+        <sfdc:object >Case</sfdc:object>
+        <sfdc:object >Contact</sfdc:object>
+        <sfdc:object >Account</sfdc:object>
+    </sfdc:objects>
+</design:component>

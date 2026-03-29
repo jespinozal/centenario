@@ -1,0 +1,60 @@
+<!--
+  @Component Name     : CEN_AlertaProspecto.cmp
+  @Description        : 
+  @Author             : Hernan Lurita
+  @Group              : 
+  @Last Modified By   : Hernan Lurita
+  @Last Modified On   : 05/12/2019
+  @Modification Log   : 
+  ==============================================================================
+  Ver         Date                     Author      		      Modification
+  ==============================================================================
+  1.0    5/12/2019 10:43:02         Hernan Lurita           Initial Version
+-->
+
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="CEN_Prospectoempresa" >
+  
+    <!-- Account and Lead-->
+    <aura:attribute name="searchResult" type="List" description="use for store and display account list return from server"/>
+    <aura:attribute name="record" type="Object" description="The record object to be displayed"/>
+    <aura:attribute name="simpleRecord" type="Object" description="A simplified view record object to be displayed"/>
+    <aura:attribute name="recordError" type="String" description="An error message bound to force:recordData"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="idlead" type="String" />
+
+    <!--Recibe valore de la validacion-->
+    <force:recordData aura:id="record"
+    		layoutType="FULL"
+    		recordId="{!v.recordId}"
+    		targetError="{!v.recordError}"
+    		targetRecord="{!v.record}"
+    		targetFields ="{!v.simpleRecord}"
+        mode="VIEW"/>
+    
+    	<div align="center" >
+    		<lightning:layoutItem size="9" padding="around-small">
+                        <lightning:input name="rsocial"
+                                         required="true"
+                                         placeholder="Ingresar la Razón Social ..."
+                                         aura:id="rsocial"
+                                         label="Razón Social"/>
+            </lightning:layoutItem>
+    		<lightning:layoutItem size="9" padding="around-small">
+                        <lightning:input name="ruc"
+                                         required="true"
+                                         placeholder="Ingresar el RUC ..."
+                                         aura:id="ruc"
+                                         label="RUC"/>
+            </lightning:layoutItem>
+            
+            <lightning:layoutItem size="7" padding="around-small">
+                        <lightning:button onclick="{!c.Search}"
+                                          variant="brand"
+                                          label="Registrar"
+                                          /> 
+          	</lightning:layoutItem>
+    	</div>
+    
+    
+
+</aura:component>

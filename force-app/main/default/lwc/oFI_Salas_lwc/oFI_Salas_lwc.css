@@ -1,0 +1,65 @@
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    border: 1px solid #e0e0e0;
+}
+
+.calendar-header-day {
+    background-color: #f4f6f9;
+    padding: 10px 0;
+    text-align: center;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.calendar-day {
+    background-color: #fff;
+    padding: 10px;
+    height: 100px; /* Altura fija para la celda */
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    position: relative;
+}
+
+.calendar-day.empty {
+    background-color: #fafafa;
+    cursor: default;
+}
+
+.calendar-day.today {
+    border: 2px solid var(--lwc-colorBorderBrand); /* Resalta el día actual */
+}
+
+.calendar-day.selected {
+    border: 2px solid var(--lwc-colorBorderBrand); /* Resalta el día actual */
+}
+
+.day-number {
+    display: block;
+    font-size: 0.8rem;
+    color: #505050;
+}
+
+.status-icons {
+    margin-top: 10px;
+}
+
+.full-booked-icon {
+    /* Estilo para icono de cheque (Full Day) */
+    --sds-c-icon-color-foreground-default: #d9534f; /* Rojo */
+}
+
+.half-am-booked-icon {
+     /* Estilo para icono de mañana (AM) */
+    --sds-c-icon-color-foreground-default: #f0ad4e; /* Naranja */
+    margin-right: 5px;
+}
+
+.half-pm-booked-icon {
+     /* Estilo para icono de tarde (PM) */
+    --sds-c-icon-color-foreground-default: #5bc0de; /* Azul claro */
+}
+
+.calendar-day:hover {
+    background-color: #f0f0f0;
+}

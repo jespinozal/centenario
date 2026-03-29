@@ -1,0 +1,128 @@
+<template>
+    <lightning-card>
+        <h3>
+            <lightning-icon icon-name="standard:filter" size="small"></lightning-icon>
+            &nbsp;&nbsp;Filtros de busqueda
+        </h3>
+        <div class="slds-text-align_center">
+            <lightning-radio-group  label="" 
+                                    name="radioButtonGroup" 
+                                    onchange={handleChange} 
+                                    options={options} 
+                                    value={selectedValue} 
+                                    type="button">
+            </lightning-radio-group>
+        </div>
+        <br/>
+        <!-- Cargos Culqi Express-->
+        <template if:true={progressChargeVisible}>
+            <div class="slds-box slds-theme_default">
+        <br/>
+        <div class="slds-grid slds-wrap">
+            <div class="slds-size_6-of-12">
+                <lightning-input type="text" name="vAmount" label="Monto" placeholder="Ingresar monto"></lightning-input>
+            </div>
+            <div class="slds-size_6-of-12 slds-p-left_small">
+                <lightning-input type="text" name="vFirstName" label="Nombre" placeholder="Ingresar nombre"></lightning-input>
+            </div>
+            <div class="slds-size_6-of-12">
+                <lightning-input type="text" name="vLastName" label="Apellido" placeholder="Ingresar apellido"></lightning-input>
+            </div>
+            <div class="slds-size_6-of-12 slds-p-left_small">
+                <lightning-input type="text" name="vReference" label="Código de Referencia" placeholder="Ingresar código de referencia"></lightning-input>
+            </div>
+            <div class="slds-size_6-of-12">
+                <lightning-input type="date" name="vCreationDateFrom" label="Fecha Desde" required></lightning-input>
+            </div>
+            <div class="slds-size_6-of-12 slds-p-left_small">
+                <lightning-input type="date" name="vCreationDateTo" label="Fecha Hasta" required></lightning-input>
+            </div>
+        </div>
+        <br/>
+        <div class="slds-float_right">
+            <lightning-button label="Buscar" onclick={searchClickCharge} variant="brand"></lightning-button>
+        </div>
+        <br/>
+        
+
+        
+                <h3>
+                    <lightning-icon icon-name="standard:picklist_type" size="small"></lightning-icon>
+                    &nbsp;&nbsp;Lista de Cargos Culqi Express
+                </h3>
+                <br/>
+                <div style="height: 200px;">
+                    <lightning-datatable    key-field="id" 
+                                            data={getPaymentDataCharge} 
+                                            columns={columnscharge}
+                                            selected-rows={selectedRowsCharge} 
+                                            onrowselection={getSelectedNameCharge}> 
+                    </lightning-datatable>
+                </div>
+                <br/>
+                <template if:false={loaded}>
+                    <div class="slds-spinner_container">
+                        <lightning-spinner alternative-text="Loading"></lightning-spinner>
+                    </div>
+                </template>
+            </div>
+        </template>
+        <!-- Ordenes Culqi Express-->
+        <template if:true={progressCashVisible}>
+            <div class="slds-box slds-theme_default">
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-size_6-of-12">
+                        <lightning-input type="text" name="vAmount" label="Monto" placeholder="Ingresar monto"></lightning-input>
+                    </div>
+                    <div class="slds-size_6-of-12 slds-p-left_small">
+                        <lightning-input type="text" name="vPaymentCode" label="Código de Pago" placeholder="Ingresar código de pago"></lightning-input>
+                    </div>
+                    <div class="slds-size_6-of-12">
+                        <lightning-input type="date" name="vCreationDateFrom" label="Fecha Desde" required></lightning-input>
+                    </div>
+                    <div class="slds-size_6-of-12 slds-p-left_small">
+                        <lightning-input type="date" name="vCreationDateTo" label="Fecha Hasta" required></lightning-input>
+                    </div>
+                </div>
+                <br/>
+                <div class="slds-float_right">
+                    <lightning-button label="Buscar" onclick={searchClickCash} variant="brand"></lightning-button>
+                </div>
+                <br/>
+                <h3>
+                    <lightning-icon icon-name="standard:picklist_type" size="small"></lightning-icon>
+                    &nbsp;&nbsp;Lista de Ordenes Culqi Express
+                </h3>
+                <br/>
+                <div style="height: 200px;">
+                    <lightning-datatable    key-field="id" 
+                                            data={getPaymentDataCash} 
+                                            columns={columnscash} 
+                                            selected-rows={selectedRowsCash} 
+                                            onrowselection={getSelectedNameCash}> 
+                    </lightning-datatable>
+                </div>
+                <br/>
+                <template if:false={loaded}>
+                    <div class="slds-spinner_container">
+                        <lightning-spinner alternative-text="Loading"></lightning-spinner>
+                    </div>
+                </template>
+            </div>
+        </template>
+        <div slot="footer" class="slds-box slds-box_small slds-theme_shade">
+            <div class="slds-clearfix">
+                <div class="slds-float_right">
+                    <template if:true={progressChargeVisible}>
+                        <lightning-button class="slds-p-left_small" label="Generar Pago" onclick={generateClickCharge} variant="brand"></lightning-button>
+                    </template>
+                    <template if:true={progressCashVisible}>
+                        <lightning-button class="slds-p-left_small" label="Generar Pago" onclick={generateClickCash} variant="brand"></lightning-button>
+                    </template>
+                    <lightning-button class="slds-p-left_small" label="Regresar" onclick={backClick}></lightning-button>
+                    <lightning-button class="slds-p-left_small" label="Cancelar" onclick={cancelClick}></lightning-button>
+                </div>
+            </div>
+        </div>
+    </lightning-card>
+</template>

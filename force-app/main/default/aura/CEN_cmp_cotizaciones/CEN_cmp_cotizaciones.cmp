@@ -1,0 +1,28 @@
+<aura:component
+  implements="force:appHostable,forceCommunity:availableForAllPageTypes,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome"
+>
+  <aura:attribute
+    name="cotizadorLibreActivado"
+    type="Boolean"
+    default="false"
+  />
+
+  <lightning:card title="Cotización libre">
+    <aura:set attribute="actions">
+      <lightning:button
+        label="Nueva cotización"
+        title="Nueva cotización"
+        onclick="{! c.onClickNuevaCotizacion }"
+      />
+    </aura:set>
+
+    <p class="slds-p-horizontal_small">
+      El objetivo es disponer de un cotizador que permita rápidamente calcular la inicial y el detalle del financiamiento de un prospecto que muestra interés por uno o más lotes, sin necesidad de que se tenga que completar el flujo regular, prospecto - cuenta potencial - oportunidad.
+    </p>
+  </lightning:card>
+  <aura:if isTrue="{!v.cotizadorLibreActivado}">
+    <c:CEN_cmp_modalCotizadorLibre
+      modalActivado="{!v.cotizadorLibreActivado}"
+    />
+  </aura:if>
+</aura:component>

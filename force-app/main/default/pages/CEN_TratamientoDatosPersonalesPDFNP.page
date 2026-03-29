@@ -1,0 +1,87 @@
+<!--
+ * Name: CEN_TratamientoDatosPersonalesPDFNP
+ * Version: 1.0
+ * Descripción: Plantilla tratamiento de datos personales no presencial, los tres flags deberan estar seleccionados.
+ * Fecha: 26/11/2021
+ * TestClass: ...
+ * ClassController: CEN_cls_TratamientoDatosPersonales
+-->
+<apex:page applyHtmlTag="false" 
+    showHeader="false" 
+    renderAs="PDF" 
+    standardController="Account" 
+    standardStylesheets="false" 
+    extensions="CEN_cls_RepresentantesController">
+    
+    <style>
+        /* cuando vayamos a imprimir ... */
+        @media print{
+            /* indicamos el salto de pagina */
+            .saltoDePagina{
+                display:block;
+                page-break-before:always;
+            }
+        }
+    </style>
+    
+    <body>
+        <div>
+            <p style="font-size: small; text-align:center;">
+                <b>Anexo 2: Cuadro de Opciones - Tratamiento de Datos Personales</b>
+            </p> 
+        </div>
+        
+        <div>
+            <p style="width:80%; font-size: small; text-align:justify; margin-left: auto; margin-right: auto;">
+                <b>EL COMPRADOR</b> declara haber sido informado que sus datos personales podrán ser tratados por 
+                <b>LA VENDEDORA</b> para: (i) enviarle publicidad de los distintos proyectos de urbanizaciones y demás 
+                negocios del Grupo Centenario (Inversiones Centenario S.A.A., Centenario Desarrollo Urbano S.A.C., 
+                Centenario Renta Inmobiliaria S.A.C., Multimercados Zonales S.A.C., Promoción Inmobiliaria del Sur S.A.C., 
+                Nuevas Inversiones Centro Comercial Camino Real S.A.C., Inmobiliaria San Silvestre S.A.C.); (ii) 
+                perfilamiento y desarrollo de estrategias comerciales y de marketing; y, (iii) compartirlo con proveedores, 
+                servicios de encuestas y call centers comerciales, quienes actuarán como encargados.
+            </p> 
+            <p style="width:80%; font-size: small; text-align:justify; margin-left: auto; margin-right: auto;">
+                De esta manera, con la firma del presente documento <b>EL COMPRADOR</b> otorga su consentimiento para que 
+                <b>LA VENDEDORA</b> trate sus datos personales para las finalidades antes descritas.
+            </p> 
+        </div>
+        
+        <br/>
+        
+        <div style="width: 80%; height:50px; margin-left: auto; margin-right: auto;">
+            <div style="width: 49%;float:left;">
+                <p style="text-align: center; font-size: small;">El presente documento se celebra mediante firma electrónica.</p>
+                <p style="text-align: center;"><b>LA VENDEDORA</b></p>
+                <p style="text-align: center;"><img src="{!representantes0.Imagen_de_Firma__c}" width="100" height="100" /></p>
+                <p style="text-align: center;">{!representantes0.Nombres_Completos__c}</p>
+            </div>
+            
+            <div style="width: 49%;float:right;">
+                <p style="text-align: center; font-size: small;">El presente documento se celebra mediante firma electrónica.</p>
+                <p style="text-align: center;"><b>EL COMPRADOR</b></p>
+                <p style="text-align: center;"><img src="{!$Resource.blanco}" width="100" height="100" /></p>
+                
+                <apex:panelGroup rendered="{!Account.CEN_Tipo_de_documento__pc = ''}">
+                    <p style="text-align: center;">{!UPPER(Account.Name)} Representado por {!UPPER(contacto.Name)}</p>
+                </apex:panelGroup>
+                <apex:panelGroup rendered="{!Account.CEN_Tipo_de_documento__pc <> ''}">
+                    <p style="text-align: center;">{!UPPER(Account.Name)}</p>
+                </apex:panelGroup>
+            </div>      
+        </div>
+        
+        <br/>
+        
+        <div style="width: 80%; height:50px; margin-left: auto; margin-right: auto;">
+            <div style="width: 49%;float:left;">
+                <p style="text-align: center;"><img src="{!representantes1.Imagen_de_Firma__c}" width="100" height="100" /></p>
+                <p style="text-align: center;">{!representantes1.Nombres_Completos__c}</p>
+            </div>
+            <div style="width: 49%;float:right;">
+             
+            </div>           
+        </div>
+        
+    </body>
+</apex:page>

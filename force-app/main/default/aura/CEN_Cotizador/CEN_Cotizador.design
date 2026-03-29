@@ -1,0 +1,17 @@
+<design:component>
+    
+    <design:attribute name="idlote" Label="IdLote"/>
+    <design:attribute name="area" Label="Area"/>
+    <design:attribute name="preciom2" Label="Preciom2"/>
+    <design:attribute name="IdOportunidad" Label="IdOportunidad"/>
+    
+    <design:attribute name="Lote" Label="Lote"/>
+    <design:attribute name="Manzana" Label="Manzana"/>
+    <design:attribute name="Tipologia" Label="Tipologia"/>
+    <design:attribute name="Estado" Label="Estado"/>
+    
+    <design:attribute name="lotesJSON"  Label="LotesJSON"/>
+	<design:attribute name="CotizacionLibre" Label="esCotizacionLibre"/>
+    <design:attribute name="idProyecto" Label="Id de proyecto"/>
+    <design:attribute name="jsonProyectoAura" Label="Json proyecto aura"/>
+</design:component>

@@ -1,0 +1,7 @@
+<apex:page sidebar="false" >
+   
+    <script>
+    window.location.replace('/lightning/n/B_squeda');  
+    </script>
+    
+</apex:page>

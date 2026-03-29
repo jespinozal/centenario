@@ -1,0 +1,642 @@
+<apex:page applyHtmlTag="false"
+  applyBodyTag="false"
+  showHeader="false"
+  renderAs="pdf"
+  standardController="Quote"
+  extensions="OFI_PdfPlantillaCotizador_Sala_cls"
+  title="PDF Cotización"
+  language="es_ES"
+>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <style type="text/css">
+      @page {
+        size: A4 portrait;
+        padding-top: 30px;
+        padding-bottom: 30px;
+        /* @top-center {
+          content: element(header);
+        } */
+        @bottom-left {
+          content: element(footer);
+        }
+      }    
+
+      /* div.header {
+        position: running(header);
+      } */
+      /* div.header--img{
+        position: : running(header--img);
+      } */
+      div.footer {
+        display: block;
+        margin-left: 64px;
+        padding-bottom: 32px;
+        text-align: left;
+        position: running(footer);
+      }
+
+      body{
+          /* padding-top: 56px; */
+          padding: 0 56px 0 48px;
+          /* margin-top: 20px; */
+          position: relative;
+          z-index: 2;
+      }
+      p{
+          font-size: 16px;
+          font-family: sans-serif;
+          font-weight: 100;
+          letter-spacing: 2px;
+      }
+        
+      .header{
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 106px;
+        width: 106px;
+        background: #fff;
+        z-index: 1;
+      }
+      .header--img img{
+        /* width: fit-content; */
+        height: 100%;
+      }
+
+      .body--title tr td img{
+        width: 100%;
+      }
+
+      .body--details__table{
+        border-spacing: 0;
+        border-collapse: collapse;
+        border: none;
+      }
+      .body--details__table thead td,
+      .body--details__table thead th,
+      .body--details__table tbody td,
+      .body--details__table tbody th {
+        text-align: center;
+        border: 1px solid #000;
+        padding: 3px 8px;
+      }
+
+      .body--terms, .body--details__total{
+        border-spacing: 0;
+        border-collapse: collapse;
+        border: none;  
+      }
+      .body--terms thead tr td{
+        border-bottom: 1px solid #000;
+      }
+
+      p{font-size: 16px;}
+
+      .extrabold{font-weight: 900;}
+      .bold{font-weight: 700;}
+      .semibold{font-weight: 500;}
+      .light{font-weight: 300;}
+      
+      .text-6{font-size: 6px;}
+      .text-8{font-size: 8px;}
+      .text-10{font-size: 10px;}
+      .text-xs{font-size: 12px;}
+      .text-sm{font-size: 14px;}
+      .text-md{font-size: 18px;}
+      .text-lg{font-size: 20px;}
+      .text-xl{font-size: 22px;}
+      .text-2xl{font-size: 24px;}
+      .text-3xl{font-size: 26px;}
+      .text-4xl{font-size: 28px;}
+      .text-5xl{font-size: 30px;}
+      .text-6xl{font-size: 32px;}
+      .text-7xl{font-size: 34px;}
+      .text-8xl{font-size: 36px;}
+      .text-9xl{font-size: 38px;}
+      
+      .text-white{color: #fff;}
+      
+      .lh-none{line-height: 0;}
+      .lh-xs{line-height: 0.5;}
+      .lh-sm{line-height: 1;}
+      .lh-md{line-height: 1.5;}
+      .lh-lg{line-height: 2;}
+      
+      .bg-purple1{background: #F1EBF7;}
+      .bg-purple2{background: #743DBC;}
+      .bg-red{background: #D4110B;}
+      .bg-black{background: #000;}
+      .bg-white{background: #fff;}
+      
+      .p-0{padding: 0px !important;}
+      .pt-0{padding-top: 0px !important;}
+      .pr-0{padding-right: 0px !important;}
+      .pl-0{padding-left: 0px !important;}
+      .pb-0{padding-bottom: 0px !important;}
+      .py-0{padding-top: 0px !important; padding-bottom:0px !important;}
+      .px-0{padding-right: 0px !important; padding-left:0px !important;}
+      .m-0{margin: 0px !important}
+      .mt-0{margin-top: 0px !important;}
+      .mr-0{margin-right: 0px !important;}
+      .ml-0{margin-left: 0px !important;}
+      .mb-0{margin-bottom: 0px !important;}
+      .my-0{margin-top: 0px !important; margin-bottom:0px !important;}
+      .mx-0{margin-right: 0px !important; margin-left:0px !important;}
+      
+      .p-2{padding: 2px !important;}
+      .pt-2{padding-top: 2px !important;}
+      .pr-2{padding-right: 2px !important;}
+      .pl-2{padding-left: 2px !important;}
+      .pb-2{padding-bottom: 2px !important;}
+      .py-2{padding-top: 2px !important; padding-bottom:2px !important;}
+      .px-2{padding-right: 2px !important; padding-left:2px !important;}
+      .m-2{margin: 2px !important;}
+      .mt-2{margin-top: 2px !important;}
+      .mr-2{margin-right: 2px !important;}
+      .ml-2{margin-left: 2px !important;}
+      .mb-2{margin-bottom: 2px !important;}
+      .my-2{margin-top: 2px !important; margin-bottom:2px !important;}
+      .mx-2{margin-right: 2px !important; margin-left:2px !important;}
+      
+      .p-4{padding: 4px !important;}
+      .pt-4{padding-top: 4px !important;}
+      .pr-4{padding-right: 4px !important;}
+      .pl-4{padding-left: 4px !important;}
+      .pb-4{padding-bottom: 4px !important;}
+      .py-4{padding-top: 4px !important; padding-bottom:4px !important;}
+      .px-4{padding-right: 4px !important; padding-left:4px !important;}
+      .m-4{margin: 4px !important;}
+      .mt-4{margin-top: 4px !important;}
+      .mr-4{margin-right: 4px !important;}
+      .ml-4{margin-left: 4px !important;}
+      .mb-4{margin-bottom: 4px !important;}
+      .my-4{margin-top: 4px !important; margin-bottom:4px !important;}
+      .mx-4{margin-right: 4px !important; margin-left:4px !important;}
+      
+      .p-6{padding: 6px !important;}
+      .pt-6{padding-top: 6px !important;}
+      .pr-6{padding-right: 6px !important;}
+      .pl-6{padding-left: 6px !important;}
+      .pb-6{padding-bottom: 6px !important;}
+      .py-6{padding-top: 6px !important; padding-bottom:6px !important;}
+      .px-6{padding-right: 6px !important; padding-left:6px !important;}
+      .m-6{margin: 6px !important;}
+      .mt-6{margin-top: 6px !important;}
+      .mr-6{margin-right: 6px !important;}
+      .ml-6{margin-left: 6px !important;}
+      .mb-6{margin-bottom: 6px !important;}
+      .my-6{margin-top: 6px !important; margin-bottom:6px !important;}
+      .mx-6{margin-right: 6px !important; margin-left:6px !important;}
+      
+      .p-8{padding: 8px !important;}
+      .pt-8{padding-top: 8px !important;}
+      .pr-8{padding-right: 8px !important;}
+      .pl-8{padding-left: 8px !important;}
+      .pb-8{padding-bottom: 8px !important;}
+      .py-8{padding-top: 8px !important; padding-bottom:8px !important;}
+      .px-8{padding-right: 8px !important; padding-left:8px !important;}
+      .m-8{margin: 8px !important;}
+      .mt-8{margin-top: 8px !important;}
+      .mr-8{margin-right: 8px !important;}
+      .ml-8{margin-left: 8px !important;}
+      .mb-8{margin-bottom: 8px !important;}
+      .my-8{margin-top: 8px !important; margin-bottom:8px !important;}
+      .mx-8{margin-right: 8px !important; margin-left:8px !important;}
+      
+      .p-10{padding: 10px !important;}
+      .pt-10{padding-top: 10px !important;}
+      .pr-10{padding-right: 10px !important;}
+      .pl-10{padding-left: 10px !important;}
+      .pb-10{padding-bottom: 10px !important;}
+      .py-10{padding-top: 10px !important; padding-bottom:10px !important;}
+      .px-10{padding-right: 10px !important; padding-left:10px !important;}
+      .m-10{margin: 10px !important;}
+      .mt-10{margin-top: 10px !important;}
+      .mr-10{margin-right: 10px !important;}
+      .ml-10{margin-left: 10px !important;}
+      .mb-10{margin-bottom: 10px !important;}
+      .my-10{margin-top: 10px !important; margin-bottom:10px !important;}
+      .mx-10{margin-right: 10px !important; margin-left:10px !important;}
+      
+      .br{
+        width: 100%;
+        height: 1px;
+        background: #ccc;
+      }
+      .space-5{width: 100%;height: 5px;}
+      .space-10{width: 100%;height: 10px;}
+      .space-15{width: 100%;height: 15px;}
+      .space-20{width: 100%;height: 20px;}
+      .space-25{width: 100%;height: 25px;}
+      
+      .w-full{width: 100% !important;};
+      .w-1-6{width: 16.66% !important;};
+      .w-2-6{width: 33.33% !important;};
+      .w-3-6{width: 50% !important;};
+      .w-4-6{width: 66.66% !important;};
+      .w-5-6{width: 83.33% !important;};
+      .w-2{width: 2px !important;};
+      .w-4{width: 4px !important;};
+      .w-6{width: 6px !important;};
+      .w-8{width: 8px !important;};
+      .w-10{width: 10px !important;};
+      .w-12{width: 12px !important;};
+      .w-14{width: 12px !important;};
+      .w-16{width: 12px !important;};
+      .w-18{width: 18px !important;};
+      .w-20{width: 20px !important;};
+      .w-22{width: 22px !important;};
+      .w-24{width: 24px !important;};
+      .w-26{width: 26px !important;};
+      .w-28{width: 28px !important;};
+      .salto-pagina { 
+            page-break-inside:avoid;
+      }   
+
+
+      .condiciones-ul {
+            list-style-type: none;
+            padding-left: 0;
+            counter-reset: item;
+        }
+        .condiciones-ul li p, .condiciones-sublista li p{
+            margin: 0;
+        }
+        .condiciones-sublista {
+            padding: 0 0 0 3.5rem;
+            margin: 0.2rem 0 0.5rem 2rem;
+            list-style-type: circle;
+        }
+        ol{
+            list-style-type: decimal;
+        }
+
+        .ul-line-icon{
+            list-style: none; /* Remove default bullets */
+            padding-left: 0;
+        }
+        .ul-line-icon li{
+            position: relative;
+            padding-left: 18px; /* Space for icon */
+        }
+        .ul-line-icon li::before{
+            content: "-"; /* Unicode or emoji */
+            position: absolute;
+            left: 0;
+            color: green;
+            font-size: 16px;
+        }
+        
+    </style>
+  </head>
+<div class="body">
+    <div class="header header--img">
+        <img src="{!$Resource.OFI_CentenarioOficinas}"/>
+    </div>
+    <div class="footer">
+        <p class="text-8 lh-none light">Centenario Renta Inmobiliaria</p>
+        <p class="text-8 lh-none light">Av. Víctor Andrés Belaunde 147, vía Principal165-Edificio Real 3 - San Isidro, Lima, Perú - Tel: +51 969 571 648</p>
+    </div>
+    <table class="body--title w-full" style="font-family: sans-serif;">
+        <tr>
+            <td>
+                <!-- <img src="{!$Resource.OFI_Dot_Salas}" height="50px" width="50px" style="display: inline; background:rgb(152,103,74);"/> -->
+                <div class="pb-6" style="display: inline;">
+                    <p class="text-9xl m-0 bold" style="color: rgb(152, 103, 74);">Espacios que</p>
+                    <p class="text-9xl mt-0 extrabold mb-10" style="color: rgb(152, 103, 74);">potencian ideas</p>
+                </div>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <img src="{!$Resource.OFI_Sala_Salas}"/>
+            </td>
+        </tr>
+    </table>
+    <div class="space-5"></div>
+
+    <div class="body--details w-full">
+        <p class="text-sm">Fecha de Cotización: <apex:outputText value="{0,date,dd'/'MM'/'yyyy}"><apex:param value="{!Quote.CreatedDate}"/></apex:outputText></p>
+        <p class="text-sm bold">Estimado:  <apex:outputText value="{!account.Name}" /></p>
+        <p class="text-sm">Muchas gracias por pensar en nosotros para su futuro evento. De acuerdo con lo solicitado le hacemos llegar nuestra mejor propuesta.</p>
+        <div class="space-10"></div>
+        <table class="body--details__table w-full" style="font-family: sans-serif;">
+            <thead>
+                <tr class="text-white text-sm" style="background: rgb(152, 103, 74);">
+                    <td>Salón de eventos</td>
+                    <td>Fecha</td>
+                    <td>Horario</td>
+                    <!-- <td>N° de personas</td> -->
+                    <td>Montaje</td>
+                    <td>Precio Total</td>
+                </tr>
+            </thead>
+            <tbody class="text-sm">
+                <apex:repeat value="{!salas}" var="sala">
+                    <tr>
+                        <td>{!sala.Product2.Name}</td>
+                        <td>
+                            <apex:outputText value="{0, date, dd/MM/yyyy HH:mm:ss}">
+                                <apex:param value="{!sala.OFI_fld_QLI_FechaHoraEvento__c}" />
+                            </apex:outputText>
+                        </td>
+                        <td>
+                            <apex:outputText value="{0, date, dd/MM/yyyy HH:mm:ss}">
+                                <apex:param value="{!sala.OFI_fld_QLI_FechaHoraFinEvento__c}" />
+                            </apex:outputText>
+                        </td>
+                        <td>{!sala.OFI_fld_QLI_Montaje__c}</td>
+                        <td>{!sala.CEN_TotalPriceEspejo__c}</td>
+                    </tr>
+                </apex:repeat>
+            </tbody>
+            <tfoot class="text-sm">
+                <tr>
+                    <td colspan="3"></td>
+                    <td  style="border:1px solid #000; text-align:center;">Soles</td>
+                    <td  style="border:1px solid #000; text-align:center;">
+                        <apex:outputText value="{0, number, ###,##0.00}">
+                            <apex:param value="{!totalSalas}" />
+                        </apex:outputText>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="space-25"></div>
+        
+        <table class="body--details__table" style="font-family: sans-serif;">
+            <thead>
+                <tr class="text-white text-sm" style="background: rgb(152, 103, 74);">
+                    <td style="width:25%;">Equipos audiovisuales y otros</td>
+                    <td>Fecha</td>
+                    <td>Cantidad</td>
+                    <td>Precio unitario</td>
+                    <td>Precio Total</td>
+                </tr>
+            </thead>
+            <tbody>
+                <apex:repeat value="{!condiciones}" var="item">
+                    <tr class="text-sm">
+                        <td style="text-align: left;">{!item['name']}</td>
+                        <td>{!item['rDate']}</td>
+                        <td>{!item['qty']}</td>
+                        <td>
+                            <apex:outputText value="{0, number, ###,##0.00}">
+                                <apex:param value="{!VALUE(item['unitAmount'])}" />
+                            </apex:outputText>
+                        </td>
+                        <td>
+                            <apex:outputText value="{0, number, ###,##0.00}">
+                                <apex:param value="{!VALUE(item['totalAmount'])}" />
+                            </apex:outputText>
+                        </td>
+                    </tr>
+                </apex:repeat>
+            </tbody>
+            <tfoot>
+                <tr class="text-sm">
+                    <td colspan="3"></td>
+                    <td style="border:1px solid #000; text-align:center;">Soles</td>
+                    <td style="border:1px solid #000; text-align:center;">
+                        <apex:outputText value="{0, number, ###,##0.00}">
+                            <apex:param value="{!totalAmount}" />
+                        </apex:outputText>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+
+
+        <div class="space-15"></div>
+        <div class="space-20"></div>
+        <p class="text-8 m-0">Evento, el mismo que debe ser aprobado por el coordinador.</p>
+        <p class="text-8 m-0">Presentar DNI fisico vigente al momento del ingreso. En el caso de utilización de obras musicales le corresponde a los organizadores del evento el pago del Apdayc y Unimpro y deberá entregar una copia del recibo al Departamento de Eventos 72 horas antes del inicio del evento.</p>
+        <div class="space-25"></div>
+        <table class="body--details__total w-full" style="font-family: sans-serif;">
+            <tr class="text-white bg-black">
+                <td class="bold pt-10 py-10" style="text-align: center;">Total del evento</td>
+                <td class="bold pt-10 py-10" style="text-align: center;">
+                    <apex:outputText value="{0, number, ###,##0.00}">
+                        <apex:param value="{!grandTotal}" />
+                    </apex:outputText>
+                </td>
+                <td class="bold pt-10 py-10" style="text-align: center;">Sin IGV</td>
+            </tr>
+        </table>
+         <div class="space-15"></div>
+         <div class="space-20"></div>
+        <p class="text-8 m-0">ESTACIONAMIENTOS</p>
+        <p class="text-8 m-0">Se otorgará 6 estacionamientos de cortesía según disponibilidad por día.</p>
+    </div>
+
+    <div class="space-15"></div>
+    <apex:outputPanel rendered="{!isOne}">
+        <div class="space-15"></div>
+        <div class="space-20"></div>
+        <div class="space-20"></div>
+        <div class="space-20"></div>
+        <div class="space-20"></div>
+    </apex:outputPanel>
+    <apex:outputPanel rendered="{!isTwo}">
+        <div class="space-15"></div>
+        <div class="space-15"></div>
+        <div class="space-20"></div>
+        <div class="space-20"></div>
+    </apex:outputPanel>
+    <apex:outputPanel rendered="{!isThree}">
+        <div class="space-15"></div>
+        <div class="space-15"></div>
+        <div class="space-15"></div>
+    </apex:outputPanel>
+    <apex:outputPanel rendered="{!isMoreThanThree}">
+        <div class="space-15"></div>
+        <div class="space-10"></div>
+    </apex:outputPanel>
+    
+
+    <div class="salto-pagina"></div>
+
+    <table class="body--terms" style="position: relative; z-index: 9; font-family: sans-serif;">
+        <thead>
+            <tr>
+                <td class="text-xs" style="text-align: center;">CATEGORÍA</td>
+                <td class="text-xs"  style="text-align: center;">DETALLE</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="text-10" style="text-align: center; border-right:1px solid #000;">PRECIO DE SALAS</td>
+                <td>
+                    <p class="text-10 mb-2">Cualquier deterioro o daño causado en los equipos, mobiliario, y/o las estructuras de las salas que fueran ocasionados durante la reserva deberá ser reparado y/o asumido por la empresa solicitante del evento.</p>
+                    <p class="text-10 mb-2">La propuesta incluye solo 40 minutos de montaje solo considerado para eventos cotizados con plazo mínimo de 4 horas, de ser un tiempo menor a este solo se permite el ingreso 15 minutos antes. En caso de requerir mayor tiempo este deberá indicar al coordinador para tomarlo en cuenta en su cotización.</p>
+                    <p class="text-10">Por favor tomar en cuenta que la tolerancia de salida de sala es de 15 minutos, pasado este plazo se considerará el cobro de 1 hora extra.</p>
+                </td>
+            </tr>
+            <tr style=" background: #eaeaea;">
+                <td class="text-10" style="text-align: center; border-right:1px solid #000;">ESTACIONAMIENTO DENTRO DE LA TORRE</td>
+                <td>
+                    <p class="text-10 mb-2">Se entregan # pases de estacionamiento de cortesía.</p>
+                    <p class="text-10 mb-2">Debemos mandar la lista de placas con mínimo 48 horas de antelación.</p>
+                    <p class="text-10 mb-2">Precio especial considerado como tarifa plana 25 soles.</p>
+                    <p class="text-10">Los estacionamientos de cortesía y prepagados están garantizados en la misma torre. Posterior al tope de estacionamientos en esta Torre, el cliente tendrá la opción de dirigirse a la playa de estacionamiento Maristas (ubicada en la calle Choquehuanca - Camino Real 580), el precio en este depende del número de horas (7 soles por hora y/o fracción).</p>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-10" style="text-align: center; border-right:1px solid #000;">SOBRE INTERNET, SONIDO Y EQUIPO AUDIOVISUAL</td>
+                <td>
+                    <p class="text-10 mb-2">Se ofrece wifi de 512kbps de cortesía. En caso de requerir capacidad mayor se deberá indicarlo para cotizarlo.</p>
+                    <p class="text-10 mb-2">Puntos eléctricos (existe un máximo de carga eléctrica por sala, indicar si todos los participantes llevaran laptops).</p>
+                    <p class="text-10 mb-2">Equipo básico para Eventos: Impresoras, laptops, cámaras fotográficas, filmadoras.</p>
+                    <p class="text-10">El local no se hace responsable por el daño u uso incorrecto de equipos de terceros.</p>
+                </td>
+            </tr>
+            <tr style=" background: #eaeaea;">
+                <td class="text-10" style="text-align: center; border-right:1px solid #000;">DETALLES SOBRE LA ALIMENTACIÓN</td>
+                <td>
+                    <p class="text-10 mb-2">Deberá considerar que el máximo permisible de ruido en las salas es de 60 decibeles, considerando que existen salas en el mismo piso, y un nivel de ruido puede perturbar el desempeño de los otros eventos programados, en caso se requiera música o DJ favor indicarlo con el coordinador.</p>
+                    <p class="text-10 mb-2">De ingresar su empresa de Catering es necesario comentarlo con la coordinación (solo se permite el ingreso de bocaditos fríos) (No se acepta el ingreso de almuerzos del establecimiento)</p>
+                    <p class="text-10 mb-2">En el caso de bebidas alcohólicas existirá un fee de ingreso por favor consultar previamente.</p>
+                    <p class="text-10 mb-2">No está permitido retirar alimentos del local.</p>
+                    <p class="text-10 mb-2">El número de personas contratadas para los servicios de alimentos y bebidas deberá ser el mismo al número de personas solicitadas para el montaje de la sala.</p>
+                    <p class="text-10 mb-2">Cualquier requerimiento especial (caso de vegetariano, alérgico u otro), deberá comunicarse y coordinarse como mínimo una semana previa de la atención.</p>
+                    <p class="text-10 mb-2">El monto total por el servicio de alimentación pactado no podrá disminuir una vez firmado el contrato.</p>
+                    <p class="text-10 mb-2">El servicio de Alimentos y Bebidas se deberá definir y Reconfirmar siete días útiles antes de la fecha del evento, cualquier aumento posterior significará un costo adicional. En caso no exista reconfirmación formal, se aplicará todo tal cual lo indicado en el contrato.</p>
+                    <p class="text-10 mb-2">En caso de requerir alimentación adicional dentro de las 72 horas previas al evento, se cobrará un incremento del 30% en el precio de estos.</p>
+                    <p class="text-10">Todo adicional deberá solicitarse por escrito y contar con la confirmación del coordinador a cargo.</p>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-10" style="text-align: center; border-right:1px solid #000;">SOBRE LA DETRACCIÓN</td>
+                <td>
+                    <p class="text-10 mb-2">Según Decreto Legislativo N° 940 el porcentaje de detracción es: para servicios de Alimentación 12%, y para servicios de alquileres (salas, equipos, e inmobiliarios) 10%; por ello se emiten facturas separadas por concepto, es decir una por Alimentación y otra por Alquileres.</p>
+                    <p class="text-10">**Para eventos pago, por favor tome en cuenta que nosotros realizamos el autodetracción, la misma que será enviada todos los lunes. Tome en cuenta que la detracción es parte de nuestro total.</p>
+                </td>
+            </tr>
+            <tr style=" background: #eaeaea;">
+                <td class="text-10" style="text-align: center; border-right:1px solid #000;">INGRESO DE PARTICIPANTES</td>
+                <td>
+                    <p class="text-10">Todos los participantes podrán consultar en la recepción la locación y espacio para su evento, indicando el nombre de este o de la empresa.</p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+     <div class="space-25"></div>
+     <div class="space-25"></div>
+     <div class="space-25"></div>
+        <div class="salto-pagina"></div>
+     <div class="space-25"></div>
+
+    <div class="body--reconfirm" style="font-family: sans-serif;">
+        <span class="bold" style="font-family: sans-serif;">RECONFIRMACION Y CRONOGRAMA PAGO</span>
+        <p class="text-sm">A fin de considerar el bloqueo de salones como definitivo, deberá recibir el presente contrato debidamente firmado por el Cliente.</p>
+        <p class="text-sm">Recomendamos respetar las fechas de pago establecidas ya que de lo contrario el Cliente podría recibir penalidades.</p>
+        <p class="text-sm">Recuerde consultar con la Coordinador antes de la firma del acuerdo, la viabilidad y autorización respectiva, de:</p>
+        <ul class="ul-line-icon">
+            <li><p class="text-sm m-0">Material publicitario (instalación de backings y/o torres publicitarias)</p></li>
+            <li><p class="text-sm m-0">Decoración o similar (mobiliarios especiales, etc.). Está prohibido pegar decoración en las paredes madera.</p></li>
+            <li><p class="text-sm m-0">Materiales comunes: papelería, folletería, útiles de oficina, banners (roll screen 2mx1m), estandartes, banderas.</p></li>
+            <li><p class="text-sm m-0">Colocar Banderola (sólo con parante, la ejecutiva indicara el lugar permitido para su exhibición).</p></li>
+            <li><p class="text-sm m-0">Otros espacios: Las actividades realizadas por el cliente están limitadas a realizarse en las salas alquiladas, cualquier otro espacio se deberá consultar.</p></li>
+            <li><p class="text-sm m-0">Planos de distribución de equipos, estructuras y amoblados (deberán ser presentados con 7 días de anterioridad – abajo mayor detalle).</p></li>
+            <li><p class="text-sm m-0">Todos los pagos de Apdayc y Unimpro, entregando una copia como máximo 72 horas antes del evento.</p></li>
+        </ul>
+        <span class="bold" style="font-family: sans-serif;">DISMINUCIÓN, CANCELACIÓN O NO-SHOW</span>
+        <p class="text-sm">En caso de que tengamos indicaciones del gobierno y no se puedan realizar eventos, los mismos serán reprogramados para cuando las condiciones lo permitan sin costos adicionales.</p>
+        <p class="text-sm">Todos los servicios requeridos deberán ser solicitados por escrito según las siguientes condiciones:</p>
+        <ul class="ul-line-icon">
+            <li><p class="text-sm m-0">Anulación desde Evento 16 a 31 días antes del Evento: Se cobrará el 25% del total contratado.</p></li>
+            <li><p class="text-sm m-0">Anulación hasta los 15 días hábiles inclusive anteriores al evento: Se cobrará el 50% del total contratado.</p></li>
+            <li><p class="text-sm m-0">Anulación hasta los últimos siete días hábiles anteriores a la fecha máxima del mismo evento se cobrará un total del 100%.</p></li>
+        </ul>
+        <span class="bold" style="font-family: sans-serif;">POLÍTICA DE PAGOS Y GARANTÍAS</span>
+        <p class="text-sm">Recomendamos respetar las fechas de pago establecidas ya que de lo contrario el Cliente podría recibir penalidades o incluso cancelación de su evento.</p>
+        <p class="text-sm">En caso no se cumpla con alguna fecha establecida en este acuerdo vigente estos deberán pagarse durante el día establecido en este documento.</p>
+        <p class="text-sm">Solo se programarán eventos si es que no existen montos pendientes por cancelar.</p>
+        <p class="text-sm">MONTO TOTAL indicado en este documento es inamovible; es decir no existen cambios en cantidad o precio respecto a lo acordado.</p>
+        <span class="bold" style="font-family: sans-serif;">CENTENARIO RENTA INMOBILIARIA S.A.C.</span>
+        <p class="text-sm">En caso de superarse los S/.700.00 a facturar se aplica detracción a la factura emitida. Los depósitos deberán hacerse a nombre de <span class="bold">CENTENARIO RENTA INMOBILIARIA S.A.C.</span> en los bancos:</p>
+        <ul>
+            <li><p class="text-sm m-0"><span class="bold">Banco de Crédito soles:</span> 193-2251194-0-32</p></li>
+            <li><p class="text-sm m-0"><span class="bold">Banco de Crédito dólares:</span> 193-2282525-1-16</p></li>
+            <li><p class="text-sm m-0"><span class="bold">Código interbancario soles:</span> 002-19300225119403216</p></li>
+            <li><p class="text-sm m-0"><span class="bold">Código interbancario dólares:</span> 002-19300228252511612</p></li>
+        </ul>
+        <p class="text-sm m-0">Todo pago deberá ser depositado en las cuentas que se especifican en este contrato, no se aceptan pagos en efectivo.</p>
+        <ul class="ul-line-icon">
+            <li><p class="text-sm m-0">En caso de que la fecha de pago sea un viernes, el comprobante de depósito deberá ser enviado antes de las 12:00 del mediodía.</p></li>
+            <li><p class="text-sm m-0">Pago con cheque: Los pagos con cheques son considerados como efectuados una vez que se confirme como saldo disponible en nuestras cuentas bancarias, el cheque debe ser depositado en nuestra cuenta del BCP y posterior a esto enviarse la constancia del depósito.</p></li>
+            <li><p class="text-sm m-0">No realizamos reembolsos</p></li>
+        </ul>
+        <p class="text-sm">El cheque deberá ser emitido a CENTENARIO RENTA INMOBILIARIA S.A.C.</p>
+        <span class="bold" style="font-family: sans-serif;">CONDICIONES GENERALES</span>
+        <ol>
+            <li><p class="text-sm">Contamos con proveedor que cumple los procedimientos estrictos en el manejo de los alimentos que sirve a sus clientes y cuenta con las certificaciones de “Buenas prácticas de manipulación de alimentos” aplicables a su preparación y mantenimiento. Por ello, no se permite el retiro de los alimentos sobrantes proporcionados para su evento. El cliente declara expresamente conocer esta política y acepta que todo alimento sobrante del evento quede en el local y no pueda ser retirado salvo excepciones previamente coordinadas y autorizadas expresamente por la coordinador.</p></li>
+            <li><p class="text-sm">No nos responsabilizamos por el consumo de bebidas alcohólicas por los invitados del organizador del evento, por lo que la empresa organizadora asume plena y exclusiva responsabilidad por el comportamiento de sus invitados y asistentes, así como de los daños que pudiesen ser causados como consecuencia de los actos de las personas asistentes.</p></li>
+            <li><p class="text-sm">No está permitido el uso de armas dentro de ninguna Torre, a todo personal de seguridad y/o persona sospechosa se le revisará con detector de metales portátil, para comprobar que no porten armas.</p></li>
+            <li><p class="text-sm">Sobre niveles máximos de Ruido: El organizador del evento declara conocer la Ordenanza Nº 410-MSI donde establecen disposiciones de regulación, prevención y control de la contaminación sonora en el distrito la misma que establece los niveles máximos de sonido en el área siendo de 60 decibeles durante el día (de 07:01 a 22:00 horas) y 50 durante la noche (de 22:02 a 07:00 horas). En este sentido se compromete a respetar dichos límites y de no hacerlo otorga a la empresa la facultad de cancelar el evento sin reembolso de ningún tipo. <span class="bold">Por tal motivo está prohibido realizar fiestas, shows o activaciones dentro de nuestras instalaciones.</span></p></li>
+            <li><p class="text-sm">Sobre Apdayc: En el caso de utilización de obras musicales les corresponde a los organizadores del evento el pago del Apdayc y Unimpro y deberá entregar una copia del recibo al Departamento de Eventos 72 horas antes del inicio del evento, no nos responsabilizamos por pago de penalidad que esta pueda ocasionar.</p></li>
+            <li><p class="text-sm">No fumar: Está prohibido fumar en lugares públicos Según Ley 25357</p></li>
+            <li><p class="text-sm">Seguridad: No se debe de obstaculizar las salidas de evacuación o las salidas de los salones en ninguna instancia.</p></li>
+            <li><p class="text-sm">Grupo Electrógeno- instalaciones: Debe ser coordinado con 2 semanas de antelación para realizar un recorrido con el jefe de seguridad, mantenimiento y aprobar el mismo.</p></li>
+            <li><p class="text-sm">Debemos informar siempre al asistente de su sala (Equipo de reservas-Operación) si colocarán algún equipo así el mismo sea de baja carga, ya que con ello indicamos donde este puede ser instalado, no nos responsabilizamos en caso de algún daño en equipos que no haya sido consultados previamente.</p></li>
+            <li><p class="text-sm">No se permiten sustancias inflamables como los efectos de humo.</p></li>
+            <li><p class="text-sm">Sobre Menores de Edad: El ingreso de menores de edad a las instalaciones, a efectos de realizar o ayudar con cualquier trabajo queda totalmente prohibido. En el caso de que participen menores de edad como parte del evento, el organizador deberá exhibir el permiso correspondiente emitido por sus padres y por el Ministerio de Trabajo, así mismo para su cuidado por cada 15 niños tendrán a 2 personas adultas, estás personas adultas que estarán al cuidado de los niños son de total responsabilidad de los organizadores del evento.</p></li>
+            <li><div>
+                <p class="text-sm mb-0">Prensa: Tener en cuenta lo siguiente:</p>
+                <ul>
+                    <li><p class="m-0 text-sm">El ingreso de prensa es por la puerta principal</p></li>
+                    <li><p class="m-0 text-sm">Está prohibido ingresar con equipos que tengan cables, toda cámara tiene que ser con baterías.</p></li>
+                    <li><p class="m-0 text-sm">Solo se harán entrevistas dentro de la sala de eventos. La prensa forma parte del aforo de la sala de eventos.</p></li>
+                </ul>
+            </div></li>
+        </ol>
+        <span class="bold" style="font-family: sans-serif;">INGRESO DE PROVEEDORES, MATERIALES Y OTROS</span>
+        <ul>
+            <li><p class="text-sm">Horario de ingreso y retiro de materiales y/o equipos: de lunes a viernes de 08:00 a 18:00 horas. Se encuentra terminantemente prohibido ingresar o retirar materiales y/o equipos fuera del horario señalado.</p></li>
+            <li><p class="text-sm">Responsabilidad del cliente sobre su personal de proveedores o dependientes.</p></li>
+            <li><p class="text-sm">Sólo se podrá ingresar teniendo un evento confirmado (ficha firmada) y cumpliendo además las condiciones siguientes:</p></li>
+        </ul>
+        <ul class="ul-line-icon">
+            <li><p class="text-sm">Aviso de ingreso mínimo 72 horas antes (detallando que se ingresara y qué trabajos se realizarán)</p></li>
+            <li><p class="text-sm">DNI vigente (no se permite el uso de otros documentos, fotocopias o documentos vencidos).</p></li>
+            <li><p class="text-sm">Guía de Remisión impresa (que detalle todo lo que se ingresa).</p></li>
+            <li><p class="text-sm">Seguro Médico vigente (social o eps) de la persona que va a realizar trabajos de instalaciones como proyector, Ecran o equipo de sonido.</p></li>
+            <li><p class="text-sm">Seguro Complementario de Trabajo de Riesgo (SCTR) para las personas que realicen trabajo de riesgo (ejemplo: instalación de backing, estrado, stands u otro).</p></li>
+            <li><p class="text-sm">Sobre SCTR: Todo personal de los proveedores y/o dependientes del organizador del evento o de las empresas de servicios que éste contrate para la implementación del evento o participación en el mismo deberán cumplir obligatoriamente con la Ley de Seguridad y Salud en el Trabajo, contar obligatoriamente con el Seguro Complementario de Trabajo de Riesgo (SCTR) contratado con la Compañía de seguros local de su elección.</p></li>
+            <li><p class="text-sm">Deberá presentar copia de dicha póliza de seguros y de la factura por la prima pagada para su verificación y aprobación mínimo 72 horas antes de la fecha del Evento. Relación de personal con datos completos y número de documento de identidad (DNI) indicando el responsable del grupo.</p></li>
+            <li><p class="text-sm">Vestimenta apropiada y equipos de protección personal de los trabajadores o dependientes: deberán presentarse correctamente uniformados para realizar sus labores, no se aceptará como uniforme el uso de short pants, BVD’s, sandalias u otros que sean inconsistentes con la imagen del hotel. De ser necesario deberán contar con sus Equipos de Protección Personal (EPP) completos, en buen estado y que correspondan con la actividad que desarrollarán (Armado de estructuras metálicas o de otros materiales).</p></li>
+        </ul>
+        <ul>
+            <li><p class="text-sm m-0">En ese sentido el organizador del evento declara que es total y exclusivamente responsable por sus dependientes y el personal de proveedores o empresas de servicios que contrate para la implementación del evento o participación en el mismo que ingresen a las instalaciones, así como de los actos que puedan realizar éstos al interior de este.</p></li>
+            <li><p class="text-sm m-0">La empresa no se responsabiliza ni asume obligación alguna por la recepción de cajas/paquetes/banderolas/ materiales etc. enviados vía Courier Federal Express, DHL, etc. que no respeten las condiciones de “Courier” y que estén sujetas a trámites aduaneros. Toda caja/paquete/banderola/material debe ser enviado a nombre del responsable de la empresa del evento, por ningún motivo deberán ser remitidas a nombre del coordinador o de algún un trabajador de la empresa.</p></li>
+        </ul>
+    </div>
+    <div class="space-15"></div>
+    <div class="body--foot">
+        <p class="text-sm lh-none">Ante cualquier consulta no dude en contactarnos.</p>
+        <p class="text-sm lh-none">Saludos cordiales,</p>
+        <div class="space-20"></div>
+        <div class="space-20"></div>
+        <table>
+            <tr>
+                <td>
+                    <img src="{!$Resource.CEN_sr_logoCentenario_2020}" width="100px"/>
+                </td>
+                <td>
+                    <p class="text-sm lh-none bold">Percy Kusien Doloriert</p>
+                    <p class="text-sm lh-none light">Comercial | Renta Inmobiliaria</p>
+                    <p class="text-sm lh-none light">T +511 616.9000 – Anexo 4146</p>
+                    <p class="text-sm lh-none light">C +51 969 571 648</p>
+                    <a href="mailto:pkusiend@centenario.com.pe"><p class="text-sm lh-none light m-0" style="color: blue; text-decoration: underline">pkusiend@centenario.com.pe</p></a>
+                    <p class="text-sm lh-none light">grupocentenario.com.pe</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+</apex:page>

@@ -1,0 +1,25 @@
+<template>
+    <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-spread slds-m-medium">
+        <div class="cen-titulo-sustentos">{header}</div>
+        <div class="slds-button_group" role="group">
+            <template if:false={esArchivado}>
+                <c-cen-boton-archivados record-id={recordId}></c-cen-boton-archivados>
+            </template>
+        </div>
+    </div>
+    <lightning-accordion
+        allow-multiple-sections-open
+        active-section-name={activeSections}
+        onsectiontoggle={handleSectionToggle}
+    >
+        <template for:each={secciones} for:item="sec">
+            <lightning-accordion-section key={sec} name={sec} label={sec}>
+                <c-cen-adjuntos-por-tipo
+                    record-id={recordId}
+                    nombre-seccion={sec}
+                    es-archivado={esArchivado}>
+                </c-cen-adjuntos-por-tipo>
+            </lightning-accordion-section>
+        </template>
+    </lightning-accordion>
+</template>

@@ -1,0 +1,175 @@
+<template>
+    <lightning-card>
+    <div class="slds-var-p-around_medium">
+    <table aria-multiselectable="true" class="slds-table slds-table_bordered slds-table_edit slds-table_fixed-layout slds-table_resizable-cols slds-tree slds-table_tree" role="treegrid" aria-label="Example expanded tree grid">
+        <thead>
+            <tr class="slds-line-height_reset">
+            <template for:each={lstCol} for:item="col">
+                <th key={col.key} aria-label={col.label} aria-sort="none" class="slds-has-button-menu slds-is-resizable slds-is-sortable" style={col.estilo} scope="col">
+                    <a class="slds-th__action slds-text-link_reset" href="#" role="button" tabindex="-1">
+                        <span class="slds-assistive-text">Sort by: </span>
+                        <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                          <span class="slds-truncate" title={col.label}>{col.label}</span>
+                          <span class="slds-icon_container slds-icon-utility-arrowdown">
+                            <svg class="slds-icon slds-icon-text-default slds-is-sortable__icon " aria-hidden="true">
+                              <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#arrowdown"></use>
+                            </svg>
+                          </span>
+                        </div>
+                      </a>
+                      <div class="slds-resizable">
+                        <input type="range" aria-label="Account Name column width" class="slds-resizable__input slds-assistive-text" id="cell-resize-handle-131" max="1000" min="20" tabindex="-1" />
+                        <span class="slds-resizable__handle">
+                          <span class="slds-resizable__divider"></span>
+                        </span>
+                      </div>
+                </th>
+            </template>
+            </tr>
+        </thead>
+        <tbody>
+        <template for:each={lstLeads} for:item="ld">
+          <tr key={ld.key} aria-expanded="true" aria-level="1" aria-posinset="2" aria-selected="false" aria-setsize="4" class="slds-hint-parent">
+            <th class="slds-tree__item" data-label="Proyecto" scope="row">
+              <template lwc:if={ld.eventos}>
+                <button class="slds-button slds-button_icon slds-button_icon-x-small slds-m-right_x-small" aria-hidden="true" tabindex="-1" title="Collapse" data-id={ld.id} onclick={handleLeadChange}>
+                  <svg class="slds-button__icon slds-button__icon_small" aria-hidden="true">
+                    <template lwc:if={ld.active}><use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#chevrondown"></use></template>
+                    <template lwc:else><use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#chevronright"></use></template>
+                  </svg>
+                  <span class="slds-assistive-text">Collapse</span>
+                </button>
+              </template>
+              <template lwc:else>
+                <button class="slds-button slds-button_icon slds-button_icon-x-small slds-m-right_x-small" aria-hidden="true" tabindex="-1" title="Collapse">
+                  <svg class="slds-button__icon slds-button__icon_small" aria-hidden="true">
+                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#dash"></use>
+                  </svg>
+                  <span class="slds-assistive-text">Collapse</span>
+                </button>
+              </template>
+              <div class="slds-truncate" title={ld.proyecto}>
+                {ld.proyecto}
+              </div>
+            </th>
+            <td data-label="Fecha" role="gridcell">
+              <div class="slds-truncate" title={ld.fecha}><lightning-formatted-date-time value={ld.fechaHora} year="numeric" month="numeric" day="numeric" ></lightning-formatted-date-time></div>
+            </td>
+            <td data-label="Propietario" role="gridcell">
+              <div class="slds-truncate" title={ld.propietario}>{ld.propietario}</div>
+            </td>
+            <td data-label="Tipologia" role="gridcell">
+                <div class="slds-truncate" title={ld.tipologia}>{ld.tipologia}</div>
+              </td>
+            <td data-label="Intentos" role="gridcell">
+              <div class="slds-truncate" title={ld.intento}>{ld.intento}</div>
+            </td>
+            <td data-label="Estado" role="gridcell">
+                <div class={ld.StatusColor} title={ld.estado}>{ld.estado}</div>
+            </td>
+            <td data-label="Nombre Prospecto" role="gridcell">
+                <div class="slds-truncate" title={ld.name}>{ld.name}</div>
+            </td>
+          </tr>
+          <!-- <template if:true={ld.eventos}> -->
+          <template lwc:if={ld.eventos}>
+            <tr lwc:if={ld.active} key={ld.key} aria-level="2" aria-posinset="1" aria-selected="false" aria-setsize="1" class="slds-hint-parent">
+                <td colspan="7">
+                  <div lwc:if={descripcion} style="white-space: pre-line;">
+                    <section aria-label="Dialog title" aria-describedby="popover-body-id" class="slds-popover slds-nubbin_bottom-left" role="dialog">
+                      <div id="popover-body-id" class="slds-popover__body">
+                        <article class="slds-card">
+                          <div class="slds-card__header slds-grid">
+                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                              <div class="slds-media__figure">
+                                <span class="slds-icon_container slds-icon-standard-event" title="event">
+                                  <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                    <use xlink:href="/_slds/icons/standard-sprite/svg/symbols.svg#event"></use>
+                                  </svg>
+                                  <span class="slds-assistive-text">Comentario del Evento:</span>
+                                </span>
+                              </div>
+                              <div class="slds-media__body">
+                                <h2 class="slds-card__header-title">
+                                  <a href="#" class="slds-card__header-link slds-truncate" title="events">
+                                    <span>Comentario del Evento:</span>
+                                  </a>
+                                </h2>
+                              </div>
+                            </header>
+                          </div>
+                          <div class="slds-card__body slds-card__body_inner">{descripcion}</div>
+                        </article>
+                      </div>
+                    </section>
+                  </div>
+                    <table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_resizable-cols" role="grid" aria-label="Example advanced table as radio group">
+                        <thead>
+                          <tr class="slds-line-height_reset">
+                            <template for:each={lstColDet} for:item="colDet">
+                                <th key={colDet.key} aria-label="Name" aria-sort="none" class="slds-is-resizable slds-is-sortable" style={colDet.estilo} scope="col">
+                                <a class="slds-th__action slds-text-link_reset" href="#" role="button" tabindex="-1">
+                                    <span class="slds-assistive-text">Sort by: </span>
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <template if:true={colDet.icon}>
+                                        <span class="slds-icon_container slds-icon-standard-account slds-var-m-right_xx-small" title="Account">
+                                        <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                            <use xlink:href={colDet.icon}></use>
+                                        </svg>
+                                        <span class="slds-assistive-text">{colDet.label}</span>
+                                        </span>
+                                    </template>
+                                    <span class="slds-truncate" title={colDet.title}>{colDet.label}</span>
+
+                                    <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                        <svg class="slds-icon slds-icon-text-default slds-is-sortable__icon " aria-hidden="true">
+                                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#arrowdown"></use>
+                                        </svg>
+                                    </span>
+                                    </div>
+                                </a>
+                                <div class="slds-resizable">
+                                    <input type="range" aria-label="Name column width" class="slds-resizable__input slds-assistive-text" id="cell-resize-handle-1100" max="1000" min="20" tabindex="-1" />
+                                    <span class="slds-resizable__handle">
+                                    <span class="slds-resizable__divider"></span>
+                                    </span>
+                                </div>
+                                </th>
+                            </template>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <template for:each={ld.eventos} for:item="evt">
+                            <tr key={evt.key} class="slds-hint-parent" data-id={evt.id} onmouseover={handleMouse} onmouseout={handleMouseOut}>
+                                <td data-label="Evento" role="gridcell">
+                                    <div class="slds-truncate" title={evt.evento}>{evt.evento}</div>
+                                </td>
+                                <td data-label="Fecha" role="gridcell">
+                                    <div class="slds-truncate" title={evt.fecha}><lightning-formatted-date-time value={evt.fecha} year="numeric" month="numeric" day="numeric" ></lightning-formatted-date-time></div>
+                                </td>
+                                <td data-label="Estado" role="gridcell">
+                                    <div class="slds-truncate" title={evt.estado}>{evt.estado}</div>
+                                </td>
+                                <td data-label="Contacto" role="gridcell">
+                                    <div class="slds-truncate" title={evt.contacto}>{evt.contacto}</div>
+                                </td>
+                                <td data-label="Valores Contacto" role="gridcell">
+                                    <div class="slds-truncate" title={evt.valorContacto}>{evt.valorContacto}</div>
+                                </td>
+                                <td data-label="Asunto" role="gridcell">
+                                    <div class="slds-truncate" title={evt.asunto}>{evt.asunto}</div>
+                                </td>
+                            </tr>
+                          </template>
+                        </tbody>
+                      </table>
+                </td>
+            </tr>
+          </template>
+        </template>
+        </tbody>
+      </table>
+    </div>
+    </lightning-card>
+
+</template>

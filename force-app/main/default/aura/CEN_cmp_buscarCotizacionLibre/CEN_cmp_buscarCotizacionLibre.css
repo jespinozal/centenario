@@ -1,0 +1,16 @@
+.THIS .spinnerBuscandoCotizaciones::after {
+  position: absolute;
+  content: "Se están cargando las Cotizaciones Libres...";
+  width: 100%;
+  text-align: center;
+  top: calc(50% + 3em);
+  font-weight: bold;
+}
+.THIS .spinnerAsociandoCotizacion::after {
+  position: absolute;
+  content: "Se está procesando la validación y la asociación...";
+  width: 100%;
+  text-align: center;
+  top: calc(50% + 3em);
+  font-weight: bold;
+}

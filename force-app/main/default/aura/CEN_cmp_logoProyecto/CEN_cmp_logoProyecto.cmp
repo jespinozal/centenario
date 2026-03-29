@@ -1,0 +1,16 @@
+<aura:component controller="CEN_cls_logoProyecto_cc" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" >
+	<aura:attribute name="recordId" type="Id" access="global"/>
+    <aura:attribute name="estaCargandoLogo" type="Boolean" default="false" access="global"/>
+    <aura:attribute name="imagenSrc" type="String" default="https://s3-us-west-1.amazonaws.com/sfdc-demo/image-placeholder.png" access="private"/>
+    
+    <!--    HANDLER     -->
+    <!--<aura:handler event="force:refreshView" action="{!c.onInit}" />-->
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+    <aura:handler name="eventoCargaImagen" event="c:CEN_cmp_cargaImagenEvento_evt" action="{!c.handleCargoImagen}"/>
+
+    <lightning:card title="Logo" iconName="custom:custom61">
+        <div class="slds-align_absolute-center slds-p-vertical_none">
+            <c:CEN_cmp_cargaImagenDinamico recordId="{!v.recordId}"  imagenSrc="{!v.imagenSrc}"/>
+        </div>
+    </lightning:card>
+</aura:component>

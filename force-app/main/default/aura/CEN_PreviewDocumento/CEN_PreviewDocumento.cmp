@@ -1,0 +1,18 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens"
+                access="global"
+                controller="CEN_cls_VisorLotes">
+    
+    <aura:attribute name="OportunidadId" default="" type="String"/>
+    <aura:attribute name="DocCargado" default="false" type="Boolean"/>
+    <aura:attribute name="BodyDocEmbed" default="" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    
+    <aura:if isTrue="{!v.DocCargado}">       
+            <aura:unescapedHtml aura:id ="ContainerPDF" value="{!v.BodyDocEmbed}"/>
+        <aura:set attribute="else">
+            <div class="slds-align_absolute-center" style="height:5rem">
+               <lightning:button  label="Intentar otra vez" iconName="utility:refresh" iconPosition="left" onclick="{!c.refreshFile}" />
+            </div>
+        </aura:set>
+    </aura:if>
+</aura:component>

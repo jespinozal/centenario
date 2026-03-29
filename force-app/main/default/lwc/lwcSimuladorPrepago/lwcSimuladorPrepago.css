@@ -1,0 +1,15 @@
+/* .slds-backdrop_open {
+  opacity: 0.1;
+} */
+
+@media only screen and (min-width: 48em) {
+  .slds-modal__container {
+    width: 100%;
+    max-width: 100% !important;
+  }
+
+  .slds-page-header {
+    border-radius: 0%;
+  }
+
+}

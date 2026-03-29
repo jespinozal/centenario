@@ -1,0 +1,30 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 13-03-2025
+  @last modified by  : Jesus Poco
+-->
+<template>
+    <lightning-card title="Solicitar Segmentación">
+        <div class="slds-p-around_medium">
+            <!-- Spinner mientras se procesa -->
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Cargando..."></lightning-spinner>
+            </template>
+            
+            <!-- Botón habilitado solo si isButtonDisabled es false -->
+            <lightning-button 
+                label="Solicitar Segmentación" 
+                variant="brand" 
+                onclick={handleClick} 
+                disabled={isButtonDisabled}>
+            </lightning-button>
+            
+            <!-- Mensaje de respuesta -->
+            <template if:true={responseMessage}>
+                <p>{responseMessage}</p>
+            </template>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,3 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <img src="{!$Resource.CEN_sr_logoCentenario}"/>
+</aura:component>

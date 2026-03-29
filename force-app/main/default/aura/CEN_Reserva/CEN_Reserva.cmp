@@ -1,0 +1,96 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens,lightning:availableForFlowScreens" access="global" controller="CEN_Reservas" >
+  
+    <aura:attribute name="resultado" type="string" default="false"/>
+    <aura:attribute name="reserva" type="Object" default=""/>
+        <aura:attribute name="mensaje" type="string" default="false"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="recordidentificador" type="String" />
+    <aura:attribute name="btnDisabled" type="Boolean" default="false"/>
+
+        	<aura:attribute name="isModaldoc" type="boolean" default="false"/>
+<aura:handler event="force:refreshView" action="{!c.forceRefreshViewHandler}"/>
+     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <!--
+    <force:recordData aura:id="record"
+    		layoutType="FULL"
+    		recordId="{!v.recordId}"
+    		targetError="{!v.recordError}"
+    		targetRecord="{!v.record}"
+    		targetFields ="{!v.simpleRecord}"
+    mode="VIEW"/>
+-->
+     <lightning:card title="Reserva SAP">
+          <aura:set attribute="actions">
+         <aura:if isTrue="{!v.reserva.Id==null}">
+       
+            <lightning:button variant="brand"
+                              label="Generar una Reserva"
+                              title="Generar una Reserva"
+                              disabled="{!v.btnDisabled}"
+                              onclick="{!c.Prueba}"/>
+        
+         </aura:if>
+              </aura:set>
+         <aura:if isTrue="{!v.reserva.Id!=null}">
+             <div class="slds-p-horizontal_small">
+                        <article class="slds-tile">
+                            <div class="slds-tile__detail">
+                              <dl class="slds-list_horizontal slds-wrap">
+                                <dt class="slds-item_label slds-text-color_weak slds-truncate">Código de Reserva en Salesforce:</dt>
+                                  <dd class="slds-item_detail slds-truncate"><b><a href="{!'/lightning/r/' + v.reserva.Id + '/view'}" target="_blank">{!v.reserva.Name}</a></b></dd>
+                                <dt class="slds-item_label slds-text-color_weak slds-truncate">Código de Reserva en SAP:</dt>
+                                <dd class="slds-item_detail slds-truncate"><ui:outputText value="{!v.reserva.CEN_Cod_Interno_SAP__c }"/></dd>
+                              </dl>
+                            </div>
+                          </article>
+                    </div>
+         </aura:if>
+    </lightning:card>
+    
+    
+    
+    
+    <!--************************************************************************  MODAL  *********************************************************************-->  
+    	<!--Use aura:if tag to display/hide popup based on isModalOpen value-->  
+        <aura:if isTrue="{!v.isModaldoc}">
+            
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModelDoc }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Reserva de Lote</h2>
+                    </header>
+                    
+                   <!--Modal/Popup Box Body Starts here-->
+                   <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1"> 
+                       
+                 	<!--****************************************************** Cabecera del Componente *****************************************************************--> 
+                       <td >
+                                    Estado de la reserva: {!v.mensaje}.
+                                   
+                       </td>
+                       
+                       
+                   <!--*************************************************************************************************************************************************--> 
+                   </div>
+                        <!--Modal/Popup Box Footer Starts her
+                        <footer class="slds-modal__footer">
+                           
+                            <lightning:button variant="brand"
+                                              label="Aceptar"
+                                              title="Aceptar"
+                                              onclick="{!c.redModelDoc}"/>
+                        </footer>e-->
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+     	</aura:if>
+    
+	
+</aura:component>

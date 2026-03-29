@@ -1,0 +1,45 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                access="global" 
+                controller="CEN_cls_Reservas_Oportunidad">
+    <aura:attribute name="recordId" type="String" default="0060v000006Onf2AAC"/>
+    <aura:attribute name="oportunidad" type="Object" default=""/>
+    <aura:attribute name="reserva" type="Object" default=""/>
+    <aura:attribute name="loteDeOportunidad" type="Object" default=""/>
+    <aura:attribute name="btnDisabled" type="Boolean" default="false"/>
+    <aura:handler event="force:refreshView" action="{!c.forceRefreshViewHandler}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:if isTrue="{!v.loteDeOportunidad==null}">
+            <lightning:card title="Reserva SAP">
+                         <p class="slds-p-horizontal_small">
+                             Esta oportunidad no tiene un Lote cotizado.
+                        </p>
+            </lightning:card>
+    </aura:if>
+    <aura:if isTrue="{!v.loteDeOportunidad!=null}">
+       
+            <aura:if isTrue="{!v.reserva==null}">
+                <lightning:card title="Reserva SAP">
+                    <aura:set attribute="actions">
+                        <lightning:button disabled="{!v.btnDisabled}" variant="brand" label="Reservar Lote" title="Reserva el último lote cotizado" onclick="{! c.handleClick }" />
+                    </aura:set>
+                </lightning:card>
+            </aura:if>
+            <aura:if isTrue="{!v.reserva!=null}">
+                <lightning:card title="Reserva SAP">
+                <article class="slds-tile slds-p-horizontal_small">
+                    <div class="slds-tile__detail">
+                        <dl class="slds-list_horizontal slds-wrap">
+                            <dt class="slds-item_label slds-text-color_weak slds-truncate">En Salesforce:</dt>
+                            <dd class="slds-item_detail slds-truncate"><b><a href="{!'/lightning/r/' + v.reserva.Id + '/view'}" target="_blank">{!v.reserva.Name}</a></b></dd>
+                            <dt class="slds-item_label slds-text-color_weak slds-truncate">En SAP:</dt>
+                            <dd class="slds-item_detail slds-truncate"><ui:outputText value="{!v.reserva.CEN_Cod_Interno_SAP__c }"/></dd>
+                        </dl>
+                    </div>
+                    </article>
+                </lightning:card>
+            </aura:if>
+       
+    </aura:if>
+    
+</aura:component>

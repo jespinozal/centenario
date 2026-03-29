@@ -1,0 +1,116 @@
+<template>
+    <lightning-card variant="Narrow" title="Estado de Documentos" icon-name="standard:document">
+        <div style="width: 100%; display:flex; gap:10px; flex-direction: column; margin-left: 10px;">
+
+            <template if:true={isOficina}>
+                <template if:true={cartaFianza}>
+                    <p class="slds-p-horizontal_small" style="font-size: 16px;">
+                        <lightning-icon icon-name="action:approval" alternative-text="Approved" title="Approved"
+                            size="x-small"></lightning-icon>
+                        &nbsp; Carta Fianza: Subido Conforme
+                    </p>
+                </template>
+                <template if:false={cartaFianza}>
+                    <p class="slds-p-horizontal_small" style="font-size: 16px;">
+                        <lightning-icon icon-name="action:close" alternative-text="Close" title="Close"
+                            size="x-small"></lightning-icon>
+                        &nbsp; Carta Fianza: Pendiente
+                    </p>
+                </template>
+                <template if:true={actaEntrega}>
+                    <p class="slds-p-horizontal_small" style="font-size: 16px;">
+                        <lightning-icon icon-name="action:approval" alternative-text="Approved" title="Approved"
+                            size="x-small"></lightning-icon>
+                        &nbsp; Acta Entrega: Subido Conforme
+                    </p>
+                </template>
+                <template if:false={actaEntrega}>
+                    <p class="slds-p-horizontal_small" style="font-size: 16px;">
+                        <lightning-icon icon-name="action:close" alternative-text="Close" title="Close"
+                            size="x-small"></lightning-icon>
+                        &nbsp; Acta Entrega: Pendiente
+                    </p>
+                </template>
+                <template if:true={polizaSeguro}>
+                    <p class="slds-p-horizontal_small" style="font-size: 16px;">
+                        <lightning-icon icon-name="action:approval" alternative-text="Approved" title="Approved"
+                            size="x-small"></lightning-icon>
+                        &nbsp; Póliza de Seguro: Subido Conforme
+                    </p>
+                </template>
+                <template if:false={polizaSeguro}>
+                    <p class="slds-p-horizontal_small" style="font-size: 16px;">
+                        <lightning-icon icon-name="action:close" alternative-text="Close" title="Close"
+                            size="x-small"></lightning-icon>
+                        &nbsp; Póliza de Seguro: Pendiente
+                    </p>
+                </template>
+            </template>
+
+
+            <template if:true={isSala}>
+                <template if:true={fichaReserva}>
+                    <p class="slds-p-horizontal_small" style="font-size: 16px;">
+                        <lightning-icon icon-name="action:approval" alternative-text="Approved" title="Approved"
+                            size="x-small"></lightning-icon>
+                        &nbsp; Ficha de Reserva: Subido Conforme
+                    </p>
+                </template>
+                <template if:false={fichaReserva}>
+                    <p class="slds-p-horizontal_small" style="font-size: 16px;">
+                        <lightning-icon icon-name="action:close" alternative-text="Close" title="Close"
+                            size="x-small"></lightning-icon>
+                        &nbsp; Ficha de Reserva: Pendiente
+                    </p>
+                </template>
+                <template if:true={confirmacion}>
+                    <p class="slds-p-horizontal_small" style="font-size: 16px;">
+                        <lightning-icon icon-name="action:approval" alternative-text="Approved" title="Approved"
+                            size="x-small"></lightning-icon>
+                        &nbsp; Confirmación: Subido Conforme
+                    </p>
+                </template>
+                <template if:false={confirmacion}>
+                    <p class="slds-p-horizontal_small" style="font-size: 16px;">
+                        <lightning-icon icon-name="action:close" alternative-text="Close" title="Close"
+                            size="x-small"></lightning-icon>
+                        &nbsp; Confirmación: Pendiente
+                    </p>
+                </template>
+            </template>
+
+
+            <template if:true={contratoFirmado}>
+                <p class="slds-p-horizontal_small" style="font-size: 16px;">
+                    <lightning-icon icon-name="action:approval" alternative-text="Approved" title="Approved"
+                        size="x-small"></lightning-icon>
+                    &nbsp; Contrato Firmado: Subido Conforme
+                </p>
+            </template>
+            <template if:false={contratoFirmado}>
+                <p class="slds-p-horizontal_small" style="font-size: 16px;">
+                    <lightning-icon icon-name="action:close" alternative-text="Close" title="Close"
+                        size="x-small"></lightning-icon>
+                    &nbsp; Contrato Firmado: Pendiente
+                </p>
+            </template>
+            <template if:true={constanciaPago}>
+                <p class="slds-p-horizontal_small" style="font-size: 16px;">
+                    <lightning-icon icon-name="action:approval" alternative-text="Approved" title="Approved"
+                        size="x-small"></lightning-icon>
+                    &nbsp; Constancia de Pago: Subido Conforme
+                </p>
+            </template>
+            <template if:true={isIndustrial}>
+                <template if:false={constanciaPago}>
+                    <p class="slds-p-horizontal_small" style="font-size: 16px;">
+                        <lightning-icon icon-name="action:close" alternative-text="Close" title="Close"
+                            size="x-small"></lightning-icon>
+                        &nbsp; Constancia de Pago: Pendiente
+                    </p>
+                </template>
+            </template>
+        </div>
+        <!-- <p slot="footer">Card Footer</p> -->
+    </lightning-card>
+</template>

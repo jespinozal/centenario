@@ -1,0 +1,52 @@
+<template>
+    <div class="container">
+        <!-- Tabla de Productos -->
+        <div class="container-table">
+            <span>Escoger Producto:</span>
+            <div style="height: 300px;">
+                <lightning-datatable
+                key-field="Id" 
+                data={data} 
+                columns={columns} 
+                onrowaction={handleRowAction}
+                hide-checkbox-column={hideCheckbox}
+                max-row-selection="1">
+                </lightning-datatable>
+            </div>
+            <div if:true={selectedProduct} class="slds-m-top_small">
+                <lightning-badge label={selectedProduct.Name}></lightning-badge>
+            </div>
+            <!-- AGREGADO: Mostrar errores -->
+            <div if:true={error} class="slds-text-color_error slds-m-top_small">
+                <lightning-formatted-text value={error}></lightning-formatted-text>
+            </div>
+        </div>
+
+        <!-- Formulario de Imagen -->
+        <div class="container-form">
+            <lightning-card title="Asignar Imagen">
+                <div class="center-element">
+                    <div class="slds-form-element">
+                        <lightning-file-upload label="Subir Imagen (1 máximo):" name="fileUploader"
+                            accept={acceptedFormats} record-id={selectedProductId}
+                            onuploadfinished={handleUploadFinished} disabled={isUploadDisabled} multiple={allowMultiple}
+                            onchange={handleFileChange} key={uploaderKey}>
+                        </lightning-file-upload>
+                    </div>
+                </div>
+
+                <template if:true={imageUrl}>
+                    <div class="slds-m-top_medium center-element">
+                        <img src={imageUrl} alt="Previsualización" class="preview-image" />
+                    </div>
+                </template>
+
+                <div class="center-element slds-m-top_medium">
+                    <lightning-button variant="brand" label="Guardar Imagen en Producto" onclick={handleSave}
+                        disabled={saveDisabled}>
+                    </lightning-button>
+                </div>
+            </lightning-card>
+        </div>
+    </div>
+</template>

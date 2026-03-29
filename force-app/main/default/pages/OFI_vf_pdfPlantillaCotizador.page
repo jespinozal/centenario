@@ -1,0 +1,394 @@
+<apex:page applyHtmlTag="false"
+  applyBodyTag="false"
+  showHeader="false"
+  renderAs="pdf"
+  standardController="Quote"
+  extensions="OFI_PdfPlantillaCotizador_cls"
+  title="PDF Cotización"
+  language="es_ES"
+>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <style type="text/css">
+      @page {
+        size: A4 portrait;
+        margin: 2px 12px;
+        font-family: sans-serif;
+        padding: 4px 12px 0px 12px;
+        /* @top-right {
+          content: element(header);
+        } */
+        @bottom-left {
+          content: element(footer);
+        }
+      }  
+
+      div.footer {
+        display: block;
+        margin-left: 64px;
+        padding-bottom: 32px;
+        text-align: left;
+        position: running(footer);
+      }
+
+      div.header{
+        background-color: yellow;
+      }
+      
+      
+
+      p{
+          font-size: 16px;
+          font-family: sans-serif;
+          letter-spacing: 2px;
+      }
+      body{
+        margin: 0 23px;
+        padding: 10px 16px 48px 16px;
+        position: relative;
+        z-index: 2;
+        background-color: peru;
+        box-sizing: border-box;
+      }
+        
+      .body{
+        margin: 0 23px;
+        padding: 10px 16px 0px 16px;
+        background: white;
+        /* height: 980px; */
+      }
+        
+      .body--img{
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 150px;
+        width: 150px;
+        background: #fff;
+      }
+      .body--img img{
+        /* width: fit-content; */
+        height: 100%;
+      }
+        
+      .body--title{
+        position: relative;
+        padding: 30px 30px 18px;
+      }
+      .body--start{
+        position: relative;
+        padding: 0 30px;
+      }
+      .body--end{
+        position: relative;
+        padding: 0 30px;
+      }
+        
+      .body--details{
+        /* position: relative;
+        padding: 0 30px;
+        display: block; */
+      }
+      .body--details table{
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .body--details__img{
+        width: 238px;
+        height: 292px;
+        vertical-align: center;
+      }
+      .body--details__img img{
+        width: 100%;
+        height: 100%;
+        border: 1px solid #ccc;
+        object-fit: cover;
+      }
+      .body--details__details{
+        vertical-align: center;
+      }
+      .body--details__row{
+        /* display: flex; */
+        display: table-row;
+        height: 18px;
+      }
+
+      /* MEJORA DE TABLA INTERNA */
+      .body--details__row td {
+        display: table-cell;
+        width: 50%;
+        padding: 4px 12px; /* Espaciado interno muy corto */
+        font-size: 12px;
+        line-height: 1.1;
+        vertical-align: middle;
+        border-bottom: 1px solid #ddd; /* Línea separadora */
+      }
+      .body--details__row:last-child td {
+        border-bottom: none; /* Quita línea en la última fila */
+      }
+
+      .body--details__row p{
+        width: 50%;
+        /* margin: 9px 12px; */
+        display: table-cell;
+        padding: 6px 12px;
+        font-size: 12px;
+        line-height: 1.2;
+        vertical-align: top;
+      }
+      .body--details__row .lines{
+        /* display: inline-block; */
+        word-wrap: break-word;        /* Rompe palabras largas */
+        overflow-wrap: break-word;    /* Moderno (reemplaza word-wrap) */
+        hyphens: auto;                /* Opcional: guiones automáticos */
+        /*line-height: 1.1;             /* Mejora legibilidad */
+      }
+
+
+
+
+      .body--tables{
+        margin-left: 32px;
+      }
+      .body--tables table {
+        border-spacing: 0;          /* ya no hace falta con collapse */
+        border-collapse: collapse;  /* ← ESTO ES LA CLAVE */
+        border: none;               /* quitamos el borde de la tabla */
+      }
+      .body--tables table.table-border tr td,
+      .body--tables table.table-border thead tr td,
+      .body--tables table.table-border thead tr td,
+      .body--tables table.table-border tbody tr td,
+      .body--tables table.table-border tbody tr td {
+        text-align: center;
+        border: 1px solid #000;/*aquí pones el grosor que realmente quieres ver */
+        padding: 3px 8px;/* opcional, para que no quede todo pegado */
+      }
+      .body--tables__img{
+        width: 90px;
+        height: fit-content;
+        vertical-align: center;
+        margin-right: 30px;
+      }
+      .body--tables__img img{
+        width: 90%;
+        height: 90%;
+        border: 1px solid #ccc;
+        object-fit: cover;
+      }
+      .body--tables__td{
+        height: 25%;
+      }
+
+      .body--end__sign{
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .body--end__sign p{
+        width: 100%;
+        text-align: center;
+      }
+        
+      .semibold{font-weight: 400;}
+      .text-xs{font-size: 12px;}
+      .text-sm{font-size: 14px;}
+      .text-md{font-size: 18px;}
+      .text-lg{font-size: 20px;}
+      .text-xl{font-size: 22px;}
+      .bold{font-weight: 700;}
+      .lh-none{line-height: 0;}
+      .lh-xs{line-height: 0.5;}
+      .lh-sm{line-height: 1;}
+      .lh-md{line-height: 1.5;}
+      .lh-lg{line-height: 2;}
+      .p-0{padding: 0;}
+      .py-0{padding-top: 0 !important; padding-bottom:0 !important;}
+      .br{
+        width: 100%;
+        height: 1px;
+        background: #ccc;
+      }
+      .middle--space{
+        width: 100%;
+        height: 18px;
+      }
+      .last--space{
+        width: 100%;
+        height: 86px;
+      }
+      .space-10{width: 100%;height: 10px;}
+      .space-15{width: 100%;height: 15px;}
+      .space-20{width: 100%;height: 20px;}
+      .space-25{width: 100%;height: 25px;}
+      .justify{
+        text-align: justify;
+        text-justify: inter-word;
+      }
+      
+        
+    </style>
+  </head>
+      
+  <div class="body">
+
+    
+
+    <div class="header"></div>
+  
+    <div class="body--img">
+      <img src="{!$Resource.OFI_CentenarioOficinas}"/>
+    </div>
+
+    
+
+    <div class="body--title">
+        <p class="lh-md text-sm" style="font-weight:300;">
+          <span class="bold">Fecha:</span> San Isidro,
+          <apex:outputText value="{!fecha}" />
+        </p>
+        <p class="lh-none semibold text-sm"><span class="bold">Empresa: </span><span class="text-sm semibold lh-none"><apex:outputText value="{!account.Name}" /></span></p>
+        
+    </div>
+    
+    <div class="body--start">
+        <p class="lh-none text-sm">Referencia:</p>
+        <p class="bold lh-none text-sm">Cotización de Inmuebles</p>
+        <p class="lh-lg text-sm">Estimados Señores:</p>
+        <p class="justify text-sm">Nos es grato hacerles llegar nuestra oferta y condiciones contractuales básicas para el arrendamiento de inmuebles, de acuerdo al siguiente detalle:</p>
+    </div> 
+    
+    <apex:outputPanel rendered="{!isLessThanThree}">
+        <div class="space-10"></div>
+    </apex:outputPanel>
+    <div class="space-10"></div>
+
+    <div class="body--tables w-full bg-red" >
+      <table class="w-full bg-purple1 table-border" style="width: 95%; font-family: sans-serif;">
+        <thead>
+          <tr class="pt-2 pb-2">
+            <td class="text-sm" style="background: #7b5229; color: #fff;">Oficina</td>
+            <td class="text-sm" style="background: #7b5229; color: #fff;">Edificio</td>
+            <td class="text-sm" style="background: #7b5229; color: #fff;">Metraje</td>
+            <td class="text-sm" style="background: #7b5229; color: #fff;">Precio Unit.</td>
+            <td class="text-sm" style="background: #7b5229; color: #fff;">Total</td>
+          </tr>
+        </thead>
+        <tbody>
+          <apex:repeat value="{!lotList}" var="ofi">
+            <tr>
+                <td class="text-xs" style="text-align: left;">{!ofi.Product2.Name}</td>
+                <td  class="text-xs">{!ofi.Product2.OFI_fld_Product2_DescEdificio__c}</td>
+                <td  class="text-xs">
+                  <apex:outputText value="{0, number, ###,##0.00}">
+                    <apex:param value="{!ofi.Product2.OFI_fld_Product2_BaseMedida__c}" />
+                  </apex:outputText>
+                  {!ofi.Product2.OFI_fld_Product2_DenominacionTipoMedida__c}
+                </td>
+                <td  class="text-xs">
+                  <apex:outputText value="{0, number, ###,##0.00}">
+                    <apex:param value="{!ofi.CEN_precio_m2_cotizado_lote__c}" />
+                  </apex:outputText>
+                  &#160;
+                  <apex:outputText value="{!divisa}" />
+                </td>
+                <td  class="text-xs">
+                  <apex:outputText value="{0, number, ###,##0.00}">
+                    <apex:param value="{!ofi.CEN_precio_venta_cotizado_lote__c}" />
+                  </apex:outputText>
+                  &#160;
+                  <apex:outputText value="{!divisa}" />
+                </td>
+            </tr>
+        </apex:repeat>
+        </tbody>
+      </table>
+
+      <apex:outputPanel rendered="{!isLessThanThree}">
+        <div class="space-10"></div>
+        <div class="space-15"></div>
+      </apex:outputPanel>
+      <div class="space-10"></div>
+      
+      <table class="w-full" style="width: 95%;">
+        <tr>
+          <td class="body--tables__img" style="border-top: none; border-left: 0px; border-bottom: 0; width: 146px;">
+            <apex:variable var="recurso" value="{!imagenUrl}"/>
+            <apex:image value="{!URLFOR($Resource[recurso])}"/>
+          </td>
+          <td class="py-0 body--tables__td" style="width: 160px; vertical-align: middle;">
+            <apex:outputText value="Plazo Forzoso: {!plazoForzoso}" rendered="{!isPlazoForzoso}" style="font-family:sans-serif; font-size: 12px;" />
+            <apex:outputPanel rendered="{!isPlazoForzoso}">
+              <br/>
+              <br/>
+            </apex:outputPanel>
+            <apex:outputText value="Incrementos Anuales: {!incrementosAnuales}" rendered="{!isIncrementosAnuales}" style="font-family:sans-serif; font-size: 12px;" />
+            <apex:outputPanel rendered="{!isIncrementosAnuales}">
+              <br/>
+              <br/>
+            </apex:outputPanel>
+            <apex:outputText value="Garantía: {!garantia}" rendered="{!isGarantia}" style="font-family:sans-serif; font-size: 12px;" />
+            <apex:outputPanel rendered="{!isGarantia}">
+              <br/>
+              <br/>
+            </apex:outputPanel>
+            <apex:outputText value="Gastos de Condominio: {!gastosCondominio}" rendered="{!isGastosCondominio}" style="font-family:sans-serif; font-size: 12px;" />
+            <apex:outputPanel rendered="{!isGastosCondominio}">
+              <br/>
+              <br/>
+            </apex:outputPanel>
+            <apex:outputText value="Periodo de Gracia: {!periodoGracia}" rendered="{!isPeriodoGracia}" style="font-family:sans-serif; font-size: 12px;" />
+            <apex:outputPanel rendered="{!isPeriodoGracia}">
+              <br/>
+              <br/>
+            </apex:outputPanel>
+            <apex:outputText value="Plazo Voluntario: {!plazoVoluntario}" rendered="{!isPlazoVoluntario}" style="font-family:sans-serif; font-size: 12px;" />
+            <apex:outputPanel rendered="{!isPlazoVoluntario}">
+              <br/>
+              <br/>
+            </apex:outputPanel>
+            <apex:outputText value="Información Adicional: {!informacionAdicional}" rendered="{!isInformacionAdicional}" style="font-family:sans-serif; font-size: 12px;" />
+          </td>
+        </tr>
+      </table>
+    </div>
+    
+    <apex:outputPanel rendered="{!isLessThanThree}">
+        <div class="space-10"></div>
+        <div class="space-15"></div>
+      </apex:outputPanel>
+      <div class="space-10"></div>
+
+    <div class="body--end">
+        <p class="text-sm justify">La vigencia de esta cotización es por un plazo de 05 días calendario contados a partir de la fecha de envío.</p>
+        <p class="text-sm justify">Todas las cifras no incluyen IGV. Las condiciones y la disponibilidad de los espacios están sujetas a variación sin previo aviso.</p>
+        <p class="text-sm justify">No duden en contactarnos para cualquier consulta al número 943.867.197 o al correo gvargasb@centenario.com.pe</p>
+        <div class="space-10"></div>
+        <p class="text-sm" style="margin-top: 12px;">Atentamente,</p>
+        <div class="space-20"></div>
+        <div class="body--end__sign">
+          <p class="text-xs underline lh-sm mb-2">Gino Vargas</p>
+          <div class="br"></div>
+          <p class="text-xs bold lh-sm mt-0">Jefe Comercial</p>
+        </div>
+        <div style="width: 100%; align-items: center;">
+          <a href="http://www.centenariooficinas.pe" class="text-xs" style="width:100%; text-align: center; display:inline-block;">www.centenariooficinas.pe</a>
+        </div>
+      <div class="footer">
+        <table>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+          </tr>
+        </table>
+        <p>Centenario Renta Inmobiliaria</p>
+        <p>Av. Víctor Andrés Belaunde 147, vía Principal165-Edificio Real 3 - San Isidro, Lima, Perú - Tel: +51 969 571 648</p>
+      </div>
+
+    
+    </div>
+  </div>
+</apex:page>

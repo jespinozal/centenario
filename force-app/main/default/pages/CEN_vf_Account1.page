@@ -1,0 +1,2 @@
+<apex:page applyHtmlTag="false" showHeader="false" standardController="Account" action="{!attach}" extensions="CEN_cls_AccountAttach">
+</apex:page>

@@ -1,0 +1,325 @@
+<apex:page applyHtmlTag="false"
+            applyBodyTag="false"
+            docType="html-5.0"
+            showHeader="false"
+            showQuickActionVfHeader="false"
+            standardStylesheets="false"
+            standardController="Account"
+            extensions="CEN_parambuscadorGoogleMap_cls">
+
+  <style type="text/css">
+  @import url('http://fonts.cdnfonts.com/css/trebuchet-ms-2');
+  #map {
+    height: 100%;
+  }
+  .botonGuardar {
+    padding: 8px;
+    background-color: #0176d3;
+    border-color: #0176d3;
+    color: #ffffff;
+    border-radius: 4px;
+    border-inline-start: 10px;
+    border-inline-end: 10px;
+    margin-left:10px;
+    margin-top: 10px;
+  }
+
+  .botonGuardar:hover {
+            background-color: #014486 !important;
+            background: none;
+            border-color: transparent;
+  }
+
+
+/*
+ * Optional: Makes the sample page fill the window.
+ */
+  html,
+  body {
+    font: 400 18px Roboto, Arial, sans-serif;
+    font-size: 12px;
+    height: 90%;
+    margin: 0;
+    padding: 0;
+  }
+
+  #description {
+    font-family: Roboto;
+    font-size: 15px;
+    font-weight: 300;
+  }
+
+  #infowindow-content .title {
+    font-weight: bold;
+  }
+
+  #infowindow-content {
+    display: none;
+  }
+
+  #map #infowindow-content {
+    display: inline;
+  }
+
+  .pac-card {
+    background-color: #fff;
+    border: 0;
+    border-radius: 2px;
+    box-shadow: 0 1px 4px -1px rgba(0, 0, 0, 0.3);
+    margin: 10px;
+    padding: 0 0.5em;
+    font: 400 18px Roboto, Arial, sans-serif;
+    overflow: hidden;
+    font-family: Roboto;
+    padding: 0;
+  }
+
+  #pac-container {
+    padding-bottom: 12px;
+    margin-right: 12px;
+  }
+
+  .pac-controls {
+    display: inline-block;
+    padding: 5px 11px;
+  }
+
+  .pac-controls label {
+    font-family: Roboto;
+    font-size: 13px;
+    font-weight: 300;
+  }
+
+  #pac-input {
+    background-color: #fff;
+    font-family: Roboto;
+    font-size: 15px;
+    font-weight: 300;
+    margin-left: 12px;
+    margin-top: 10px;
+    padding: 10px;
+    text-overflow: ellipsis;
+    width: 400px;
+  }
+
+  #pac-input:focus {
+    border-color: #4d90fe;
+  }
+
+  #title {
+    color: #fff;
+    background-color: #4d90fe;
+    font-size: 25px;
+    font-weight: 500;
+    padding: 6px 12px;
+  }
+
+  #target {
+    width: 345px;
+  }
+
+  .pac-container, .pac-item{
+    z-index: 2147483647 !important;
+  }
+
+  .direccionMap{width:200px;}
+</style>
+
+<html>
+  <head>
+    <title>Place Autocomplete Address Form</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+    <meta charset="utf-8"/>
+  </head>
+  <body>
+    <div>
+      <apex:form >
+        <apex:outputPanel id="seccionErrores">
+          <div style="display: {!IF(MsgError, '', 'none')};">
+            <h3>
+              <apex:image value="/img/msg_icons/warning16.png" /> &nbsp;No se puede continuar. Los siguientes campos están vacíos:
+            </h3>
+              <ul>
+                <apex:repeat var="a" value="{!listaDeErrores}">
+                  <li class="elementoError"><apex:outputText value="{!a}"/></li>
+                </apex:repeat>
+              </ul>
+          </div>
+        </apex:outputPanel>
+      </apex:form>
+    </div>
+    <div style="display: {!IF(MsgMapaOk, '', 'none')};">
+      <apex:form styleClass="theButton">
+        <div style="display: none; ">
+          <apex:inputText styleClass="ubicacionMap" value="{!account.CEN_Ubicacion__c}"/>
+          <apex:inputText styleClass="latitudMap" value="{!account.CEN_Latitude__c}"/>
+          <apex:inputText styleClass="longitudMap" value="{!account.CEN_Longitude__c}"/>
+          <apex:inputText styleClass="urlMap" value="{!account.CEN_URL_map__c}"/>
+        </div>
+        Dirección Legal &nbsp; <apex:inputText styleClass="direccionMap" value="{!account.CEN_Direccion__c}"/>
+        <apex:commandButton styleClass="botonGuardar" rerender="form" status="status" value="Guardar" action="{!save}"/>
+        <!-- <apex:commandButton styleClass="botonGuardar" value="Guardar" action="{!guardarDireccion}" onclick="!showToastSuccess();" /> -->
+        <apex:actionStatus id="status">
+            <apex:facet name="start">
+            <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.25; z-index: 1000; background-color: black;">
+              &nbsp;
+            </div>
+            <div style="position: fixed; left: 0; top: 0; bottom: 0; right: 0; z-index: 1001; margin: 15% 50%">
+            <div style="display: inline-block; padding: 2px; background-color: #fff; width:125px;">
+              <img src="/img/loading.gif" style="float: left; margin: 8px;"/>
+              <span style="display: inline-block; padding: 10px 0px;">Please Wait...</span>
+            </div>
+            </div>
+          </apex:facet>
+        </apex:actionStatus>
+      </apex:form>
+    </div>
+
+    <p></p>
+
+    <input
+        id="pac-input"
+        class="controls"
+        type="text"
+        placeholder="Escribir Direccion Google Maps"
+        style="display: {!IF(MsgMapaOk, '', 'none')};"
+      />
+    <div id="map"  style="display: {!IF(MsgMapaOk, '', 'none')};">
+    </div>
+
+<script type="text/javascript">
+
+  var map;
+  var direccionMapa;
+
+  function initMap() {
+    var latitudMap = document.getElementsByClassName('latitudMap')[0].value;
+    var longitudMap = document.getElementsByClassName('longitudMap')[0].value;
+    var defaultLatLong = {
+    lat: latitudMap ? parseFloat(latitudMap) : -12.0469615,
+    lng: longitudMap ? parseFloat(longitudMap) : -77.0372758
+    };
+
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: defaultLatLong,
+      zoom: 13,
+      mapTypeId: 'roadmap'
+    });
+
+    let input = document.getElementById('pac-input');
+    //let boton = document.getElementsByClassName('theButton')[0];
+    let autocomplete = new google.maps.places.Autocomplete(input);
+
+    autocomplete.bindTo('bounds', map);
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+    //map.controls[google.maps.ControlPosition.TOP_LEFT].push(boton);
+
+    let marker = new google.maps.Marker({
+      map: map,
+      position: defaultLatLong,
+      draggable: true,
+      clickable: true
+    });
+
+    google.maps.event.addListener(marker, 'dragend', function(marker) {//cuando muevo el marcador
+      const latLng = marker.latLng;
+      map.setCenter(this.getPosition());
+      currentLatitude = latLng.lat();
+      currentLongitude = latLng.lng();
+      const latlng = {
+        lat: currentLatitude,
+        lng: currentLongitude
+      };
+      const geocoder = new google.maps.Geocoder;
+      geocoder.geocode({
+        'location': latlng
+      }, function(results, status) {
+        if (status === 'OK') {
+          if (results[0]) {
+            input.value = results[0].formatted_address;
+            document.getElementsByClassName('latitudMap')[0].value = latLng.lat();
+            document.getElementsByClassName('longitudMap')[0].value = latLng.lng();
+            document.getElementsByClassName('ubicacionMap')[0].value = input.value;
+            document.getElementsByClassName('urlMap')[0].value = "https://www.google.com/maps/search/"+latLng.lat()+","+latLng.lng();
+            direccionMapa = input.value;
+          } else {
+            window.alert('No results found');
+          }
+        } else {
+          window.alert('Geocoder failed due to: ' + status);
+        }
+      });
+    });
+
+    autocomplete.addListener('place_changed', function() {//cuando selecciono una sugerencia del box
+      const place = autocomplete.getPlace();
+      if (!place.geometry) {
+        return;
+      }
+      if (place.geometry.viewport) {
+        map.fitBounds(place.geometry.viewport);
+      } else {
+        map.setCenter(place.geometry.location);
+      }
+
+      marker.setPosition(place.geometry.location);
+      currentLatitude = place.geometry.location.lat();
+      currentLongitude = place.geometry.location.lng();
+      document.getElementsByClassName('latitudMap')[0].value = currentLatitude;
+      document.getElementsByClassName('longitudMap')[0].value = currentLongitude;
+      document.getElementsByClassName('ubicacionMap')[0].value = place.formatted_address;
+      document.getElementsByClassName('urlMap')[0].value = "https://www.google.com/maps/search/"+currentLatitude+","+currentLongitude;
+    });
+
+    google.maps.event.addListener(map, 'click', function(event) {
+      marker.setPosition(event.latLng);
+      map.setCenter(marker.getPosition());
+      let ubicacion;
+      const geocoder = new google.maps.Geocoder;
+      geocoder.geocode({
+      'latLng': event.latLng
+      }, function(results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+          if (results[0]) {
+            input.value = results[0].formatted_address;
+          }
+        }
+      });
+      document.getElementsByClassName('latitudMap')[0].value = event.latLng.lat();
+      document.getElementsByClassName('longitudMap')[0].value = event.latLng.lng();
+      document.getElementsByClassName('ubicacionMap')[0].value = input.value;
+      document.getElementsByClassName('urlMap')[0].value = "https://www.google.com/maps/search/"+event.latLng.lat()+","+event.latLng.lng();
+    });
+  }
+
+  document.onfullscreenchange = function ( event ) {
+
+    let target = event.target;
+    let pacContainerElements = document.getElementsByClassName("pac-container");
+
+    if (pacContainerElements.length > 0) {
+        let pacContainer = document.getElementsByClassName("pac-container")[0];
+        if (pacContainer.parentElement === target) {
+            console.log("Exiting FULL SCREEN - moving pacContainer to body");
+            document.getElementsByTagName("body")[0].appendChild(pacContainer);
+        } else {
+            console.log("Entering FULL SCREEN - moving pacContainer to target element");
+            target.appendChild(pacContainer);
+        }
+    } else {
+            console.log("FULL SCREEN change - no pacContainer found");
+    }};
+
+
+  function showToastSuccess() {
+    sforce.one.showToast({
+      "title": "Generandose documentos",
+      "message": "Dirección actualizada y generando Documentos.",
+      "type": "success"
+    });
+  }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB6Ps4n7pYwD74MBFwEw7cRqEk5lboKVnI&callback=initMap&libraries=places&v=weekly" defer="true"></script>
+</body>
+</html>
+</apex:page>

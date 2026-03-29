@@ -1,0 +1,52 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                access="global"
+                controller="CEN_cls_Agregar_Lote_Interaccion">
+    <aura:attribute name="recordId" type="String" default="0010v00000VZtcmAAD"/>	
+    <aura:attribute name="lotesShowed" type="List" default=""/>  
+    <aura:attribute name="LotesCuenta" type="List" default=""/>
+    <aura:attribute name="totalLotes" type="Integer" default="0"/>
+    <aura:attribute name="verTodosBool" type="Boolean" default="false"/>   
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <lightning:card title="{!'Lotes ('+v.totalLotes+')'}" iconName="standard:product_item">
+        <div class="slds-p-horizontal_medium">
+                   <aura:if isTrue="{!v.verTodosBool==false}">
+                       <aura:iteration items="{!v.lotesShowed}" var="item">
+                           <lightning:tile label="{!item.Name}" href="{!item.Url}">
+                               <aura:set attribute="media">
+                                   <lightning:avatar size="x-small" fallbackIconName="standard:product" alternativeText="{!item.Name}"/>
+                               </aura:set>
+                                <ul class="slds-list_horizontal slds-has-dividers_right">
+                                    <li class="slds-item">Origen: {!item.Origen}</li>
+                                </ul>
+                           </lightning:tile>
+                       </aura:iteration>
+                       <aura:set attribute="else">
+                            <aura:iteration items="{!v.LotesCuenta}" var="item">
+                               <lightning:tile label="{!item.Name}" href="{!item.Url}">
+                                   <aura:set attribute="media">
+                                       <lightning:avatar size="x-small" fallbackIconName="standard:product" alternativeText="{!item.Name}"/>
+                                   </aura:set>
+                                   <ul class="slds-list_horizontal slds-has-dividers_right">
+                                    <li class="slds-item">Origen: {!item.Origen}</li>
+                                </ul>
+                               </lightning:tile>
+                           </aura:iteration>
+                       </aura:set>
+                   </aura:if>
+            </div>
+        <aura:set attribute="footer">
+             <aura:if isTrue="{!v.totalLotes>3}">
+               <div class="slds-text-align_center">
+                   <a href="javascript:void(0)" onclick="{!c.verTodos}">
+                       <aura:if isTrue="{!v.verTodosBool==false}">
+                           Ver todos
+                           <aura:set attribute="else">
+                               Ver menos
+                           </aura:set>
+                       </aura:if>                       
+                   </a>
+               </div>
+             </aura:if>
+         </aura:set>        
+    </lightning:card>    
+</aura:component>

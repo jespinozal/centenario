@@ -1,0 +1,64 @@
+.THIS {
+}
+
+.THIS .profilePicture {
+	float:none; 
+    max-width:35%;
+}
+
+.THIS .caseButton{
+   background-color: #FFFFFF;
+   border-color: white;
+}
+
+.THIS .popover-body-address {
+    max-width:80%;
+    white-space: normal; 
+    word-wrap: break-word;
+}
+
+.THIS .popover-body-email {
+    max-width:80%;
+    white-space: normal; 
+    word-break: break-all;
+}
+
+.THIS .contactInformation {
+    max-width:78%;
+}
+
+.THIS .ActivityIndicator {
+    vertical-align: middle;
+}
+
+.THIS .figureAligned {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.THIS .figureTop {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.THIS .csatContainer {
+    height: 60px;
+    text-align: center;
+}
+
+.THIS .csatText {
+    font-size: 15px;
+    position: relative; 
+    top: 0px;
+}
+
+.THIS .csatCanvas {
+    position: relative; 
+}
+
+.THIS .csatValue {
+    font-size: 15px;
+    font-weight: bold;
+    position: relative;
+	top: -22px;
+}

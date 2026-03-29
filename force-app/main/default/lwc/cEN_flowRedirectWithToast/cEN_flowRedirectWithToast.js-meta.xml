@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>59.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Flow Redirect With Toast</masterLabel>
+    <description>Muestra una notificación y redirige a un ID de registro.</description>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <property name="recordId" type="String" label="ID del Registro de Destino" description="El ID del registro al que se va a redirigir."/>
+            <property name="toastTitle" type="String" label="Título del Toast" description="El título para la notificación."/>
+            <property name="toastMessage" type="String" label="Mensaje del Toast" description="El mensaje para la notificación. Puedes usar {recordId}."/>
+            <property name="toastVariant" type="String" label="Variante del Toast" description="success, warning, error, info"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

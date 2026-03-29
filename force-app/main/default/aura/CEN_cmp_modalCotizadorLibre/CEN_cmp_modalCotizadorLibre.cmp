@@ -1,0 +1,220 @@
+<aura:component
+  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens,lightning:availableForFlowScreens"
+  access="global"
+  controller = "CEN_ModalCotizadorLibre_ctr"
+>
+  <aura:attribute name="IdOportunidad" type="string" />
+  <aura:attribute name="proforma" type="string" />
+  <aura:attribute name="tipoVenta" type="string" />
+  <aura:attribute name="moneda" type="string" />
+  <aura:attribute name="esCotizacionLibre" type="Boolean" />
+  <aura:attribute name="isVisible" type="Boolean" default = "false" />
+  <!--NAVIGATION-->
+  <aura:attribute name="modalActivado" type="Boolean" default="true" />
+  <aura:attribute name="pag1" type="Boolean" default="true" />
+  <aura:attribute name="pag2" type="Boolean" default="false" />
+  <aura:attribute name="pag3" type="Boolean" default="false" />
+  <!-- <aura:attribute name="pagNC" type="Boolean" default="false" />
+  <aura:attribute name="isNC" type="Boolean" default="false" /> -->
+  <!--DATA FOR PAGE1-->
+  <aura:attribute name="selectedLookUpRecord" type="sObject" />
+  <aura:attribute name="idProyectoSF" type="string" />
+  <!--DATA FOR PAGE2-->
+  <aura:attribute name="disabledBtnGenerarFinanciamento" type="boolean" default="false" />
+  <aura:attribute name="disabledBtnCalcularFinanciamento" type="boolean" default="false" />
+  <aura:attribute name="hasPermission" type="boolean" default="false" />
+  <aura:attribute name="flagGenerarCotizacion" type="boolean" default="false" />
+  <aura:attribute name="flagCalcularCotizacion" type="boolean" default="false" />
+  <aura:attribute name="flagCalcularDescuento" type="boolean" default="false" />
+  <!--DATA FOR PAGE3-->
+  <aura:attribute name="pdfCotizacionId" type="string" />
+  <aura:attribute name="pdfCotizacionBlob" type="string" />
+  <aura:attribute name="idRegistroCotizacion" type="string" />
+  <!--DATA PARA AMBOS PAGE-->
+  <aura:attribute
+    name="lotesJSON"
+    type="string"
+    description="JSON Lotes seleccionados para cotizar"
+  />
+  <aura:attribute
+    name="lotesList"
+    default=""
+    type="List"
+    description="Lotes seleccionados para cotizar"
+  />
+
+  <!--HANDLER-->
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+<aura:if isTrue="{!v.isVisible}">
+  <aura:html tag="style">
+    .cuf-content { padding: 0 0rem !important; } .slds-p-around--medium {
+    padding: 0rem !important; } .slds-modal__content{ } .slds-modal__container{
+    height : 100%; width: 100%; max-width: 100%; } .modal-body{ height: auto
+    !important; max-height: 100% !important; } .customFooter{ display: inline
+    !important; } .modal-header{ visibility: hidden; } .modal-footer{
+    visibility: hidden; }
+  </aura:html>
+
+  <section
+    role="dialog"
+    tabindex="-1"
+    class="slds-modal slds-fade-in-open slds-modal_large"
+    aria-labelledby="modal-heading-01"
+    aria-modal="true"
+    aria-describedby="modal-content-id-1"
+  >
+    <div class="slds-modal__container">
+      <header class="slds-modal__header">
+        <lightning:buttonIcon
+          class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+          iconName="utility:close"
+          size="large"
+          variant="bare"
+          onclick="{! c.closeModal }"
+          alternativeText="Cerrar"
+          title="Cerrar"
+        />
+        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+          Nueva cotización
+        </h2>
+      </header>
+      <div
+        class="slds-modal__content slds-p-around_x-small"
+        id="modal-content-id-1"
+      >
+        <aura:if isTrue="{!v.flagGenerarCotizacion}">
+          <lightning:spinner
+            alternativeText="Loading"
+            size="medium"
+            variant="brand"
+            class="generarCotizacionSpinner"
+          />
+        </aura:if>
+
+        <aura:if isTrue="{!and(not(v.flagCalcularDescuento),v.flagCalcularCotizacion)}">
+          <lightning:spinner
+            alternativeText="Loading"
+            size="medium"
+            variant="brand"
+            class="calcularCotizacionSpinner"
+          />
+        </aura:if>
+
+        <aura:if isTrue="{!and(v.flagCalcularDescuento,v.flagCalcularCotizacion)}">
+          <lightning:spinner
+            alternativeText="Loading"
+            size="medium"
+            variant="brand"
+            class="calcularDescuentoSpinner"
+          />
+        </aura:if>
+
+        <div class="{!if(v.pag1,'slds-show','slds-hide')}">
+          <c:CEN_Visorlotes
+            selectedLookUpRecord="{!v.selectedLookUpRecord}"
+            idProyectoSF="{!v.idProyectoSF}"
+            lotesList="{!v.lotesList}"
+            recordId="{!v.recordId}"
+            IdOportunidad="{!v.IdOportunidad}"
+            esCotizacionLibre="{!v.esCotizacionLibre}"
+            moneda="{!v.moneda}"
+          />
+        </div>
+        <div class="{!if(v.pag2,'slds-show','slds-hide')}">
+          <c:CEN_Cotizador
+            lotesList="{!v.lotesList}"
+            recordId="{!v.IdOportunidad}"
+            IdOportunidad="{!v.IdOportunidad}"
+            CotizacionLibre="{!v.esCotizacionLibre}"
+            disabledBtnGenerarFinanciamento="{!v.disabledBtnGenerarFinanciamento}"
+            disabledBtnCalcularFinanciamento="{!v.disabledBtnCalcularFinanciamento}"
+            hasPermission="{!v.hasPermission}"
+            proforma="{!v.proforma}"
+            tipoVenta="{!v.tipoVenta}"
+            pageCotizador="{!v.pag2}"
+            pdfCotizacionBlob="{!v.pdfCotizacionBlob}"
+            flagGenerarCotizacion="{!v.flagGenerarCotizacion}"
+            flagCalcularCotizacion="{!v.flagCalcularCotizacion}"
+            flagCalcularDescuento="{!v.flagCalcularDescuento}"
+            pdfCotizacionId="{!v.pdfCotizacionId}"
+            idRegistroCotizacion="{!v.idRegistroCotizacion}"
+            proyecto="{!v.selectedLookUpRecord}"
+          />
+        </div>
+        <div class="{!if(v.pag3,'slds-show','slds-hide')}">
+          <div
+            class="slds-grid slsds-grid_vertica slds-wrap"
+            style="width: 100%; max-height: 100%"
+          >
+            <aura:if isTrue="{!not(empty(v.pdfCotizacionId))}">
+              <div class="sdls-col slds-size_1_of_1" style="width: 100%">
+                <aura:unescapedHtml
+                  value="{!'&lt;embed src=&quot;/servlet/servlet.FileDownload?file='+v.pdfCotizacionId+'&quot; style=&quot;width: 100%;height:100vh;&quot;/&gt;'}"
+                />
+              </div>
+            </aura:if>
+            <aura:if isTrue="{!not(empty(v.pdfCotizacionBlob))}">
+              <div class="sdls-col slds-size_1_of_1" style="width: 100%">
+                <aura:unescapedHtml
+                  value="{!'&lt;embed src=&quot;'+v.pdfCotizacionBlob+'&quot; style=&quot;width: 100%;height:100vh;&quot;/&gt;'}"
+                />
+              </div>
+            </aura:if>
+          </div>
+        </div>
+      </div>
+      <footer class="slds-modal__footer slds-modal__footer_directional">
+        <aura:if isTrue="{!or(v.pag1,v.pag2)}">
+          <lightning:button
+            variant="destructive"
+            label="Cancelar"
+            title="Cancelar"
+            onclick="{! c.closeModal }"
+          />
+        </aura:if>
+
+        <aura:if isTrue="{!v.pag1}">
+          <lightning:button
+            variant="brand"
+            label="Continuar"
+            title="Continuar"
+            disabled="{!if(empty(v.lotesList),true,false)}"
+            onclick="{! c.onClickContinuar }"
+          />
+        </aura:if>
+        <aura:if isTrue="{!v.pag2}">
+          <lightning:button
+            variant="neutral"
+            label="Anterior"
+            title="Anterior"
+            onclick="{! c.onClickAnterior }"
+          />
+          <aura:if isTrue="{!v.hasPermission}">
+          <lightning:button
+            variant="brand"
+            label="+"
+            title="Gestión de descuento"
+            onclick="{! c.onClickGestionDescuento }"
+          />
+          </aura:if>
+          <lightning:button
+            variant="brand"
+            label="Calcular"
+            title="Calcular"
+            disabled="{!v.disabledBtnCalcularFinanciamento}"
+            onclick="{! c.onClickCalcular }"
+          />
+          <lightning:button
+            variant="brand"
+            label="Generar Cotización"
+            title="Generar Cotización y PDF"
+            disabled="{!or(v.disabledBtnGenerarFinanciamento,empty(v.lotesList))}"
+            onclick="{! c.onClickGenerarCotizacion }"
+          />
+        </aura:if>
+      </footer>
+    </div>
+  </section>
+</aura:if>
+  <div class="slds-backdrop slds-backdrop_open"></div>
+</aura:component>

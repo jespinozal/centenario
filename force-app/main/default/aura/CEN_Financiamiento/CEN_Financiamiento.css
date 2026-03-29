@@ -1,0 +1,24 @@
+.THIS .table_body{
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    height: 26em;
+}
+
+.THIS .table_body_cabecera{
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    height: 20em;
+}
+
+.THIS .table_body_short{
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    height: 20em;
+}
+
+.THIS .slds-grid_align-end { 
+    justify-content: left !important; 
+}

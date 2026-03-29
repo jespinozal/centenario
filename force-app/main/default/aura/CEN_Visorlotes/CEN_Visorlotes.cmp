@@ -1,0 +1,519 @@
+<aura:component
+  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens,lightning:availableForFlowScreens"
+  access="global"
+  controller="CEN_cls_VisorLote_2"
+>
+  <aura:attribute name="recordId" type="string" />
+  <aura:attribute name="IdOportunidad" type="string" />
+  <!-- call doInit method on component load -->
+  <aura:attribute name="idProyecto" type="String" />
+
+  <!-- aura attributes to store data/values -->
+  <aura:attribute name="listOfAllAccountsFilter" type="Object" />
+
+  <aura:attribute name="dataCharged" default="false" type="Boolean" />
+  <aura:attribute name="listOfAllAccounts" type="list" />
+  <aura:attribute name="dataVisible" type="list" />
+  <aura:attribute name="PaginationList" type="list" />
+
+  <aura:attribute
+    name="selectedCount"
+    type="integer"
+    default="0"
+    description="selected Records Count"
+  />
+  <aura:attribute
+    name="selectedPrecioTotal"
+    type="Decimal"
+    default="0.00"
+    description="selected Precio total"
+  />
+
+  <aura:attribute name="startPage" type="Integer" default="0" />
+  <aura:attribute name="endPage" type="Integer" default="0" />
+  <aura:attribute name="totalRecordsCount" type="Integer" default="0" />
+  <aura:attribute
+    name="pageSize"
+    type="Integer"
+    default="9"
+    description="number of records to be display on per page"
+  />
+  <aura:attribute name="currentPage" type="integer" default="1" />
+  <aura:attribute name="totalPagesCount" type="integer" />
+  <aura:attribute name="bNoRecordsFound" type="boolean" default="true" />
+  <aura:attribute name="serviceMensaje" type="String" />
+
+  <aura:attribute
+    name="selectChangeTamanioEnabled"
+    default="false"
+    type="Boolean"
+  />
+  <aura:attribute
+    name="selectChangePrecioEnabled"
+    default="false"
+    type="Boolean"
+  />
+
+  <aura:attribute name="sliderTamaniomin" default="0.00" type="Decimal" />
+  <aura:attribute name="sliderTamaniomax" default="0.00" type="Decimal" />
+  <aura:attribute name="sliderTamanio1Value" default="0.00" type="Decimal" />
+  <aura:attribute name="sliderTamanio2Value" default="0.00" type="Decimal" />
+
+  <aura:attribute name="sliderPreciomin" default="0.00" type="Decimal" />
+  <aura:attribute name="sliderPreciomax" default="0.00" type="Decimal" />
+  <aura:attribute name="sliderPrecio1Value" default="0.00" type="Decimal" />
+  <aura:attribute name="sliderPrecio2Value" default="0.00" type="Decimal" />
+
+  <aura:attribute name="selectedValueEstado" default="Libre" type="String" />
+  <aura:attribute name="selectedOrdenPor" default="LoteASC" type="String" />
+  <aura:attribute name="selectedElegido" default="todos" type="String" />
+  <aura:attribute name="selectedMoneda" default="PEN" type="String" />
+  <aura:attribute name="selectedBimoneda" default="false" type="Boolean" />
+  <aura:attribute name="bimoneda" default="" type="String" />
+
+  <!--Valores usados para la salida del componente-->
+  <aura:attribute name="idlote" default="" type="integer" />
+  <aura:attribute name="area" default="" type="integer" />
+  <aura:attribute name="preciom2" default="" type="integer" />
+
+  <aura:attribute name="lote" default="" type="string" />
+  <aura:attribute name="manzana" default="" type="string" />
+  <aura:attribute name="tipologia" default="" type="string" />
+  <aura:attribute name="estado" default="" type="string" />
+
+  <aura:attribute name="lotesJSON" default="" type="string" />
+  <aura:attribute name="lotesList" default="" type="List" />
+
+  <aura:attribute name="selectedLookUpRecord" type="sObject" />
+  <aura:attribute
+    name="errorMessage"
+    default="Ingrese un proyecto."
+    type="string"
+  />
+  <aura:attribute name="idProyectoSF" default="" type="string" />
+  <aura:attribute name="jsonProyecto" default="" type="string" />
+  <aura:attribute
+    name="esCotizacionLibre"
+    type="Boolean"
+    default="false"
+    description="FLAG ES COTIZACION LIBRE"
+  />
+  <aura:attribute name="moneda" default="" type="string" />
+
+  <!--HANDLERS-->
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+  <aura:handler
+    name="change"
+    value="{!v.IdOportunidad}"
+    action="{!c.onChangeDatosOportunidad}"
+  />
+
+  <div
+    class="slds-grid slds-wrap slds-gutters_x-small slds-p-bottom_x-small slds-grid_vertical"
+    style="width: 100%; max-height: 100%; overflow: auto !important"
+  >
+    <div class="slds-col slds-grid slds-wrap slds-size_1-of-1">
+      <div class="slds-col slds-size_4-of-12">
+        <label class="slds-form-element__label" for="text-input-id-1">
+          <abbr class="slds-required">* </abbr>Proyecto
+        </label>
+        <div
+          class="{!if(not(empty(v.selectedLookUpRecord)),'','slds-has-error ')+'slds-form-element__control'}"
+        >
+          <c:customLookup
+            objectAPIName="Proyecto__c"
+            IconName="standard:store_group"
+            selectedRecord="{!v.selectedLookUpRecord}"
+            labelObjectToSearch="Proyecto"
+          />
+          <aura:if isTrue="{!empty(v.selectedLookUpRecord)}">
+            <div class="slds-form-element__help" id="error-message-unique-id">
+              <ui:outputText value="{!v.errorMessage}" />
+            </div>
+          </aura:if>
+        </div>
+      </div>
+      <div class="slds-col slds-size_2-of-12">
+        <lightning:input
+          type="number"
+          name="tamanio1Value"
+          label="{!'m2 - Mayor a ' + v.sliderTamaniomin}"
+          value="{!v.sliderTamanio1Value}"
+          min="{!v.sliderTamaniomin}"
+          max="{!v.sliderTamaniomax}"
+        />
+      </div>
+      <div class="slds-col slds-size_2-of-12">
+        <lightning:input
+          type="number"
+          name="tamanio2Value"
+          label="{!'m2 - Menor a ' + v.sliderTamaniomax}"
+          value="{!v.sliderTamanio2Value}"
+          min="{!v.sliderTamaniomin}"
+          max="{!v.sliderTamaniomax}"
+        />
+      </div>
+      <div class="slds-col slds-size_2-of-12">
+        <lightning:input
+          type="number"
+          name="precio1Value"
+          label="{!v.selectedMoneda == 'PEN' ? 'S/. Mayor a ' + v.sliderPreciomin : '$ Mayor a ' + v.sliderPreciomin}"
+          value="{!v.sliderPrecio1Value}"
+          min="{!v.sliderPreciomin}"
+          max="{!v.sliderPreciomax}"
+        />
+      </div>
+      <div class="slds-col slds-size_2-of-12">
+        <lightning:input
+          type="number"
+          name="precio2Value"
+          label="{!v.selectedMoneda == 'PEN' ? 'S/. Menor a ' + v.sliderPreciomax : '$' + ' Menor a ' + v.sliderPreciomax}"
+          value="{!v.sliderPrecio2Value}"
+          min="{!v.sliderPreciomin}"
+          max="{!v.sliderPreciomax}"
+        />
+      </div>
+    </div>
+    <div class="slds-col slds-grid slds-wrap slds-size_1-of-1">
+      <div class="slds-col slds-size_2-of-12">
+        <lightning:input
+          name="manzana"
+          required="false"
+          placeholder="Ingrese la Manzana (A)"
+          aura:id="manzana"
+          label="Ingrese la Manzana"
+        />
+      </div>
+      <div class="slds-col slds-size_2-of-12">
+        <lightning:input
+          name="lote"
+          required="false"
+          placeholder="Ingrese el Lote (Lt.1)"
+          aura:id="lote"
+          label="Ingrese el Lote"
+        />
+      </div>
+      <!--<div class="slds-col slds-grid slds-wrap slds-size_5-of-12">-->
+      <div class="slds-col slds-size_2-of-12">
+        <lightning:select
+          name="selectEstado"
+          label="¿Estado del Lote?"
+          required="false"
+          value="{!v.selectedValueEstado}"
+        >
+          <option value="">Seleccione un estado</option>
+          <option value="Entregado">Entregado</option>
+          <option value="Borrado">Borrado</option>
+          <option value="Libre">Libre</option>
+          <option value="Bloqueado">Bloqueado</option>
+          <option value="Vendido">Vendido</option>
+          <option value="Reservado">Reservado</option>
+        </lightning:select>
+      </div>
+      <div class="slds-col slds-size_2-of-12">
+        <lightning:select
+          name="selectElegido"
+          label="¿Ver Lotes elegidos?"
+          required="false"
+          value="{!v.selectedElegido}"
+        >
+          <option value="todos">Todos</option>
+          <option value="si">Seleccionados</option>
+          <option value="no">No Seleccionados</option>
+        </lightning:select>
+      </div>
+      <div class="slds-col slds-size_2-of-12">
+        <lightning:select
+          name="selectOrder"
+          label="Ordenar por"
+          required="false"
+          value="{!v.selectedOrdenPor}"
+        >
+          <option value="LoteASC">Lote: de la A a la Z</option>
+          <option value="LoteDESC">Lote: de la Z a la A</option>
+          <option value="AreaASC">Área: el más bajo primero</option>
+          <option value="AreaDESC">Área: el más alto primero</option>
+          <option value="PrecioASC">Precio: el más bajo primero</option>
+          <option value="PrecioDESC">Precio: el más alto primero</option>
+          <option value="ManzanaASC">Manzana: de la A a la Z</option>
+          <option value="ManzanaDESC">Manzana: de la Z a la A</option>
+        </lightning:select>
+      </div>
+      <!--</div>-->
+      <div class="slds-col slds-size_1-of-12">
+
+        <lightning:select
+          name="selectMoneda"
+          label="Moneda"
+          required="false"
+          value="{!v.selectedMoneda}"
+          onchange="{!c.onMoneda}"
+        >
+          <option value="PEN">SOLES</option>
+          <option value="USD">DOLARES</option>
+        </lightning:select>
+
+        <!-- <lightning:button
+          variant="brand"
+          label="Filtrar "
+          title="Buscar proyecto y filtrar Tabla"
+          disabled="{!v.dataCharged}"
+          onclick="{!c.buscarLotes}"
+        />
+        <lightning:button
+          variant="Neutral"
+          label="Limpiar"
+          title="Limpiar filtros de la tabla y poner valores por defecto."
+          disabled="{!v.dataCharged}"
+          onclick="{! c.cleanFilters }"
+        /> -->
+      </div>
+      <div class="slds-col slds-size_1-of-12">
+        <label class="slds-form-element__label" for="text-input-id-1">
+          Bimoneda
+        </label>
+        <lightning:input type="checkbox" aura:id="boxBimoneda" value="{!v.selectedBimoneda}" onchange="{!c.bimonedaSelected}"/>
+      </div>
+    </div>
+    <div class="slds-col slds-grid slds-wrap slds-size_1-of-1 slds-m-top_small">
+      <div
+        class="slds-col slds-size_12-of-12"
+        style="align-self: flex-end; text-align-last: center"
+      >
+        <lightning:button
+        variant="brand"
+        label="Filtrar "
+        title="Buscar proyecto y filtrar Tabla"
+        disabled="{!v.dataCharged}"
+        onclick="{!c.buscarLotes}"
+        />
+        <lightning:button
+          variant="Neutral"
+          label="Limpiar"
+          title="Limpiar filtros de la tabla y poner valores por defecto."
+          disabled="{!v.dataCharged}"
+          onclick="{! c.cleanFilters }"
+        />
+      </div>
+    </div>
+
+    <div class="slds-col slds-size_1-of-1 slds-p-top_x-small">
+      <div class="slds-grid slds-grid_vertical slds-wrap">
+        <div class="slds-col slds-size_1-of-1">
+          <lightning:spinner
+            class="spins slds-hide"
+            aura:id="mySpinner"
+            variant="brand"
+            alternativeText="Loading"
+          />
+        </div>
+
+        <aura:if isTrue="{!v.bNoRecordsFound}">
+          <!--display error message if there is no records available -->
+          <div class="slds-col slds-size_1-of-1">
+            <div
+              class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_info"
+              role="alert"
+            >
+              <span class="slds-assistive-text">error</span>
+              <h2>
+                Debe buscar y seleccionar un proyecto. {!v.serviceMensaje}
+              </h2>
+            </div>
+          </div>
+          <!-- message if there is records available -->
+          <aura:set attribute="else">
+            <!-- data table start-->
+            <div class="slds-col slds-size_1-of-1">
+              <table
+                class="slds-table slds-table_cell-buffer slds-table_bordered slds-p-bottom_xx-small"
+              >
+                <thead>
+                  <tr class="slds-line-height_reset">
+                    <!--header checkbox for select all-->
+                    <th class="" scope="col"></th>
+                    <th class="" scope="col">
+                      <div class="slds-truncate" style="text-align: center">
+                        Lote
+                      </div>
+                    </th>
+                    <th class="" scope="col">
+                      <div class="slds-truncate" style="text-align: center">
+                        Tipologia
+                      </div>
+                    </th>
+                    <th class="" scope="col">
+                      <div class="slds-truncate" style="text-align: center">
+                        Manzana
+                      </div>
+                    </th>
+                    <th class="" scope="col">
+                      <div class="slds-truncate" style="text-align: center">
+                        Estado
+                      </div>
+                    </th>
+                    <th class="" scope="col">
+                      <div class="slds-truncate" style="text-align: center">
+                        Área
+                      </div>
+                    </th>
+                    <th class="" scope="col">
+                      <div class="slds-truncate" style="text-align: center">
+                        Precio m2
+                      </div>
+                    </th>
+                    <th class="" scope="col">
+                      <div class="slds-truncate" style="text-align: center">
+                        Moneda
+                      </div>
+                    </th>
+                    <th class="" scope="col">
+                      <div class="slds-truncate" style="text-align: center">
+                        Precio Total
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <aura:iteration items="{!v.PaginationList}" var="obj">
+                    <aura:if isTrue="{!obj.isVisible}">
+                      <tr>
+                        <td
+                          scope="row"
+                          class="slds-text-align_right"
+                          style="width: 3.25rem"
+                        >
+                          <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                              <label class="slds-checkbox">
+                                <ui:inputCheckbox
+                                  text="{!obj.objAccount.Id}"
+                                  value="{!obj.isChecked}"
+                                  change="{!c.checkboxSelect}"
+                                />
+                                <span class="slds-checkbox_faux"></span>
+                                <span
+                                  class="slds-form-element__label text"
+                                ></span>
+                              </label>
+                            </div>
+                          </div>
+                        </td>
+                        <td scope="row">
+                          <div class="slds-truncate" style="text-align: center">
+                            <ui:outputText value="{!obj.Descripcionlote}" />
+                          </div>
+                        </td>
+                        <td scope="row">
+                          <div class="slds-truncate" style="text-align: center">
+                            <ui:outputText value="{!obj.FillerStr02}" />
+                          </div>
+                        </td>
+                        <td scope="row">
+                          <div class="slds-truncate" style="text-align: center">
+                            <ui:outputText value="{!obj.Manzana}" />
+                          </div>
+                        </td>
+                        <td scope="row">
+                          <div class="slds-truncate" style="text-align: center">
+                            <ui:outputText value="{!obj.Codestadolote}" />
+                          </div>
+                        </td>
+                        <td scope="row">
+                          <div class="slds-truncate" style="text-align: center">
+                            <ui:outputNumber
+                              format="###,###,###,##0.00###"
+                              value="{!obj.Area}"
+                            />
+                          </div>
+                        </td>
+                        <td scope="row">
+                          <div class="slds-truncate" style="text-align: center">
+                            <ui:outputNumber
+                              format="###,###,###,##0.00###"
+                              value="{!obj.Precioventam2fun}"
+                            />
+                          </div>
+                        </td>
+                        <td scope="row">
+                          <div class="slds-truncate" style="text-align: center">
+                            <ui:outputText value="{!obj.Codmonedafuncional}" />
+                          </div>
+                        </td>
+                        <td scope="row">
+                          <div class="slds-truncate" style="text-align: center">
+                            <ui:outputNumber
+                              format="###,###,###,##0.00###"
+                              value="{!obj.Precioventafun}"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    </aura:if>
+                  </aura:iteration>
+                </tbody>
+              </table>
+            </div>
+            <div class="slds-col slds-size_1-of-1">
+              <!-- DataTable End -->
+              <!-- display total record and selected record count -->
+              <div class="slds-grid slds-gutters slds-m-vertical_xx-small">
+                <div class="slds-col slds-size_2-of-10 slds-text-align_left">
+                  <span
+                    class="slds-badge slds-badge_lightest"
+                    style="display: inline-block"
+                  >
+                    Total de Registros : {!v.selectedCount > 0 ? v.selectedCount
+                    + '/' : ''} {!v.totalRecordsCount}
+                  </span>
+                </div>
+                <!--  Pagination Buttons Start -->
+                <div
+                  class="slds-col slds-size_6-of-10 slds-align_absolute-center"
+                >
+                  <lightning:buttonIcon
+                    iconName="utility:back"
+                    variant="brand"
+                    alternativeText="Anterior"
+                    disabled="{!v.startPage == 0}"
+                    title="Anterior"
+                    name="Previous"
+                    onclick="{!c.navigation}"
+                  />
+                  <span
+                    class="slds-badge slds-badge_lightest"
+                    style="margin-right: 10px; margin-left: 10px"
+                  >
+                    Página {!v.currentPage} de {!v.totalPagesCount}
+                  </span>
+                  <lightning:buttonIcon
+                    iconName="utility:forward"
+                    variant="brand"
+                    alternativeText="Siguiente"
+                    disabled="{!(v.endPage + 1) >= v.totalRecordsCount}"
+                    title="Siguiente"
+                    name="Next"
+                    onclick="{!c.navigation}"
+                  />
+                </div>
+                <!--  Pagination Buttons End -->
+                <div class="slds-col slds-size_2-of-10 slds-text-align_right">
+                  <span
+                    class="slds-badge slds-badge_lightest"
+                    style="display: inline-block"
+                  >
+                    Precio Total : {!v.selectedMoneda == 'PEN' ? 'S/.' : '$'}
+                    <ui:outputNumber
+                      format="###,###,###,##0.00###"
+                      value="{!v.selectedPrecioTotal}"
+                    />
+                  </span>
+                </div>
+              </div>
+            </div>
+          </aura:set>
+        </aura:if>
+      </div>
+    </div>
+  </div>
+</aura:component>

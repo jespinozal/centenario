@@ -1,0 +1,31 @@
+<aura:component 
+    implements="flexipage:availableForRecordHome,force:hasRecordId" 
+    access="global"
+    controller="CEN_cls_Activar_Cotizador">
+    <!--    atributos   -->
+    <aura:attribute name="recordId" type="String" default="" />
+    <aura:attribute name="lotesList" type="List" />
+    <aura:attribute name="isModal" type="Boolean" default="false" />
+    <aura:attribute name="page2" type="Boolean" default="false" />
+    <aura:attribute name="modalActivado" type="Boolean" default="true" />
+    <aura:attribute name="idProyectoSF" type="String" />
+    <aura:attribute name="objProyectoSF" type="sObject" />
+    <!--    handlers    -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="change" value="{!v.modalActivado}" action="{!c.onchangeIsmodal}"/>
+    <!--    eventos    -->
+    <aura:if isTrue="{!v.isModal}">
+        <c:CEN_cmp_modalCotizadorLibre 
+            recordId = "{!v.recordId}"
+            IdOportunidad="{!v.recordId}"
+            esCotizacionLibre="false" 
+            modalActivado="{!v.modalActivado}"
+            lotesList="{!v.lotesList}"
+            pag1="false"
+            pag2="{!v.page2}"
+            pag3="false"
+            idProyectoSF="{!v.idProyectoSF}"
+            selectedLookUpRecord="{!v.objProyectoSF}"
+         />
+    </aura:if>
+</aura:component>

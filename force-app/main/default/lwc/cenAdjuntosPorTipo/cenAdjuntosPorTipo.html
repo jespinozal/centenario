@@ -1,0 +1,34 @@
+<!-- 
+Developer: Jose Miguel Espinoza Mestanza
+Email: josemiguel.espinozamestanza@emeal.nttdata.com 
+-->
+<template>
+    <template if:true={hayGrupos}>
+        <template for:each={grupos} for:item="grupo">
+            <section key={grupo.nombreGrupo} class="slds-m-bottom_medium">
+                <div class="slds-media slds-align-center cen-header">
+                    <div class="slds-media__figure">
+                        <span class="record-avatar-container slds-avatar slds-avatar_small icon" style="background-color:#5a9cdd">
+                            <lightning-icon
+                                icon-name="custom:custom57"
+                                size="small"
+                                alternative-text="Adjuntos Relacionados"
+                            ></lightning-icon>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <span class="slds-truncate slds-m-right--xx-small cen-header-text" title={grupo.nombreGrupo}>
+                            {grupo.nombreGrupo}
+                        </span>
+                    </div>
+                </div>
+
+                <c-cen-tabla-adjuntos-relacionados
+                    adjuntos={grupo.adjuntos}
+                    nombre-grupo={grupo.nombreGrupo}
+                    record-id={recordId}>
+                </c-cen-tabla-adjuntos-relacionados>
+            </section>
+        </template>
+    </template>
+</template>

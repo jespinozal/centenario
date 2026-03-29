@@ -1,0 +1,80 @@
+<!-- sldsValidatorIgnore -->
+<template>
+    <template if:true={isModalOpen}>
+    <div if:true={isLoaded} class="cstm-spinner">
+		<lightning-spinner alternative-text="Loading..."></lightning-spinner>
+	</div>
+
+    <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open slds-modal_small">
+        <div class="slds-modal__container">
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick={closeModal}>
+            <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#close"></use>
+            </svg>
+            <span class="slds-assistive-text">Cerrar</span>
+            </button>
+            <div class="slds-modal__header">
+                <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Nuevos Socios</h1>
+            </div>
+              <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                <div class="slds-m-around--xx-large container-fluid">
+                    <div class="container-fluid">
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer" aria-label="headerParent">
+                            <thead>
+                                <tr class="slds-text-title_caps">
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="PRIMARY">PRINCIPAL</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="PARTNER">*SOCIO</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="ROLE">FUNCIÓN</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="0">
+                                    <td>
+                                        <lightning-input data-key="-1" data-id="toggle0" type="toggle" checked onchange={selectall}></lightning-input>
+                                    </td>
+                                    <td colspan="2">
+                                        Ningún socio principal &nbsp;
+                                            <lightning-helptext content="¿No desea elegir un socio como principal? Seleccione esta opción."></lightning-helptext>
+                                    </td>
+                                </tr>
+                                <template for:each={partnerList} for:item="partner" for:index="indx">
+                                    <tr key={partner.key} id={partner.key}>
+                                        <td>
+                                            <lightning-input data-key={indx} data-id={partner.toggle} type="toggle" onchange={selectall}></lightning-input>
+                                        </td>
+                                        <td>
+                                            <lightning-record-edit-form object-api-name="Opportunity">
+                                                <lightning-input-field data-id={indx} field-name="AccountId" variant="label-hidden" onchange={handleAccountSelection}> </lightning-input-field>
+                                            </lightning-record-edit-form>
+                                        </td>
+                                        <td>
+                                            <lightning-combobox data-id={indx} name="types" value={value} options={TypeOptions} onchange={handleRoleChange} variant="label-hidden"> </lightning-combobox> 
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                </div>
+            </div>
+        </div>
+        <div class="slds-modal__footer slds-modal__footer_directional">
+            <button class="slds-button slds-button_neutral" onclick={addRow}>Agregar Fila</button>
+        </div>
+        <div class="slds-modal__footer">
+            <button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={closeModal}>Cancelar</button>
+            <button class="slds-button slds-button_brand" onclick={saveRecord}>Guardar</button>
+        </div>
+    </div>
+</section>
+<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+
+</template>
+
+
+</template>

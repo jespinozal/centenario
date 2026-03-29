@@ -1,0 +1,71 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 07-30-2025
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning-icon icon-name="standard:partner_fund_claim" alternative-text="Partners" size="small"></lightning-icon>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-card__header-link slds-truncate" title={cardTitle}>
+                            {cardTitle}
+                        </span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+
+        <div class="slds-card__body">
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Cargando..." size="small"></lightning-spinner>
+            </template>
+            
+            <template if:true={hasPartners}>
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered" aria-label="Lista de Partners">
+                    <tbody>
+                        <template for:each={processedPartners} for:item="partner">
+                            <tr key={partner.accountId} class="slds-hint-parent">
+                                <td data-label="Partner">
+                                    <div class="slds-truncate">
+                                        <a href={partner.accountUrl} title={partner.accountName} onclick={handleNavigate}>{partner.accountName}</a>
+                                        <div class="slds-dl_horizontal slds-text-body_small">
+                                            <dl class="slds-list_horizontal slds-wrap">
+                                                <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Rol">Rol:</dt>
+                                                <dd class="slds-item_detail slds-truncate" title={partner.role}>{partner.role}</dd>
+                                                <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Mobile">Mobile:</dt>
+                                                <dd class="slds-item_detail slds-truncate">
+                                                    <lightning-formatted-phone if:true={partner.mobile} value={partner.mobile}></lightning-formatted-phone>
+                                                </dd>
+                                                <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Email">Email:</dt>
+                                                <dd class="slds-item_detail slds-truncate">
+                                                     <lightning-formatted-email if:true={partner.email} value={partner.email}></lightning-formatted-email>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </template>
+
+            <template if:false={hasPartners}>
+                <template if:false={isLoading}>
+                    <p class="slds-text-align_center slds-var-p-vertical_medium">No se encontraron partners.</p>
+                </template>
+            </template>
+        </div>
+
+        <footer class="slds-card__footer" if:true={hasPartners}>
+            
+        </footer>
+    </article>
+</template>

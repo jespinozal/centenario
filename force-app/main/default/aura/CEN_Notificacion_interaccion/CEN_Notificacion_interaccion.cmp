@@ -1,0 +1,90 @@
+<aura:component controller="CEN_ImagenCuenta" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:hasSObjectName,forceCommunity:availableForAllPageTypes" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="imagenSrc" type="String" default="https://s3-us-west-1.amazonaws.com/sfdc-demo/image-placeholder.png"/>
+    <aura:attribute name="message" type="String" default=""/>
+
+    
+    <aura:attribute name="contact_image_url" type="String" access="global"/>
+    <aura:attribute name="image_size" type="String" access="global"/>
+    <aura:attribute name="Phone_To_Display" type="String" access="global"/>
+    <aura:attribute name="Display_Activity_Indicator" type="String" access="global"/>
+    <aura:attribute name="Display_CSAT" type="String" access="global"/>
+    <aura:attribute name="Display_NPS" type="String" access="global"/>
+    <aura:attribute name="Display_Case_Origin" type="String" access="global"/>
+    <aura:attribute name="Icon_Template" type="String" access="global"/>
+    <aura:attribute name="GaugeLineWidth" type="String" access="global"/>  
+    <aura:attribute name="Padding" type="String" access="global"/>
+    <aura:attribute name="chc" type="LCH_ContactHighlightContainer"/>
+    <aura:attribute type="String" name="CleanGID" />
+    <aura:attribute type="String" name="SilvercCard" default="{!'https://image.ibb.co/kVDAGn/ohana_Silver.png'}" access="global" />
+    <aura:attribute type="String" name="GoldCard" default="{!'https://image.ibb.co/nrTjSH/ohana_Gold.png'}" access="global"/>
+    <aura:attribute type="String" name="PlatinumCard" default="{!'https://image.ibb.co/dMRtMc/ohana_Platinum.png'}" access="global"/>
+    <aura:attribute type="Integer" name="LoyaltyProgressMiles" access="global"/>
+    <aura:attribute type="Integer" name="LoyaltyProgressFlights" access="global"/>
+	<aura:handler event="force:refreshView" action="{!c.doInit}" />
+
+    <ltng:require scripts="{!$Resource.LCH_Gauge}" afterScriptsLoaded="{!c.doInit}"/>
+    
+
+    <article class="{!'slds-card slds-p-around_'+v.Padding}">
+        <div class="slds-container slds-has-flexi-truncate">
+            
+             <!-- titulo __________________________________________________________________________________ -->
+			<div class="demo-only" style="padding:0.5rem;background:#16325c">
+				<div class="slds-text-align_center"> 
+					<div  class="slds-text-color_inverse">Notificación</div>
+				</div>
+			</div>
+      	
+			<br/>
+           <!--  -->
+            
+            <!-- Container for Contact Name __________________________________________________________________________________ -->
+
+            <div class="container slds-has-flexi-truncate" style="display: flex;margin-left:0px">
+  			
+                <!-- Information __________________________________________________________________________________ -->
+
+
+                
+					<div class="slds-media__figure slds-text-align--center figureAligned">
+							<aura:set attribute="popoverBody">
+								<div class="slds-grid slds-grid--align-spread slds-grid--vertical slds-text-align--left">
+									<div class="slds-media slds-tile" style="display: inline-block;">
+										
+										<div class="slds-media__body figureAligned popover-body-email">
+											<p class="tile__title">
+											<aura:if isTrue="{!or(v.chc == null, and(or(v.chc.RelatedCase.CEN_Actualizar_Datos__c == false, v.chc.RelatedCase.CEN_Actualizar_Datos__c == false)))}">
+														El cliente, no registró ninguna actualización de datos.
+													<!--No se encontró Correo.!-->
+												<aura:set attribute="else">
+														El cliente registró una actualización de datos.
+												</aura:set>
+											</aura:if>
+											
+											</p>
+										</div>
+									</div>
+								</div>
+							</aura:set>
+					</div>
+						<p class="tile__title slds-truncate">
+							<aura:if isTrue="{!or(v.chc == null, and(or(v.chc.RelatedCase.CEN_Actualizar_Datos__c == false, v.chc.RelatedCase.CEN_Actualizar_Datos__c == false)))}">
+											El cliente, no registró ninguna actualización de datos.
+								<!--No se encontró Correo.!-->
+								<aura:set attribute="else">
+										El cliente registró una actualización de datos.
+								</aura:set>
+							</aura:if>  
+
+						</p>
+                                            
+                     
+                        
+			</div>
+             
+            <br/> 
+        </div>   
+    </article>
+</aura:component>

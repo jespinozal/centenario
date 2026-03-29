@@ -1,0 +1,14 @@
+<design:component>
+    
+    <design:attribute name="idProyecto" Label="IdProyecto"/>
+    
+    <design:attribute name="idlote" Label="IdLote"/>
+    <design:attribute name="area" Label="Area"/>
+    <design:attribute name="preciom2" Label="Preciom2"/>
+    
+    <design:attribute name="lote"  Label="Lote"/>
+    <design:attribute name="manzana"  Label="Manzana"/>
+    <design:attribute name="tipologia"  Label="Tipologia"/>
+    <design:attribute name="estado"  Label="Estado"/>
+	
+</design:component>

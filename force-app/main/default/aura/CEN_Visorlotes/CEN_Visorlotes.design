@@ -1,0 +1,19 @@
+<design:component>
+    
+    <design:attribute name="idProyecto" Label="IdProyecto a buscar"/>
+    
+    <design:attribute name="idlote" Label="IdLote"/>
+    <design:attribute name="area" Label="Area"/>
+    <design:attribute name="preciom2" Label="Preciom2"/>
+    
+    <design:attribute name="lote"  Label="Lote"/>
+    <design:attribute name="manzana"  Label="Manzana"/>
+    <design:attribute name="tipologia"  Label="Tipologia"/>
+    <design:attribute name="estado"  Label="Estado"/>
+    
+    <design:attribute name="lotesJSON"  Label="LotesJSON"/>    
+    <!-- para restablecer al cotizador -->
+    <design:attribute name="idProyectoSF" Label="JSON proyecto seleccionado"/>
+    <design:attribute name="jsonProyecto" Label="Json codlotes lotes del proyecto"/>    
+	
+</design:component>

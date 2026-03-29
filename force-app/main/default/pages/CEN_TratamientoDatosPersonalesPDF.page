@@ -1,0 +1,105 @@
+<apex:page applyHtmlTag="false" showHeader="false" renderAs="PDF" standardController="Account" standardStylesheets="false" extensions="CEN_cls_RepresentantesController">
+    
+    <style>
+        /* cuando vayamos a imprimir ... */
+        @media print{
+            /* indicamos el salto de pagina */
+            .saltoDePagina{
+                display:block;
+                page-break-before:always;
+            }
+        }
+    </style>
+    
+    <body>
+        <div>
+            <p style="font-size: small; text-align:center;">
+                <b>Anexo 2: Cuadro de Opciones - Tratamiento de Datos Personales</b>
+            </p> 
+        </div>
+        
+        <div>
+            <p style="width:80%; font-size: small; text-align:justify; margin-left: auto; margin-right: auto;">
+                <b>EL COMPRADOR</b> declara haber sido informado que si otorga su consentimiento
+                en el presente Cuadro de Opciones - Tratamiento de Datos Personales. <b>LA 
+                VENDEDORA</b> podrá utilizar los datos de <b>EL COMPRADOR</b> para las finalidades 
+                que se indican, según se detalla a continuación:
+            </p> 
+        </div>
+        
+        <!--INICIO NUEVO-->
+        
+        
+        <table style="width:80%; border: 1px solid; border-collapse: collapse; margin-left: auto; margin-right: auto;">
+            <tr>
+                <td style="width:55%; border: 1px solid; padding: 5px 5px; text-align:center; font-size: small; background-color:#777777;">Finalidad</td>
+                <td style="width:45%; border: 1px solid; padding: 5px 5px; text-align:center; font-size: small; background-color:#777777;">Aceptación de <b>EL COMPRADOR</b></td> 
+            </tr>
+            <tr>
+                <td style="width:55%; border: 1px solid; padding: 25px 5px; text-align:justify; font-size: small;">Enviarle publicidad de los distintos proyectos del Grupo Centenario (Inversiones Centenario S.A.A., Centenario Desarrollo Urbano S.A.C., Centenario Renta Inmobiliaria S.A.C., Multimercados Zonales S.A.C., Promoción Inmobiliaria del Sur S.A.C., Nuevas Inversiones Centro Comercial Camino Real S.A.C., Inmobiliaria San Silvestre S.A.C.) que pudieran resultar de interés del cliente.</td>
+ 
+                <apex:panelGroup rendered="{!Account.check1__c = true}">
+                    <td style="width:45%; border: 1px solid; padding: 25px 5px; text-align:center; font-size: small;">Sí acepto (x)<br/><br/>No acepto ( )</td>
+                </apex:panelGroup>
+                <apex:panelGroup rendered="{!Account.check1__c <> true}">
+                    <td style="width:45%; border: 1px solid; padding: 25px 5px; text-align:center; font-size: small;">Sí acepto ( )<br/><br/>No acepto (x)</td>
+                </apex:panelGroup>
+
+            </tr>
+            <tr>
+                <td style="width:55%; border: 1px solid; padding: 25px 5px; text-align:justify; font-size: small;">Perfilar a los clientes (con información brindada por estos y disponible en internet y/o en fuentes públicas) para desarrollar estrategias comerciales y de marketing.</td>
+                <apex:panelGroup rendered="{!Account.check2__c = true}">
+                    <td style="width:45%; border: 1px solid; padding: 25px 5px; text-align:center; font-size: small;">Sí acepto (x)<br/><br/>No acepto ( )</td>
+                </apex:panelGroup>
+                <apex:panelGroup rendered="{!Account.check2__c <> true}">
+                    <td style="width:45%; border: 1px solid; padding: 25px 5px; text-align:center; font-size: small;">Sí acepto ( )<br/><br/>No acepto (x)</td>
+                </apex:panelGroup>
+            </tr>
+            <tr>
+                <td style="width:55%; border: 1px solid; padding: 25px 5px; text-align:justify; font-size: small;">Para el tratamiento de sus datos, se utilizarán encargados como proveedores, servicios de encuestas y call centers comerciales.</td>
+                <apex:image value="{!$Resource.celular}" alt="noImage" height="150" width="150" rendered="{}"/>
+                <apex:panelGroup rendered="{!Account.check3__c = true}">
+                    <td style="width:45%; border: 1px solid; padding: 25px 5px; text-align:center; font-size: small;">Sí acepto (x)<br/><br/>No acepto ( )</td>
+                </apex:panelGroup>
+                <apex:panelGroup rendered="{!Account.check3__c <> true}">
+                    <td style="width:45%; border: 1px solid; padding: 25px 5px; text-align:center; font-size: small;">Sí acepto ( )<br/><br/>No acepto (x)</td>
+                </apex:panelGroup>
+            </tr>
+        </table>
+        
+        <br/>
+        
+        <div style="width: 80%; height:50px; margin-left: auto; margin-right: auto;">
+            <div style="width: 49%;float:left;">
+                <p style="text-align: center;"><b>LA VENDEDORA</b></p>
+                <p style="text-align: center;"><img src="{!representantes0.Imagen_de_Firma__c}" width="100" height="100" /></p>
+                <p style="text-align: center;">{!representantes0.Nombres_Completos__c}</p>
+            </div>
+            
+            <div style="width: 49%;float:right;">
+                <p style="text-align: center;"><b>EL COMPRADOR</b></p>
+                <p style="text-align: center;"><img src="{!$Resource.blanco}" width="100" height="100" /></p>
+                
+                <apex:panelGroup rendered="{!Account.CEN_Tipo_de_documento__pc = ''}">
+                    <p style="text-align: center;">{!UPPER(Account.Name)} Representado por {!UPPER(contacto.Name)}</p>
+                </apex:panelGroup>
+                <apex:panelGroup rendered="{!Account.CEN_Tipo_de_documento__pc <> ''}">
+                    <p style="text-align: center;">{!UPPER(Account.Name)}</p>
+                </apex:panelGroup>
+            </div>      
+        </div>
+        
+        <br/>
+        
+        <div style="width: 80%; height:50px; margin-left: auto; margin-right: auto;">
+            <div style="width: 49%;float:left;">
+                <p style="text-align: center;"><img src="{!representantes1.Imagen_de_Firma__c}" width="100" height="100" /></p>
+                <p style="text-align: center;">{!representantes1.Nombres_Completos__c}</p>
+            </div>
+            <div style="width: 49%;float:right;">
+             
+            </div>           
+        </div>
+        
+    </body>
+</apex:page>

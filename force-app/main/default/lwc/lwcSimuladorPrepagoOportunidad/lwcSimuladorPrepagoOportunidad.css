@@ -1,0 +1,7 @@
+@media only screen and (min-width: 48em) {
+    .panel .modal-container {
+        width: 90% !important;
+        max-width: fit-content !important;
+        min-width: 480px;
+    }   
+  }

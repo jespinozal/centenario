@@ -1,0 +1,26 @@
+.THIS .generarCotizacionSpinner::after {
+  position: absolute;
+  content: "Se está registrando la cotización y generando el PDF...";
+  width: 100%;
+  text-align: center;
+  top: calc(50% + 3em);
+  font-weight: bold;
+}
+
+.THIS .calcularCotizacionSpinner::after {
+  position: absolute;
+  content: "Se está calculando el financiamiento...";
+  width: 100%;
+  text-align: center;
+  top: calc(50% + 3em);
+  font-weight: bold;
+}
+
+.THIS .calcularDescuentoSpinner::after {
+  position: absolute;
+  content: "Se está calculando los descuentos...";
+  width: 100%;
+  text-align: center;
+  top: calc(50% + 3em);
+  font-weight: bold;
+}

@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="Evento cuando carga imagen" >
+    <aura:attribute name="cargoImagen" type="Boolean"/>
+</aura:event>

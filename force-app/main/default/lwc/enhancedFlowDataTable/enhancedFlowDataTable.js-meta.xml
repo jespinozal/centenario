@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>59.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <property name="inputData" type="@salesforce/schema/CEN_Documento_de_Flujo__c[]" label="Input Data Collection" description="Colección de registros de Documento de Flujo para mostrar en la tabla."/>
+            <property name="selectedRows" type="@salesforce/schema/CEN_Documento_de_Flujo__c[]" label="Selected Rows" description="Salida con las filas seleccionadas por el usuario." />
+            <property name="preselectedRows" type="@salesforce/schema/CEN_Documento_de_Flujo__c[]" label="Input Data Collection" description="Colección de registros de Documento de Flujo para mostrar en la tabla."/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

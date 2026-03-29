@@ -1,0 +1,5 @@
+<design:component>
+	<design:attribute name="resultado" Label="ResultadoComp"/>
+     <design:attribute name="recordId2" Label="Id"/>
+    <design:attribute name="mensaje" Label="Mensaje"/>
+</design:component>

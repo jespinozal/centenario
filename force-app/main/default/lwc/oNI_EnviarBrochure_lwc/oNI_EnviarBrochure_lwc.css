@@ -1,0 +1,15 @@
+.modal-body-scroll {
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.pdf-frame {
+    width: 100%;
+    height: 50vh;
+    border: none;
+}
+
+iframe {
+    border: 0;
+    width: 100%;
+}

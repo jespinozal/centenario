@@ -1,0 +1,17 @@
+<template>
+    <div class="slds-grid slds-wrap">
+        <div class="slds-size_5-of-12">
+            <lightning-input type="date" name="inDate" label="Fecha" onchange={handleDateTimeInputMask} required></lightning-input>
+        </div>
+        <div class="slds-size_5-of-12 slds-p-left_small">
+            <!-- <template if:true={checked}> -->
+                <lightning-input type="text" name="inTime" label="Hora" placeholder="hh:mm:ss" 
+                 onchange={handleDateTimeInputMask} disabled={disabledInput}></lightning-input>
+            <!-- </template> -->
+        </div>
+        <div class="slds-size_2-of-12 slds-p-left_small">
+            <br/>
+            <lightning-input type="toggle" label="" name="tglTime" checked onchange={changeToggle}></lightning-input>
+        </div>
+    </div>
+</template>

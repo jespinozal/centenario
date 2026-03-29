@@ -1,0 +1,47 @@
+<!-- sldsValidatorIgnore -->
+<template>
+  <lightning-modal-header label="Enviar Brochure"></lightning-modal-header>
+  <lightning-modal-body>
+    <div  class="modal-body-scroll">
+
+      <template if:false={generatedPDF}>
+        <div class="slds-var-p-around_medium">
+          <lightning-input
+                    type="text"
+                    label="Filtrar"
+                    onchange={handleFilterChange}
+                    class="slds-m-bottom_small"
+                ></lightning-input>
+          <lightning-datatable
+            key-field="id"
+            data={data}
+            columns={columns}
+            onrowselection={handleRowSelection}
+          ></lightning-datatable>
+          </div>
+      </template>
+
+      <template if:true={generatedPDF}>
+        <template if:true={url}>
+            <iframe src={url} class="pdf-frame"></iframe>
+        </template>
+        <template if:false={url}>
+            <lightning-card>
+              No se pudo generar el PDF. Vuelva a intentarlo más tarde o consulte con su Administrador de Salesforce
+            </lightning-card>
+        </template>
+      </template>
+
+    </div>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <template if:false={generatedPDF}>
+      <lightning-button label="Generar Brochure" title="Generar Brochure" variant="brand" onclick={handlePDF}
+            disabled={PDFButton} class="slds-m-horizontal_xxx-small"></lightning-button>
+    </template>
+    <template if:true={generatedPDF}>
+      <lightning-button label="Enviar" title="Enviar" variant="brand" onclick={handleSend}
+            disabled={sendButton} class="slds-m-horizontal_xxx-small"></lightning-button>
+    </template>
+  </lightning-modal-footer>
+</template>

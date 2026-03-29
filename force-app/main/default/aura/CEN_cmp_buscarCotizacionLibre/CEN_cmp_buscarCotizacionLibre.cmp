@@ -1,0 +1,164 @@
+<aura:component
+  implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction"
+  access="global"
+  controller="CEN_cls_buscarCotizacionLibre_cc"
+>
+  <!--tools-->
+  <aura:attribute name="page1" type="Boolean" default="true" />
+  <aura:attribute name="page2" type="Boolean" default="false" />
+
+  <!--page1-->
+  <aura:attribute name="optionsTipoDocumento" type="List" />
+  <aura:attribute name="objInputBuscador" type="Object" />
+  <aura:attribute
+    name="estaBuscandoCotizaciones"
+    type="Boolean"
+    default="false"
+  />
+    <aura:attribute name="isVisible" type="Boolean" default = "false" />
+  <aura:attribute
+    name="listaCotizacionLibreWrapper"
+    type="CEN_cls_buscarCotizacionLibre_cc.CotizacionLibreWrapper[]"
+  />
+  <!--page2-->
+  <aura:attribute name="idCotizacionSeleccionado" type="String" />
+  <aura:attribute name="idOportunidad" type="String" />
+  <aura:attribute name="idPDF" type="String" />
+  <aura:attribute name="planillaPDFcotizadorEndpoint" type="String" />
+  <aura:attribute name="asociandoCotizacion" type="Boolean" default="false" />
+  <aura:attribute name="lotesCotizacionSeleccionado" type="List" />
+  <aura:attribute name="lotesNoLibre" type="List" default="[]" />
+
+  <!--HANDLER-->
+  <aura:handler name="init" value="{! this }" action="{!c.doInit}" />
+  <aura:handler
+    name="eventoEnviarAccion"
+    event="c:CEN_cmp_buscarCotizacionlibre_evt"
+    action="{!c.handleAccionRecibida}"
+  />
+  <!--BODY-->
+
+  <aura:html tag="style">
+    .spinnerBuscandoCotizaciones{ width: 100%; height: auto !important; }
+    .cuf-content { padding: 0 0rem !important; } .slds-p-around--medium {
+    padding: 0rem !important; } .slds-modal__content{ } .slds-modal__container{
+    height : 100%; width: 100%; max-width: 100%; } .modal-body{ height: auto
+    !important; max-height: 100% !important; } .customFooter{ display: inline
+    !important; } .modal-header{ visibility: hidden; } .modal-footer{
+    visibility: hidden; }
+  </aura:html>
+<aura:if isTrue="{!v.isVisible}">
+  <section
+    role="dialog"
+    tabindex="-1"
+    class="slds-modal slds-fade-in-open slds-modal_large"
+    aria-labelledby="modal-heading-01"
+    aria-modal="true"
+    aria-describedby="modal-content-id-1"
+  >
+    <div class="slds-modal__container">
+      <header class="slds-modal__header">
+        <lightning:buttonIcon
+          class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+          iconName="utility:close"
+          size="large"
+          variant="bare"
+          onclick="{! c.onclickClose }"
+          alternativeText="Cerrar"
+          title="Cerrar"
+        />
+        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+          Buscar cotización libre
+        </h2>
+      </header>
+      <div
+        class="slds-modal__content slds-p-around_x-small"
+        id="modal-content-id-1"
+      >
+        <aura:if isTrue="{!v.estaBuscandoCotizaciones}">
+          <lightning:spinner
+            class="spinnerBuscandoCotizaciones"
+            aura:id="spinnerCargandoCotizaciones"
+            variant="brand"
+            alternativeText="Loading"
+          />
+        </aura:if>
+        <aura:if isTrue="{!v.asociandoCotizacion}">
+          <lightning:spinner
+            class="spinnerAsociandoCotizacion"
+            aura:id="spinnerAsociandoCotizacion"
+            variant="brand"
+            alternativeText="Loading"
+          />
+        </aura:if>
+        <div class="{!if(v.page1,'slds-show','slds-hide')}">
+          <c:CEN_cmp_formBuscadorCotizador
+            optionsTipoDocumento="{!v.optionsTipoDocumento}"
+            objInputBuscador="{!v.objInputBuscador}"
+          />
+          <c:CEN_cmp_tablaCotizaciones
+            listaCotizacionLibreWrapper="{!v.listaCotizacionLibreWrapper}"
+            idCotizacionSeleccionado="{!v.idCotizacionSeleccionado}"
+            idPDF="{!v.idPDF}"
+          />
+        </div>
+        <div
+          class="{!if(v.page2,'slds-show','slds-hide')}"
+          style="width: 100%; height: auto; max-height: 100vh"
+        >
+          <aura:if isTrue="{!not(empty(v.idPDF))}">
+            <iframe
+              src="{!'/servlet/servlet.FileDownload?file='+v.idPDF}"
+              width="100%"
+              height="100%"
+              frameborder="0"
+              style="height: 100vh !important"
+            />
+            <aura:set attribute="else">
+              <iframe
+                src="{!v.planillaPDFcotizadorEndpoint+'?id='+v.idCotizacionSeleccionado}"
+                width="100%"
+                height="100%"
+                frameborder="0"
+                style="height: 100vh !important"
+              />
+            </aura:set>
+          </aura:if>
+        </div>
+      </div>
+      <footer class="slds-modal__footer slds-modal__footer_directional">
+        <lightning:button
+          variant="destructive"
+          label="Cancelar"
+          title="Cancelar"
+          onclick="{! c.onclickClose }"
+        />
+        <aura:if isTrue="{!v.page1}">
+          <lightning:button
+            label="Siguiente"
+            title="Siguiente"
+            disabled="{!empty(v.idCotizacionSeleccionado)}"
+            onclick="{! c.onclickSiguiente }"
+            variant="brand"
+          />
+        </aura:if>
+        <aura:if isTrue="{!v.page2}">
+          <lightning:button
+            label="Anterior"
+            title="Anterior"
+            onclick="{! c.onclickAnterior }"
+          />
+          <lightning:button
+            label="Asociar a Oportunidad"
+            title="Asociar cotización y PDF a la oportunidad"
+            onclick="{! c.onclickAsociarCotizacion }"
+            variant="brand"
+            disabled="{!v.asociandoCotizacion}"
+          />
+        </aura:if>
+      </footer>
+    </div>
+  </section>
+</aura:if>
+  <div class="slds-backdrop slds-backdrop_open"></div>
+</aura:component>

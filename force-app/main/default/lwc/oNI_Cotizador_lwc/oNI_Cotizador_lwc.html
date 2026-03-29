@@ -1,0 +1,563 @@
+<template>
+  <template if:true={isEmbedded}>
+    <lightning-card title="Cotización libre" icon-name="utility:modal">
+      <div class="slds-p-around_medium">
+        <lightning-button label="Nueva cotización" onclick={openModal}></lightning-button>
+      </div>
+    </lightning-card>
+  </template>
+  <!-- Modal Section -->
+  <template if:true={doModal} style="padding: 12px 26px;">
+
+    <!-- PATH -->
+    <div class="slds-p-around_medium">
+      <lightning-progress-indicator 
+          current-step={currentStageName} 
+          type="path" 
+          variant="base">
+        <lightning-progress-step label="Selección de Producto" value="stage1"></lightning-progress-step>
+        <lightning-progress-step label="Validar Precios" value="stage2"></lightning-progress-step>
+        
+        <template if:false={isOffice}>
+          <lightning-progress-step label="Forma de Pago" value="stage3"></lightning-progress-step>
+          <lightning-progress-step label="Simulación" value="stage4"></lightning-progress-step>
+          <lightning-progress-step label="Simulación" value="stage5"></lightning-progress-step>
+          <lightning-progress-step label="Simulación" value="stage6"></lightning-progress-step>
+        </template>
+        <lightning-progress-step label="Condiciones" value="stage7"></lightning-progress-step>
+        
+        
+        <template if:true={isOffice}>
+        <lightning-progress-step label="Total" value="stage3"></lightning-progress-step>
+        </template>
+        <lightning-progress-step label="Confirmo Cotización" value="stage8"></lightning-progress-step>
+        <lightning-progress-step label="Guardando" value="stage9"></lightning-progress-step>
+      </lightning-progress-indicator>
+    </div>
+
+    
+
+    <template if:true={stage1}>
+
+      <!-- FILTERING -->
+      <lightning-layout>
+        <!-- INPUT PROJECT -->
+        <lightning-layout-item size="4" padding="around-small">
+          <template if:true={isIndustrial}>
+            <lightning-record-picker lwc:ref="recordPicker" object-api-name="Proyecto__c" label="Proyecto"
+              onchange={handleRecordSelected}>
+              required
+              </lightning-record-picker>
+          </template>
+          <template if:true={isOffice}>
+            <lightning-record-picker lwc:ref="recordPickerOFI" object-api-name="Proyecto__c" label="Edificio"
+              onchange={handleRecordSelected} filter={ofiFilter}>
+              required
+              </lightning-record-picker>
+          </template>
+        </lightning-layout-item>
+        <!-- PICKLIST SUB FILTER -->
+        <lightning-layout-item size="4" padding="around-small">
+          <template if:true={isIndustrial}>
+            <div class="flex-container-cell">
+              <div class="element">
+                <lightning-input label="Manzana" value={mz} lwc:ref="mz"></lightning-input>
+              </div>
+              <div class="element">
+                <lightning-input label="Etapa" value={block} lwc:ref="block"></lightning-input>
+              </div>
+            </div>
+          </template>
+          <template if:true={isOffice}>
+            <lightning-combobox lwc:ref="industry" name="industry" label="Tipo" value={selectedIndustry}
+              placeholder="Seleccionar el Tipo" options={industryOptions}
+              onchange={handleIndustryChange}></lightning-combobox>
+          </template>
+        </lightning-layout-item>
+        <!-- BOTON FILTER -->
+        <lightning-layout-item size="4" padding="around-small" style="line-height:72px">
+          <lightning-button variant="brand" label="Filtrar " title="Buscar proyecto y filtrar Tabla"
+            onclick={doFilter}></lightning-button>
+          <lightning-button variant="Neutral" label="Limpiar"
+            title="Limpiar filtros de la tabla y poner valores por defecto." onclick={clearFilter}></lightning-button>
+          </lightning-layout-item>
+      </lightning-layout>
+
+      <!-- BODY -->
+      <div class="slds-col slds-grid slds-wrap slds-size_1-of-1 slds-m-top_small">
+        <div class="slds-col slds-size_12-of-12" style="align-self: flex-end; text-align-last: center">
+          <!-- ADD NEW ONE [IND] -->
+          <template if:true={isIndustrial}>
+            <lightning-accordion class="" allow-multiple-sections-open  active-section-name={activeSections}  onsectiontoggle={handleToggle}>
+              <lightning-accordion-section name="A" label="Creación Nuevo Lote Rústico">
+                <lightning-layout>
+                  <lightning-layout-item size="4" padding="around-small">
+                    <lightning-input label="Lote" lwc:ref="Descripcionlote" placeholder="Lote"></lightning-input>
+                  </lightning-layout-item>
+                  <lightning-layout-item size="2" padding="around-small">
+                    <lightning-input label="Area" lwc:ref="Area" type="number" step=".001" placeholder="Area"></lightning-input>
+                  </lightning-layout-item>
+                  <lightning-layout-item size="2" padding="around-small">
+                    <lightning-input label="Precio m2" lwc:ref="Precioventam2fun" type="number" step=".001" placeholder="Precio m2"></lightning-input>
+                  </lightning-layout-item>
+                  <lightning-layout-item size="2" padding="around-small">
+                    <lightning-combobox lwc:ref="currency" name="currency" label="Moneda" value={selectedCurrency} placeholder="Seleccionar Moneda" options={currencyOptions} onchange={handleCurrencyChange}></lightning-combobox>
+                  </lightning-layout-item>
+                  <lightning-layout-item size="2" padding="around-small" style="line-height: 70px;">
+                    <lightning-button label="Agregar" onclick={handleAddRow}></lightning-button>
+                  </lightning-layout-item>
+                </lightning-layout>
+              </lightning-accordion-section>
+            </lightning-accordion>
+          </template>
+          <!-- TABLE -->
+          <lightning-datatable key-field="Idlote" data={data} columns={columns} onrowselection={handleRowSelection} selected-rows={preSelectedRows}></lightning-datatable>
+        </div>
+      </div>
+    </template>
+
+
+    <template if:true={stage2}>
+
+      <div>
+        <lightning-layout>
+          <lightning-layout-item size="12" padding="around-small">
+
+            <lightning-datatable key-field="Idlote" data={preSelectedRowsData} columns={columns2} hide-checkbox-column
+              draft-values={draftValues} onsave={handleSave} errors={errors}>
+
+            </lightning-datatable>
+
+
+
+
+
+          </lightning-layout-item>
+
+        </lightning-layout>
+
+      </div>
+
+    </template>
+
+
+    <template if:true={stage3}>
+
+      <template if:true={isIndustrial}>
+        <div>
+          <lightning-layout>
+            <lightning-layout-item size="12" padding="around-small">
+              <table>
+                <tr>
+
+                  <td>Formas de Pago</td>
+                  <td>
+
+                    <lightning-combobox name="paymentType" placeholder="Seleccionar Forma de Pago" value={typeSale}
+                      onchange={handleChangePaymentType} options={paymentTypeOptions}>
+                    </lightning-combobox>
+
+                  </td>
+                  <td style="text-align:right">Precio Total:</td>
+                  <td>&nbsp;</td>
+                  <td >
+                  
+                    <div class="flex-container-cell">
+
+                        <div class="element">
+                                 <div class={nextableClass}>{totalPaymentPer} %</div>
+                          </div>
+                              <div class="element">
+
+                                 <div class={nextableClass}>{totalPaymentStr}</div>
+                          </div>
+                    </div>
+
+                   
+                  
+                  </td>
+
+                </tr>
+
+                <template if:true={isFinanced}>
+
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td style="text-align:right">Pago monto a la firma
+
+                    </td>
+                    <td style="text-align:center">
+                      <lightning-input name="pme" style="visibility:hidden" type="checkbox" checked={pme}
+                        onchange={handlePaymentChange}></lightning-input>
+                    </td>
+                    <td>
+                      
+                       <div class="flex-container-cell">
+
+                        <div class="element">
+                          <lightning-input value={directPaymentPer} name="directPaymentPer" disabled={input_pme} min="10" max="100" type="number" onchange={handlePaymentChange}></lightning-input>
+                        </div>
+                        <div class="element">
+                          <lightning-input lwc:ref="directPayment" value={directPaymentX} disabled="disabled"
+                                                      type="number" step="0.01" name="directPayment"
+                                                      onchange={handlePaymentChange}></lightning-input>
+                        </div>
+                        </div>
+                      
+                      </td>
+
+                  </tr>
+
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td style="text-align:right">Fraccionamiento sin interés
+
+                    </td>
+                    <td style="text-align:center">
+                      <lightning-input name="psie" type="checkbox" checked={psie}
+                        onchange={handlePaymentChange}></lightning-input>
+                    </td>
+                    <td>
+
+                      <div class="flex-container-cell">
+
+                        <div class="element">
+                        <lightning-input value={installmentPaymentPer} name="installmentPaymentPer" disabled={input_psie} min="0" max="100" type="number" onchange={handlePaymentChange}></lightning-input>
+                      </div>
+                      <div class="element">
+                        <lightning-input value={installmentPaymentX} disabled="disabled" type="number" step="0.01"
+                          name="installmentPayment" onchange={handlePaymentChange}>
+
+                        </lightning-input>
+                        </div>
+                      </div>
+
+                      <div class="flex-container-cell">
+
+                        <div class="element">
+                            <lightning-input style="visibility:hidden"></lightning-input>
+                            </div>
+
+                        <div class="element">
+                      
+                      <lightning-input value={installmentNumber} name="installmentNumber" disabled={input_psie}
+                        type="number" step="1" placeholder="Nro de Cuotas"
+                        onchange={handlePaymentChange}></lightning-input>
+
+                        </div>
+
+                          
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td style="text-align:right">Crédito directo con TEA
+
+                    </td>
+                    
+                    <td style="text-align:center">
+                      
+                        <lightning-input name="pcde" type="checkbox" checked={pcde}
+                          onchange={handlePaymentChange}></lightning-input>
+                      
+                      </td>
+                    <td>
+                      
+                       <div class="flex-container-cell">
+
+                        <div class="element">
+                        <lightning-input value={chunkPaymentPer} name="chunkPaymentPer" disabled={input_pcde} min="0" max="100" type="number" onchange={handlePaymentChange}></lightning-input>
+                      </div>
+                      <div class="element">
+                      <lightning-input value={chunkPaymentX} disabled="disabled" type="number" step="0.01"
+                        name="chunkPayment" onchange={handlePaymentChange}></lightning-input>
+                      
+                      </div>
+                      </div>
+                      </td>
+                  </tr>
+
+                  <tr>
+
+                    <td></td>
+                    <td><span style="display:none">{isHIE}</span> </td>
+                    <td style="text-align:right">Hito
+
+                    </td>
+                    <td style="text-align:center">
+                      <lightning-input name="hie" type="checkbox" checked={hie}
+                        onchange={handlePaymentChange}></lightning-input>
+                    </td>
+                    <td>
+                      
+                       <div class="flex-container-cell">
+
+                        <div class="element">
+                        <lightning-input value={milestonePaymentPer} name="milestonePaymentPer" disabled={input_hie} min="0" max="100" type="number" onchange={handlePaymentChange}></lightning-input>
+                      </div>
+                      <div class="element">
+                      <lightning-input value={milestonePaymentX} disabled="disabled" type="number" step="0.01"
+                        name="milestonePayment" onchange={handlePaymentChange}></lightning-input>
+                      </div>
+                      </div>
+                      
+                      
+                      </td>
+
+                  </tr>
+
+                </template>
+
+              </table>
+
+
+            </lightning-layout-item>
+          </lightning-layout>
+
+        </div>
+      </template>
+      <template if:true={isOffice}>
+        <div>
+          <lightning-layout>
+            <lightning-layout-item size="12" padding="around-small">
+
+              <table>
+                <tr>
+                  <td>Total:</td>
+                  <td><lightning-input value={totalPaymentStr} name="totalPayment" disabled></lightning-input></td>
+
+                </tr>
+                <tr>
+
+                </tr>
+              </table>
+
+
+
+
+
+            </lightning-layout-item>
+          </lightning-layout>
+        </div>
+      </template>
+
+
+    </template>
+
+
+    <template if:true={stage4}>
+
+      
+
+
+      <div>
+        <lightning-layout>
+
+          <lightning-layout-item size="3" padding="around-small">
+            <lightning-input value={insName} label="Descripción" placeholder="Descripción"
+              lwc:ref="insName"></lightning-input>
+          </lightning-layout-item>
+          <lightning-layout-item size="3" padding="around-small">
+            <lightning-input type="date" value={insDate} label="Fecha" placeholder="Fecha"
+              lwc:ref="insDate"></lightning-input>
+          </lightning-layout-item>
+          <lightning-layout-item size="3" padding="around-small">
+            <lightning-input type="number" step="0.01" value={insAmount} label="Monto" placeholder="Monto"
+              lwc:ref="insAmount"></lightning-input>
+          </lightning-layout-item>
+
+          <lightning-layout-item size="3" padding="around-small">
+            <lightning-button label="Agregar Fraccionamiento" onclick={handleAddInstallment}
+              style="line-height: 70px;"></lightning-button>
+
+          </lightning-layout-item>
+
+
+        </lightning-layout>
+
+        <lightning-layout>
+          <lightning-layout-item size="9" padding="around-small">
+
+            <lightning-datatable key-field="id" data={installmentList} columns={milestoneColumns}
+              onrowaction={handleRowActionInstallment}>
+            </lightning-datatable>
+
+
+          </lightning-layout-item>
+          <lightning-layout-item size="3" padding="around-small">
+           Fraccionamiento sin interés Monto Total: {installmentPayment}<br/>
+           Cuotas:{currentInstallmentNumber} de {installmentNumber}
+          </lightning-layout-item>
+        </lightning-layout>
+
+      </div>
+
+
+
+
+
+      
+      
+
+    </template>
+
+
+    <template if:true={stage5}>
+
+      <div>
+        <lightning-layout>
+
+          <c-lwc-simulador-financiamiento onchildata={handleDataFromChild} set-producto={producto} set-area={area}
+            set-precio-m2={precioM2} set-monto-financiar={montoFinanciar}>
+
+          </c-lwc-simulador-financiamiento>
+
+
+        </lightning-layout>
+      </div>
+
+      
+
+      
+
+
+      
+    </template>
+
+    <template if:true={stage6}>
+
+      <div>
+        <lightning-layout>
+
+          <lightning-layout-item size="3" padding="around-small">
+            <lightning-input value={miName} label="Descripción" placeholder="Descripción"
+              lwc:ref="miName"></lightning-input>
+          </lightning-layout-item>
+          <lightning-layout-item size="3" padding="around-small">
+            <lightning-input type="date" value={miDate} label="Fecha" placeholder="Fecha" style="display: none"
+              lwc:ref="miDate"></lightning-input>
+          </lightning-layout-item>
+          <lightning-layout-item size="3" padding="around-small">
+            <lightning-input type="number" step="0.01" value={miAmount} label="Monto" placeholder="Monto"
+              lwc:ref="miAmount"></lightning-input>
+          </lightning-layout-item>
+
+          <lightning-layout-item size="3" padding="around-small">
+            <lightning-button label="Agregar Hito" onclick={handleAddMilestone}
+              style="line-height: 70px;"></lightning-button>
+
+          </lightning-layout-item>
+
+
+        </lightning-layout>
+
+        <lightning-layout>
+          <lightning-layout-item size="9" padding="around-small">
+
+            <lightning-datatable key-field="id" data={milestoneList} columns={milestoneColumnsStageSix}
+              onrowaction={handleRowAction}>
+            </lightning-datatable>
+
+
+          </lightning-layout-item>
+          <lightning-layout-item size="3" padding="around-small">
+            Hito Monto Total {milestonePayment}
+          </lightning-layout-item>
+        </lightning-layout>
+
+      </div>
+
+
+      
+      
+    </template>
+
+    <template if:true={stage7}>
+
+
+      
+
+        <div>
+          <lightning-layout>
+
+            <lightning-layout-item size="12" padding="around-small">
+              <lightning-datatable key-field="id" data={conditions} columns={conditionsCols}
+                draft-values={draftValuesConditions} onsave={handleSaveConditions} onrowselection={handleCondSelection}
+                selected-rows={preSelectedCondRows}>
+
+              </lightning-datatable>
+            </lightning-layout-item>
+
+
+          </lightning-layout>
+        </div>
+
+
+      
+
+
+    </template>
+
+    <template if:true={stage8}>
+      <div>
+        <lightning-layout>
+          <lightning-layout-item size="12" padding="around-small">
+
+            Esta seguro de crear la cotización?
+          </lightning-layout-item>
+        </lightning-layout>
+      </div>
+    </template>
+
+
+    <template if:true={stage9}>
+      <div>
+        <lightning-layout>
+          <lightning-layout-item size="12" padding="around-small">
+            <div class="slds-is-relative" style="height: 100px;">
+              <lightning-spinner alternative-text="Loading..." size="medium" variant="brand"></lightning-spinner>
+            </div>
+          </lightning-layout-item>
+        </lightning-layout>
+      </div>
+    </template>
+
+
+
+
+    <template if:true={isPageable}>
+      <div class="slds-col slds-size_6-of-10 slds-align_absolute-center">
+        <lightning-button-icon label="<" icon-name="utility:back" variant="brand" alternative-text="Anterior"
+          title="Anterior" name="Previous" onclick={previousPage}></lightning-button-icon>
+        <span class="slds-badge slds-badge_lightest" style="margin-right: 10px; margin-left: 10px">
+          Página {currentPage} de {totalPages}
+        </span>
+        <lightning-button-icon label=">" icon-name="utility:forward" variant="brand" alternative-text="Siguiente"
+          title="Siguiente" name="Next" onclick={nextPage}></lightning-button-icon>
+      </div>
+
+    </template>
+
+
+
+    <footer class="slds-modal__footer">
+      <template if:true={stageF}>
+        <template if:false={stage1}>
+          <lightning-button variant="neutral" label="Atras" onclick={handlePrevStage}
+            style="float: left"></lightning-button>
+        </template>
+        <lightning-button disabled={nextable} variant="brand" label={nextStageLabel}
+          onclick={handleNextStage}></lightning-button>
+      </template>
+    </footer>
+
+  </template>
+</template>

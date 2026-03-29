@@ -1,0 +1,195 @@
+<aura:component
+  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+  access="global"
+  controller="CEN_cls_Onbase"
+>
+  <aura:attribute name="oportunidad" type="Object" default="{}" />
+  <aura:attribute
+    name="existeSolicitudEnOnbase"
+    type="Boolean"
+    default="false"
+  />
+  <aura:attribute name="btnDisabled" type="Boolean" default="false" />
+  <aura:attribute name="estadoPreliminar" type="Boolean" default="false" />
+  <aura:attribute name="isVisible" type="Boolean" default="false" />
+  <aura:attribute name="estadoFinalizado" type="Boolean" default="false" />
+  <aura:handler
+    event="force:refreshView"
+    action="{!c.forceRefreshViewHandler}"
+  />
+
+  <!-- PARA ERRORES DE CAMPO FALTANTES -->
+  <aura:attribute name="faltanCampos" type="Boolean" default="false" />
+  <aura:attribute name="errorListaFaltanCampos" type="List" />
+
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+  <aura:if isTrue="{!v.isVisible}">
+  <aura:if isTrue="{!v.existeSolicitudEnOnbase}">
+    <lightning:card title="OnBase CVG">
+      <aura:set attribute="actions">
+        <lightning:buttonGroup>
+          <aura:if isTrue="{!v.estadoFinalizado == false}">
+            <lightning:button
+              label="Actualizar"
+              title="Enviar actualización a OnBase"
+              onclick="{! c.onclickActualizarSolicitudOnbase }"
+              iconName="utility:arrow_top"
+            />
+          </aura:if>
+          <lightning:button
+            label="Abrir"
+            title="Abrir en otra pestaña la Solicitud/PreSolicitud en OnBase "
+            onclick="{! c.abrirOnbase }"
+          />
+          <lightning:buttonMenu
+            alternativeText="Ver menú"
+            class="slds-button_last"
+            onselect="{!c.handleMenuSelect }"
+            menuAlignment="auto"
+          >
+            <lightning:menuItem
+              label="Ver Documentos"
+              value="1"
+              title="Abrir en otra pestaña la carpeta de documentos de Solicitud/PreSolicitud en OnBase "
+            />
+            <lightning:menuItem 
+              label="Ir a OnBase Web" 
+              value="2" 
+              title="Abrir en otra pestaña OnBase Web "
+            />
+          </lightning:buttonMenu>
+        </lightning:buttonGroup>
+      </aura:set>
+      <div class="slds-p-horizontal_small">
+        <article class="slds-tile">
+          <div class="slds-tile__detail">
+            <dl class="slds-list_horizontal slds-wrap">
+              <dt class="slds-item_label slds-text-color_weak slds-truncate">
+                Tipo de Solicitud:
+              </dt>
+              <dd class="slds-item_detail">
+                <ui:outputText
+                  value="{!v.oportunidad.CEN_Tipo_de_solicitud__c}"
+                />
+              </dd>
+              <dt class="slds-item_label slds-text-color_weak slds-truncate">
+                N° Solicitud/PreSolicitud:
+              </dt>
+              <dd class="slds-item_detail">
+                <ui:outputText
+                  value="{!v.oportunidad.CEN_Nro_solicitud_presolicitud__c}"
+                />
+              </dd>
+              <dt class="slds-item_label slds-text-color_weak slds-truncate">
+                N° Documento:
+              </dt>
+              <dd class="slds-item_detail">
+                <ui:outputText
+                  value="{!v.oportunidad.CEN_Onbase_documento_id__c}"
+                />
+              </dd>
+              <dt class="slds-item_label slds-text-color_weak slds-truncate">
+                Estado:
+              </dt>
+              <dd class="slds-item_detail">
+                <ui:outputText value="{!v.oportunidad.CEN_Sub_estado__c}" />
+              </dd>
+              <dt class="slds-item_label slds-text-color_weak slds-truncate">
+                Descripción:
+              </dt>
+              <dd class="slds-item_detail">
+                <ui:outputText value="{!v.oportunidad.Description}" />
+              </dd>
+              <dt class="slds-item_label slds-text-color_weak slds-truncate">
+                Usuario asignado:
+              </dt>
+              <dd class="slds-item_detail">
+                <ui:outputText
+                  value="{!v.oportunidad.CEN_Supervisor__r.Name}"
+                />
+              </dd>
+              <dt class="slds-item_label slds-text-color_weak slds-truncate">
+                Correo asignado:
+              </dt>
+              <dd class="slds-item_detail">
+                <ui:outputText value="{!v.oportunidad.CEN_CorreoAuxi__c}" />
+              </dd>
+              <dt class="slds-item_label slds-text-color_weak slds-truncate">
+                Bandeja de la solicitud:
+              </dt>
+              <dd class="slds-item_detail">
+                <ui:outputText
+                  value="{!v.oportunidad.CEN_Bandeja_onbase_de_solicitud__c}"
+                />
+              </dd>
+            </dl>
+          </div>
+        </article>
+      </div>
+    </lightning:card>
+  </aura:if>
+  <aura:if isTrue="{!v.existeSolicitudEnOnbase==false}">
+    <lightning:card title="OnBase CVG">
+      <aura:set attribute="actions">
+        <lightning:button
+          disabled="{!v.btnDisabled}"
+          label="Crear Solicitud/PreSolicitud"
+          title="Enviar la oportunidad a Onbase y crear la Solicitud/PreSolicitud"
+          onclick="{! c.enviarAonBase }"
+        />
+      </aura:set>
+    </lightning:card>
+  </aura:if>
+  <aura:if isTrue="{!v.faltanCampos}">
+    <section
+      role="dialog"
+      tabindex="-1"
+      class="slds-modal slds-fade-in-open slds-modal_small"
+      aria-labelledby="modal-heading-01"
+      aria-modal="true"
+      aria-describedby="modal-content-id-1"
+    >
+      <div class="slds-modal__container">
+        <header
+          class="slds-modal__header slds-theme_alert-texture slds-theme_error"
+        >
+          <lightning:buttonIcon
+            class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+            iconName="utility:close"
+            size="large"
+            variant="bare"
+            onclick="{! c.closeModal }"
+            alternativeText="Cerrar"
+            title="Cerrar"
+          />
+          <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+            Faltan Campos
+          </h2>
+        </header>
+        <div
+          class="slds-modal__content slds-p-around_medium"
+          id="modal-content-id-1"
+        >
+          <div class="slds-p-around_medium">
+            <ul>
+              <aura:iteration items="{!v.errorListaFaltanCampos}" var="error">
+                <li type="square"><b>{!error.key}</b></li>
+                <p>{!error.camposFaltantes}</p>
+              </aura:iteration>
+            </ul>
+          </div>
+        </div>
+        <footer class="slds-modal__footer">
+          <lightning:button
+            variant="brand"
+            label="Cerrar"
+            title="Cerrar"
+            onclick="{! c.closeModal }"
+          />
+        </footer>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+  </aura:if>
+</aura:if>
+</aura:component>

@@ -1,0 +1,18 @@
+<template>
+    <lightning-card title="Update fecha de entrega lotes">
+        <div class="slds-p-around_medium">
+            <!-- Botón habilitado solo si isButtonDisabled es false -->
+            <!-- Spinner mientras se procesa -->
+            <template if:true={isLoading}>
+                <template if:true={isLoading}></template>
+                <lightning-spinner alternative-text="Cargando..."></lightning-spinner>
+            </template>
+            <lightning-button 
+                label="Update lotes fecha de entrega" 
+                variant="brand" 
+                onclick={handleClick} 
+                disabled={isButtonDisabled}>
+            </lightning-button>
+        </div>
+    </lightning-card>
+</template>

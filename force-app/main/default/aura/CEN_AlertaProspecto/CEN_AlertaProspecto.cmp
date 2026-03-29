@@ -1,0 +1,38 @@
+<!--
+  @Component Name     : CEN_AlertaProspecto.cmp
+  @Description        : 
+  @Author             : Hernan Lurita
+  @Group              : 
+  @Last Modified By   : Hernan Lurita
+  @Last Modified On   : 05/12/2019
+  @Modification Log   : 
+  ==============================================================================
+  Ver         Date                     Author      		      Modification
+  ==============================================================================
+  1.0    5/12/2019 10:43:02         Hernan Lurita           Initial Version
+-->
+
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasSObjectName" access="global" controller="CEN_AlertaProspecto" >
+  
+
+    <aura:attribute name="sMensajeAlerta" type="string" />
+<!-- Account and Lead-->
+    <aura:attribute name="searchResult" type="List" description="use for store and display account list return from server"/>
+    <aura:attribute name="record" type="Object" description="The record object to be displayed"/>
+    <aura:attribute name="simpleRecord" type="Object" description="A simplified view record object to be displayed"/>
+    <aura:attribute name="recordError" type="String" description="An error message bound to force:recordData"/>
+    <aura:attribute name="sobjecttype" type="String" default="{!v.sObjectName}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <!--Recibe valore de la validacion-->
+    <force:recordData aura:id="record"
+    		layoutType="FULL"
+    		recordId="{!v.recordId}"
+    		targetError="{!v.recordError}"
+    		targetRecord="{!v.record}"
+    		targetFields ="{!v.simpleRecord}"
+        mode="VIEW"/> 
+        
+    <ltng:require styles="{!$Resource.multilineToastCSS}" />
+ 
+</aura:component>

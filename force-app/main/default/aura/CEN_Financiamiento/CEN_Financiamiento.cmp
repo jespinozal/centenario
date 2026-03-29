@@ -1,0 +1,2085 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                access="global" 
+                controller="CEN_cls_Financiamiento">
+    <aura:attribute name="recordId" type="String" default="0010v00000UC4c2AAD"/>
+    <aura:attribute name="cuenta" type="Object" default="{}"/>
+    <aura:attribute name="mydata" type="Object" default="{}"/>
+    <aura:attribute name="data" type="List" default="[]"/>
+    <aura:attribute name="mycolumns" type="List" default="[]"/>
+    <aura:attribute name="lotes" type="List" default="[]"/>
+    <aura:attribute name="mensaje" type="String"  default=""/>
+    <aura:attribute name="total_financiamientos" type="Integer" default="0"/>
+    <!--DETALLE FINANCIAMIENTO-->
+    <aura:attribute name="proforma" type="Object" default=""/>
+    <aura:attribute name="proformaDetalles" type="Object" default=""/>
+    <aura:attribute name="CurrentUser" type="Object"/>
+    <force:recordData recordId="{!$SObjectType.CurrentUser.Id}"
+                  fields="Profile.Name"
+                  targetFields="{!v.CurrentUser}"/>
+    <aura:attribute name="lotesProforma" type="List" default="[]"/>
+    <aura:attribute name="verFinanciamientos" type="Boolean" default="false"/>
+    <aura:attribute name="verDetalle" type="Boolean" default="false"/>
+    <aura:attribute name="verCampo" type="Boolean" default="true"/>
+    <aura:attribute name="loaded" type="Boolean" default="true"/>
+    <aura:attribute name="activeProfile" type="Boolean" default="false"/>
+
+    <!--MOD FINANCIAMIENTO-->
+    <aura:attribute name="localidad" type="String" default=""/>
+    <aura:attribute name="kardex" type="String" default=""/>
+    <aura:attribute name="notaria" type="String" default=""/>
+    <aura:attribute name="partida" type="String" default=""/>
+    <aura:attribute name="fecha" type="String" default=""/>
+    
+   	<aura:attribute name="activeSections" type="List" default="[]" />
+    <aura:attribute name="activeSectionsMessage" type="String" default="" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <lightning:card title="{!'Financiamientos ('+v.total_financiamientos+')'}" iconName="standard:buyer_account" >
+        <div aura:id="last-financiamiento" class="slds-hide slds-p-horizontal_small">
+        <aura:iteration items="{!v.data}" var="item">
+            <article class="slds-tile">
+                <h3 class="slds-truncate" >
+                    <a>
+                        <lightning:button variant="base" label="{!item.proforma.PROFORMA +' - '+ item.proforma.VERSION}" value="{!item}" onclick="{! c.verDetalle }"/>
+                    </a>
+                </h3>
+                <div class="slds-tile__detail">
+                  <dl class="slds-list_horizontal slds-wrap">
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate">Proyecto:</dt>
+                    <dd class="slds-item_detail slds-truncate">{!item.proforma.PROYECTO_TEXT}</dd>
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate">Precio:</dt>
+                    <dd class="slds-item_detail slds-truncate"><ui:outputNumber format="#,###,###,##0.00############" value="{!item.proforma.PRECIO}"/>
+                        <ui:outputText value="{!' '+item.proforma.WAERS}"/></dd>
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate">Fecha Cierre Venta:</dt>
+                    <dd class="slds-item_detail slds-truncate">
+                        <aura:if isTrue="{!item.proforma.FECHA_CVENTAS!='0000-00-00'}">
+                            <ui:outputDate format="EEE, d MMM yyyy" value="{!item.proforma.FECHA_CVENTAS}"/>
+                        </aura:if>
+                      </dd>
+                  </dl>
+                </div>
+              </article>
+        </aura:iteration>
+        </div>
+         <aura:set attribute="footer">
+             <aura:if isTrue="{!v.total_financiamientos!=0}">
+               <div class="slds-text-align_center">
+                   <a href="javascript:void(0)" onclick="{!c.verTodos}">
+                       Ver todos
+                   </a>
+               </div>
+             </aura:if>
+         </aura:set>       
+    </lightning:card>
+    <aura:if isTrue="{!v.verFinanciamientos}">
+        <div aura:id="modal-tiene-financiamiento">
+      <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" 
+               aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.Cerrar }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate"><strong>Financiamientos del cliente</strong></h2>
+                    </header>
+                    
+                   <!--Modal/Popup Box Body Starts here-->
+                   <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">                      
+                 	<!--****************************************************** Cabecera del Componente *****************************************************************--> 
+                       <div class="table_body_cabecera">
+                           <!--<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">-->
+                           <table class="slds-table slds-table_cell-buffer slds-no-row-hover slds-table_bordered slds-table_col-bordered slds-text-body_small">
+                               <thead>
+                                   <tr class="slds-line-height_reset">
+                                       <th class="" scope="col">
+                                           <div class="slds-truncate" title="Proyecto">Proyecto</div>
+                                       </th>
+                                       <th class="" scope="col">
+                                           <div class="slds-truncate" title="Fecha de cierre de ventas">F. Cierre de ventas</div>
+                                       </th>
+                                       <th class="" scope="col">
+                                           <div class="slds-truncate" title="Cantidad de Lotes">Lotes</div>
+                                       </th>
+                                       <th class="" scope="col">
+                                           <div class="slds-truncate" title="Información de los lotes">Mz.Lt.</div>
+                                       </th>
+                                       <th class="" scope="col">
+                                           <div class="slds-truncate" title="Sociedad">Sociedad</div>
+                                       </th>
+                                       <th class="" scope="col">
+                                           <div class="slds-truncate" title="Financiamiento N°">Financiamiento N°</div>
+                                       </th>
+                                       <th class="" scope="col">
+                                           <div class="slds-truncate" title="Versión">Versión</div>
+                                       </th>
+                                       <th class="" scope="col">
+                                           <div class="slds-truncate" title="Estado del Financiamiento">Est. Financiamiento</div>
+                                       </th>
+                                       <th class="" scope="col">
+                                           <div class="slds-truncate" title="Fecha de Inactividad">Fecha Inactividad</div>
+                                       </th>
+                                       <th class="" scope="col">
+                                           <div class="slds-truncate" title="Motivo">Motivo</div>
+                                       </th>
+                                       <th class="" scope="col">
+                                           <div class="slds-truncate" title="Moneda Lote">Moneda Lote</div>
+                                       </th>
+                                       <th class="" scope="col">
+                                           <div class="slds-truncate" title="Descripción Vía Financiamiento">Descripción Vía Financiamiento</div>
+                                       </th>
+                                       <th class="" scope="col">
+                                           <div class="slds-truncate" title="Descripción Vía Financiamiento">Ver detalles</div>
+                                       </th>
+                                   </tr>
+                               </thead>
+                               <tbody>
+                                   <aura:iteration items="{!v.mydata}" var="item">
+                                   <tr class="slds-hint-parent">
+                                       <td data-label="Proyecto">
+                                           <div class="slds-truncate" title="{!item.proforma.PROYECTO_TEXT}">
+                                               <ui:outputText value="{!item.proforma.PROYECTO_TEXT}"/>                                           
+                                           </div>
+                                       </td>
+                                       <td data-label="F. Cierre de ventas">
+                                           <div class="slds-truncate" title="{!item.proforma.FECHA_CVENTAS}">
+                                               <aura:if isTrue="{!item.proforma.FECHA_CVENTAS!='0000-00-00'}">
+                                                   <ui:outputDate format="EEE, d MMM yyyy" value="{!item.proforma.FECHA_CVENTAS}"/>
+                                               </aura:if>                                        
+                                           </div>
+                                       </td>
+                                        <td data-label="Lotes">
+                                           <div class="slds-truncate" title="{!item.CantidadLotes}">
+                                               <ui:outputText value="{!item.CantidadLotes}"/>                                           
+                                           </div>
+                                       </td>
+                                       <td data-label="Mz.Lt">
+                                           <div class="slds-truncate" title="{!item.LotesConcatenado}">
+                                               <ui:outputText value="{!item.LotesConcatenado}"/>                                           
+                                           </div>
+                                       </td>
+                                       <td data-label="Sociedad">
+                                           <div class="slds-truncate" title="{!item.proforma.BUKRS}">
+                                               <ui:outputText value="{!item.proforma.BUKRS}"/>                                           
+                                           </div>
+                                       </td>
+                                       <td data-label="Financiamiento N°">
+                                           <div class="slds-truncate" title="{!item.proforma.PROFORMA}">
+                                               <ui:outputText value="{!item.proforma.PROFORMA}"/>                                           
+                                           </div>
+                                       </td>
+                                        <td data-label="Versión">
+                                           <div class="slds-truncate" title="{!item.proforma.VERSION}">
+                                               <ui:outputText value="{!item.proforma.VERSION}"/>                                           
+                                           </div>
+                                       </td>
+                                       <td data-label="Est. Financiamiento">
+                                           <div class="slds-truncate" title="{!item.proforma.ESTADO}">
+                                               <ui:outputText value="{!item.proforma.ESTADO}"/>                                           
+                                           </div>
+                                       </td>
+                                        <td data-label="Fecha Inactividad">
+                                           <div class="slds-truncate" title="{!item.proforma.FECHA_INACTIVO}">
+                                               <ui:outputText value="{!item.proforma.FECHA_INACTIVO}"/>                                           
+                                           </div>
+                                       </td>
+                                       <td data-label="Motivo">
+                                           <div class="slds-truncate" title="{!item.proforma.MOTIVO}">
+                                               <ui:outputText value="{!item.proforma.MOTIVO}"/>                                           
+                                           </div>
+                                       </td>
+                                       <td data-label="Moneda Lote">
+                                           <div class="slds-truncate" title="{!item.proforma.WAERS}">
+                                               <ui:outputText value="{!item.proforma.WAERS}"/>                                           
+                                           </div>
+                                       </td>
+                                       <td data-label="Descripción Vía Financiamiento">
+                                           <div class="slds-truncate" title="{!item.proforma.VIAFINAN_TEXT}">
+                                               <ui:outputText value="{!item.proforma.VIAFINAN_TEXT}"/>                                           
+                                           </div>
+                                       </td>
+                                       <td data-label="Ver detalles">
+                                           <div class="slds-truncate" title="Ver más detalles">
+                                               <lightning:button variant="base" label="Ver detalles" value="{!item}" onclick="{! c.verDetalle }"/>                                           
+                                           </div>
+                                       </td>
+                                   </tr>
+                                   </aura:iteration>
+                               </tbody>
+                           </table>                           
+                       </div>                                                    
+                   <!--*************************************************************************************************************************************************--> 
+                   </div>
+                        <footer class="slds-modal__footer">
+                           
+                            <lightning:button variant="brand"
+                                              label="Cerrar"
+                                              title="Cerrar"
+                                              onclick="{!c.Cerrar}"/>
+                        </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+      
+      
+  </div>  
+    </aura:if>
+    <aura:if isTrue="{!v.verDetalle}">
+        <div aura:id="modal-detalle-proforma">
+      <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" 
+               aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.CerrarDetalleProforma }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate"><b>Financiamiento <ui:outputText value="{!v.proforma.proforma.PROFORMA}"/></b></h2>                        
+                    </header>                    
+                   <!--Modal/Popup Box Body Starts here-->
+                   <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">                       
+                 	<!--****************************************************** Cabecera del Componente *****************************************************************--> 
+                       <lightning:tabset selectedTabId="1">
+                           <lightning:tab label="Detalle del financiamiento" id="1">
+                               <div class="slds-grid slds-grid_vertical">
+                                   <div class="slds-col">
+                                       <div class="slds-grid">
+                                           <div class="slds-col slds-size_1-of-2">
+                                               <span>
+                                                   <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                       <div class="slds-col slds-border_bottom">
+                                                           <div class="slds-grid">
+                                                               <div class="slds-col slds-size_2-of-3">N° Proforma</div>
+                                                               <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.PROFORMA}"/></div>
+                                                           </div>
+                                                       </div>
+                                                       <div class="slds-col slds-border_bottom">
+                                                           <div class="slds-grid">
+                                                               <div class="slds-col slds-size_2-of-3">Versión</div>
+                                                               <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputNumber format="#" value="{!v.proforma.proforma.VERSION}"/></div>
+                                                           </div>
+                                                       </div>
+                                                       
+                                                       <div class="slds-col slds-border_bottom">
+                                                           <div class="slds-grid">
+                                                               <div class="slds-col slds-size_2-of-3">Urbanización</div>
+                                                               <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.PROYECTO_TEXT}"/></div>
+                                                           </div>
+                                                       </div>
+                                                       <div class="slds-col slds-border_bottom">
+                                                           <div class="slds-grid">
+                                                               <div class="slds-col slds-size_2-of-3">Cod Propiedad</div>
+                                                               <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.LotesConcatenado}"/></div>
+                                                           </div>
+                                                       </div>
+                                                       <div class="slds-col slds-border_bottom">
+                                                           <div class="slds-grid">
+                                                               <div class="slds-col slds-size_2-of-12">Cliente</div>
+                                                               <div class="slds-col slds-size_3-of-12 slds-text-align_right">
+                                                                   <aura:if isTrue="{!v.cuenta.RecordType.Name!='Cuenta Natural'}">
+                                                                         {!v.cuenta.CEN_Numero_de_documento_del__c}
+                                                                         <aura:set attribute="else">
+                                                                             {!v.cuenta.CEN_N_mero_de_documento__pc}
+                                                                         </aura:set>
+                                                                   </aura:if> 
+                                                               </div>
+                                                               <div class="slds-col slds-size_7-of-12 slds-text-align_right">{!v.cuenta.Name}</div>
+                                                           </div>
+                                                       </div>
+                                                   </div>
+                                               </span>
+                                           </div>
+                                            <div class="slds-col slds-size_1-of-2">
+                                               <span>
+                                                   <div class="slds-grid slds-grid_vertical">
+                                                       <div class="slds-col slds-border_bottom">
+                                                           <div class="slds-grid">
+                                                               <div class="slds-col slds-size_8-of-12">Precio venta</div>
+                                                               <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.PRECIO}"/></div>
+                                                               <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                           </div>
+                                                       </div>
+                                                       <div class="slds-col slds-border_bottom">
+                                                           <div class="slds-grid">
+                                                               <div class="slds-col slds-size_8-of-12">PVP/m<sup>2</sup></div>
+                                                               <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value=""/></div>
+                                                               <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                           </div>
+                                                       </div>
+                                                       <div class="slds-col slds-border_bottom">
+                                                           <div class="slds-grid">
+                                                               <div class="slds-col slds-size_8-of-12">Importe amortizado</div>
+                                                               <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.AMORTIZADO}"/></div>
+                                                               <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                           </div>
+                                                       </div>
+                                                       <div class="slds-col slds-border_bottom">
+                                                           <div class="slds-grid">
+                                                               <div class="slds-col slds-size_2-of-3">Fecha cierre ventas</div>
+                                                               <div class="slds-col slds-size_1-of-3 slds-text-align_right">
+                                                                   <aura:if isTrue="{!v.proforma.proforma.FECHA_CVENTAS!='0000-00-00'}">
+                                                                       <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.FECHA_CVENTAS}"/>
+                                                                   </aura:if>
+                                                               </div>
+                                                           </div>
+                                                       </div>
+                                                       <div class="slds-col">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-border_bottom slds-p-right_small slds-size_7-of-12">
+                                                           <div class="slds-grid">
+                                                           <div class="slds-col slds-size_2-of-3">
+                                                               Vía financiamiento
+                                                           </div>
+                                                           <div class="slds-col slds-size_1-of-2 slds-text-align_center">
+                                                               {!v.proforma.proforma.VIA_FINANCIAMIENTO}
+                                                           </div>
+                                                           </div>
+                                                       </div>
+                                                       <div class="slds-col slds-size_1-of-12"> </div>
+                                                       <div class="slds-col slds-border_bottom slds-size_4-of-12">
+                                                           <div class="slds-grid">
+                                                           <div class="slds-col slds-size_1-of-2">
+                                                               Medio
+                                                           </div>
+                                                           <div class="slds-col slds-size_1-of-2 slds-text-align_right">
+                                                               {!v.proforma.proforma.MEDIO}
+                                                           </div>
+                                                           </div>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                                   </div>
+                                                </span>
+                                           </div>
+                                       </div>
+                                   </div>
+                                   <div class="slds-col slds-p-top_medium">
+                                       <span>
+                                            <div class="table_body_short">                               
+                                  <table class="slds-table slds-table_cell-buffer slds-no-row-hover slds-table_bordered slds-text-body_small">
+                                      <thead>
+                                          <tr class="slds-line-height_reset">
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Número de Cuota">N° Cuota</div>
+                                              </th><!--
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Cuota auxiliar">Cuota aux</div>
+                                              </th>-->
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Tipo de cuota">Tipo cuota</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Saldo inicial">Saldo inicial</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Importe amortizado">Imp. Amortizado</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Importe intereses">Imp. Interes</div>
+                                              </th><!--
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Gastos">Gastos</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Intereses + gastos administrativos">IntGasAdm</div>
+                                              </th>-->
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Importe de la cuota">Imp. de la cuota</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Moneda">Moneda</div>
+                                              </th><!--
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Saldo final">Saldo final</div>
+                                              </th>-->
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Fecha de vencimiento">F. vencimiento</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Fecha Alterna">F. Alterna</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Fecha de pago">Fecha pago</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Indicador de Pagado">¿Pagado?</div>
+                                              </th>
+                                              <!--
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Descuento">Descuento</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="No Dias">N° Dias</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="No Dias Acu">N° Dias Acu</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="IGV">IGV</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Desgravamen Desempleo">Dgv desempleo</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Desgravamen Desempleo">Dgv seguro vida</div>
+                                              </th>
+                                              
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Sociedad">Sociedad</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Número de un documento contable">N° doc. contable</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Ejercicio">Ejercicio</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Indicador devengado">¿Devengado?</div>
+                                              </th>-->
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Indicador de Envío a banco">¿Envío a banco?</div>
+                                              </th>
+                                              <th class="" scope="col">
+                                                  <div class="slds-truncate" title="Fecha de envío a banco">F. envío a banco</div>
+                                              </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <aura:iteration items="{!v.proformaDetalles}" var="item">
+                                              <aura:if isTrue="{!item.FlagPagado=='X'}">
+                                                      <tr class="slds-hint-parent" style="background-color:rgb(217, 255, 223)">
+                                                  <td data-label="N° Cuota">
+                                                      <ui:outputNumber format="#" value="{!item.Cuota}"/>
+                                                  </td><!--
+                                                  <td data-label="Cuota aux">
+                                                      <ui:outputNumber format="#" value="{!item.CuotaAux}"/>
+                                                  </td>-->
+                                                  <td data-label="Tipo cuota">
+                                                      {!item.TipoCuota}
+                                                  </td>
+                                                  <td data-label="Saldo inicial">
+                                                      <ui:outputNumber format="#,###,###,##0.00############" value="{!item.SaldoInicial}"/>
+                                                  </td>
+                                                  <td data-label="Imp. Amort">
+                                                      <ui:outputNumber format="#,###,###,##0.00############" value="{!item.Amortizacion}"/>
+                                                  </td>
+                                                  <td data-label="Imp Interes">
+                                                      <ui:outputNumber format="#,###,###,##0.00############" value="{!item.Intereses}"/>
+                                                  </td><!--
+                                                   <td data-label="Gastos">
+                                                      <ui:outputNumber format="#,###,###,##0.00############" value="{!item.Gastos}"/>
+                                                  </td>
+                                                  <td data-label="IntGasAdm">
+                                                      <ui:outputNumber format="#,###,###,##0.00############" value="{!item.InteresGastos}"/>
+                                                  </td>-->
+                                                  <td data-label="Imp cuota">
+                                                      <ui:outputNumber format="#,###,###,##0.00############" value="{!item.ImpCuota}"/>
+                                                  </td>
+                                                  <td data-label="Moneda">
+                                                     {!item.Waers}
+                                                  </td><!--
+                                                  <td data-label="Saldo final">
+                                                     <ui:outputNumber format="#,###,###,##0.00############" value="{!item.SaldoFinal}"/>
+                                                  </td>-->
+                                                  <td data-label="Fec. Venc.">
+                                                     <aura:if isTrue="{!item.FechaVencimiento!='0000-00-00'}">
+                                                          {!item.FechaVencimiento}
+                                                      </aura:if>
+                                                  </td>
+                                                          <td data-label="Fecha Alterna">
+                                                              <aura:if isTrue="{!item.FechaAlterna!='0000-00-00'}">
+                                                          {!item.FechaAlterna}
+                                                      </aura:if>
+                                                  </td>
+                                                  <td data-label="Fecha pago">
+                                                     <aura:if isTrue="{!item.FechaPago!='0000-00-00'}">
+                                                         {!item.FechaPago}
+                                                      </aura:if>
+                                                  </td><!--
+                                                  <td data-label="Descuento">
+                                                     <ui:outputNumber format="#,###,###,##0.00############" value="{!item.DescuentoPagoAdelantado}"/>
+                                                  </td>-->
+                                                  <td data-label="Pagado">
+                                                     {!item.FlagPagado}
+                                                  </td><!--
+                                                  <td data-label="No Dias">
+                                                     {!item.NoDias}
+                                                  </td>
+                                                          <td data-label="No Dias Acu">
+                                                     {!item.NoDiasAcu}
+                                                  </td>
+                                                          <td data-label="IGV">
+                                                              <ui:outputNumber value="{!item.Igv}" format="#,###,###,##0.00############"/>
+                                                  </td>
+                                                          <td data-label="Desgravamen Desempleo">
+                                                              <ui:outputNumber value="{!item.Desempleo}" format="#,###,###,##0.00############" />
+                                                  </td>
+                                                          <td data-label="Dgv seguro vida">
+                                                              <ui:outputNumber value="{!item.SeguroVida}" format="#,###,###,##0.00############" />
+                                                  </td>
+                                                          
+                                                          <td data-label="Sociedad">
+                                                               {!item.BUKRS}
+                                                  </td>
+                                                          <td data-label="Número de un documento contable">
+                                                               {!item.Belnr}
+                                                  </td>
+                                                          <td data-label="Ejercicio">
+                                                               {!item.Gjahr}
+                                                  </td>
+                                                          <td data-label="Indicador devengado">
+                                                               {!item.FlagDevengado}
+                                                  </td>-->
+                                                          <td data-label="Indicador Envío a banco">
+                                                               {!item.FlagEnvioBanco}
+                                                  </td>
+                                                          <td data-label="Fecha Alterna">
+                                                              <aura:if isTrue="{!item.FechaEnvioBanco!='0000-00-00'}">
+                                                          {!item.FechaEnvioBanco}
+                                                      </aura:if>
+                                                  </td>
+                                              </tr>
+                                                   <aura:set attribute="else">
+                                                       <tr class="slds-hint-parent">
+                                                  <td data-label="N° Cuota">
+                                                      <ui:outputNumber format="#" value="{!item.Cuota}"/>
+                                                  </td><!--
+                                                  <td data-label="Cuota aux">
+                                                      <ui:outputNumber format="#" value="{!item.CuotaAux}"/>
+                                                  </td>-->
+                                                  <td data-label="Tipo cuota">
+                                                      {!item.TipoCuota}
+                                                  </td>
+                                                  <td data-label="Saldo inicial">
+                                                      <ui:outputNumber format="#,###,###,##0.00############" value="{!item.SaldoInicial}"/>
+                                                  </td>
+                                                  <td data-label="Imp. Amort">
+                                                      <ui:outputNumber format="#,###,###,##0.00############" value="{!item.Amortizacion}"/>
+                                                  </td>
+                                                  <td data-label="Imp Interes">
+                                                      <ui:outputNumber format="#,###,###,##0.00############" value="{!item.Intereses}"/>
+                                                  </td><!--
+                                                   <td data-label="Gastos">
+                                                      <ui:outputNumber format="#,###,###,##0.00############" value="{!item.Gastos}"/>
+                                                  </td>
+                                                  <td data-label="IntGasAdm">
+                                                      <ui:outputNumber format="#,###,###,##0.00############" value="{!item.InteresGastos}"/>
+                                                  </td>-->
+                                                  <td data-label="Imp cuota">
+                                                      <ui:outputNumber format="#,###,###,##0.00############" value="{!item.ImpCuota}"/>
+                                                  </td>
+                                                  <td data-label="Moneda">
+                                                     {!item.Waers}
+                                                  </td><!--
+                                                  <td data-label="Saldo final">
+                                                     <ui:outputNumber format="#,###,###,##0.00############" value="{!item.SaldoFinal}"/>
+                                                  </td>-->
+                                                  <td data-label="Fec. Venc.">
+                                                     <aura:if isTrue="{!item.FechaVencimiento!='0000-00-00'}">
+                                                          {!item.FechaVencimiento}
+                                                      </aura:if>
+                                                  </td>
+                                                          <td data-label="Fecha Alterna">
+                                                              <aura:if isTrue="{!item.FechaAlterna!='0000-00-00'}">
+                                                          {!item.FechaAlterna}
+                                                      </aura:if>
+                                                  </td>
+                                                  <td data-label="Fecha pago">
+                                                     <aura:if isTrue="{!item.FechaPago!='0000-00-00'}">
+                                                         {!item.FechaPago}
+                                                      </aura:if>
+                                                  </td><!--
+                                                  <td data-label="Descuento">
+                                                     <ui:outputNumber format="#,###,###,##0.00############" value="{!item.DescuentoPagoAdelantado}"/>
+                                                  </td>-->
+                                                  <td data-label="Pagado">
+                                                     {!item.FlagPagado}
+                                                  </td><!--
+                                                  <td data-label="No Dias">
+                                                     {!item.NoDias}
+                                                  </td>
+                                                          <td data-label="No Dias Acu">
+                                                     {!item.NoDiasAcu}
+                                                  </td>
+                                                          <td data-label="IGV">
+                                                              <ui:outputNumber value="{!item.Igv}" format="#,###,###,##0.00############"/>
+                                                  </td>
+                                                          <td data-label="Desgravamen Desempleo">
+                                                              <ui:outputNumber value="{!item.Desempleo}" format="#,###,###,##0.00############" />
+                                                  </td>
+                                                          <td data-label="Dgv seguro vida">
+                                                              <ui:outputNumber value="{!item.SeguroVida}" format="#,###,###,##0.00############" />
+                                                  </td>
+                                                          
+                                                          <td data-label="Sociedad">
+                                                               {!item.BUKRS}
+                                                  </td>
+                                                          <td data-label="Número de un documento contable">
+                                                               {!item.Belnr}
+                                                  </td>
+                                                          <td data-label="Ejercicio">
+                                                               {!item.Gjahr}
+                                                  </td>
+                                                          <td data-label="Indicador devengado">
+                                                               {!item.FlagDevengado}
+                                                  </td>-->
+                                                          <td data-label="Indicador Envío a banco">
+                                                               {!item.FlagEnvioBanco}
+                                                  </td>
+                                                          <td data-label="Fecha Alterna">
+                                                              <aura:if isTrue="{!item.FechaEnvioBanco!='0000-00-00'}">
+                                                          {!item.FechaEnvioBanco}
+                                                      </aura:if>
+                                                  </td>
+                                              </tr>
+                                              </aura:set>
+                                              </aura:if>
+                                          </aura:iteration>
+                                      </tbody>
+                                   </table> 
+                               </div>
+                                       </span>
+                                   </div>
+                               </div>
+                           </lightning:tab>
+                           <lightning:tab label="Información de Lotes" id="2">
+                              <div class="slds-grid slds-grid_vertical">
+                                   <div class="slds-col ">
+                                       <article class="slds-card ">
+                                           <div class="slds-card__body slds-card__body_inner">
+                                               <strong>STATUS</strong>
+                                           <div class="slds-grid slds-grid_vertical">
+                                               <div class="slds-col">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_1-of-2">
+                                                           <span>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                           <div class="slds-col slds-size_2-of-3">Status</div>
+                                                                           <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.ESTADO2}"/></div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                           </span>
+                                                       </div>
+                                                       <div class="slds-col slds-size_1-of-2">
+                                                           <span>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                           <div class="slds-col slds-size_2-of-3">Subestado inmueble</div>
+                                                               <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.SUBESTADO}"/></div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                           </span>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               </div>
+                                            </div>
+                                       </article>
+                                  </div>
+                                  <div class="slds-col ">
+                                       <article class="slds-card ">
+                                           <div class="slds-card__body slds-card__body_inner">
+                                               <strong>DATOS DEL PRODUCTO</strong>
+                                           <div class="slds-grid slds-grid_vertical">
+                                               <div class="slds-col">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_1-of-2">
+                                                           <span>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                           <div class="slds-col slds-size_2-of-3">Cantidad de lotes</div>
+                                                               <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.CantidadLotes}"/></div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                           </span>
+                                                       </div>
+                                                       <div class="slds-col slds-size_1-of-2">
+                                                           <span>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                            <div class="slds-col slds-size_2-of-3">Tipo Prod.</div>
+                                                               <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.TIPO}"/></div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                           </span>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               </div>
+                                            </div>
+                                       </article>
+                                  </div>
+                                 
+                                  <aura:iteration items="{!v.proforma.lotes}" var="lotep">
+                                      
+                                  <div class="slds-col ">
+                                       <article class="slds-card ">
+                                           <div class="slds-card__body slds-card__body_inner">
+                                               <strong>Superficies de <ui:outputText value="{!lotep.DESCRIPCION_LARGA}"/></strong>
+                                           <div class="slds-grid slds-grid_vertical">
+                                               <div class="slds-col">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_1-of-2">
+                                                           <span>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                           <div class="slds-col slds-size_8-of-12">Área Vendible Venta</div> 
+                                                                           <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!lotep.AREA_NUEVA}"/></div>
+                                                                           <div class="slds-col slds-size_1-of-12 slds-text-align_right">m<sup>2</sup></div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                           <div class="slds-col slds-size_8-of-12">Diferencia de Área</div>
+                                                                           <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!lotep.VARIACION}"/></div>
+                                                                           <div class="slds-col slds-size_1-of-12 slds-text-align_right">m<sup>2</sup></div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                           <div class="slds-col slds-size_8-of-12">Perímetro derecha</div> 
+                                                                           <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!lotep.PERIMETRO_DEREC}"/></div>
+                                                                           <div class="slds-col slds-size_1-of-12 slds-text-align_right">m</div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                           <div class="slds-col slds-size_8-of-12">Perímetro fondo</div> 
+                                                                           <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!lotep.PERIMETRO_FONDO}"/></div>
+                                                                           <div class="slds-col slds-size_1-of-12 slds-text-align_right">m</div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                           <div class="slds-col slds-size_8-of-12">Perímetro Frente</div> 
+                                                                           <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!lotep.PERIMETRO_FRENTE}"/></div>
+                                                                           <div class="slds-col slds-size_1-of-12 slds-text-align_right">m</div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                           <div class="slds-col slds-size_8-of-12">Perímetro Izquierda</div> 
+                                                                           <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!lotep.PERIMETRO_IZQUI}"/></div>
+                                                                           <div class="slds-col slds-size_1-of-12 slds-text-align_right">m</div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                           </span>
+                                                       </div>
+                                                       <div class="slds-col slds-size_1-of-2">
+                                                           <span>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                           <div class="slds-col slds-size_8-of-12">Área primera venta</div>
+                                                                           <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!lotep.AREA_VENDIBLE}"/></div>
+                                                                           <div class="slds-col slds-size_1-of-12 slds-text-align_right">m<sup>2</sup></div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                           <div class="slds-col slds-size_8-of-12">Lindero derecha</div> 
+                                                                           <div class="slds-col slds-size_4-of-12 slds-text-align_right"><ui:outputText value="{!lotep.LINDERO_DERECHA}"/></div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                           <div class="slds-col slds-size_8-of-12">Lindero Izquierda</div> 
+                                                                           <div class="slds-col slds-size_4-of-12 slds-text-align_right"><ui:outputText value="{!lotep.LINDERO_IZQUIERDA}"/></div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                           <div class="slds-col slds-size_8-of-12">Lindero Frente</div> 
+                                                                           <div class="slds-col slds-size_4-of-12 slds-text-align_right"><ui:outputText value="{!lotep.LINDERO_FRENTE}"/></div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                           <div class="slds-col slds-size_8-of-12">Lindero Fondo</div> 
+                                                                           <div class="slds-col slds-size_4-of-12 slds-text-align_right"><ui:outputText value="{!lotep.LINDERO_FONDO}"/></div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                           </span>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               </div>
+                                            </div>
+                                       </article>
+                                  </div>
+                                                                         
+                                  </aura:iteration>
+                                  <div class="slds-col ">
+                                       <article class="slds-card ">
+                                           <div class="slds-card__body slds-card__body_inner">
+                                                <strong>DATOS DE ADQUISICIÓN</strong>
+                                                <div class="slds-grid slds-grid_vertical">
+                                                    <div class="slds-col">
+                                                        <div class="slds-grid">
+                                                            <div class="slds-col slds-size_1-of-2">
+                                                                <span>
+                                                                    <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                        <div class="slds-col slds-border_bottom">
+                                                                            <div class="slds-grid">
+                                                                                <div class="slds-col slds-size_2-of-3">Nombre de la Notaria</div>
+                                                                                <aura:if isTrue="{!v.verCampo}">
+                                                                                    <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.NOMBRE_NOTARIO}"/></div>
+                                                                                    <aura:if isTrue="{!v.activeProfile}">
+                                                                                        <lightning:buttonIcon iconName="utility:edit" onclick="{!c.showHide}" class="slds-col_bump-left" iconClass="slds-button__icon_hint" variant="bare" alternativeText="Edit Records" /> 
+                                                                                    </aura:if>
+                                                                                <aura:set attribute="else">
+                                                                                    <lightning:input class="slds-col slds-size_1-of-3 slds-text-align_right" aura:id="inputNombreNotario" value="{!v.proforma.proforma.NOMBRE_NOTARIO}" />
+                                                                                </aura:set>
+                                                                                </aura:if>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </span>
+                                                            </div>
+                                                            <div class="slds-col slds-size_1-of-2">
+                                                                <span>
+                                                                    <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                        <div class="slds-col slds-border_bottom">
+                                                                            <div class="slds-grid">
+                                                                                <div class="slds-col slds-size_2-of-3">Localidad de la Notaria</div>
+                                                                                <aura:if isTrue="{!v.verCampo}">
+                                                                                    <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.LOCAL_REGISTRO}"/></div>
+                                                                                    <aura:if isTrue="{!v.activeProfile}">
+                                                                                        <lightning:buttonIcon iconName="utility:edit" onclick="{!c.showHide}" class="slds-col_bump-left" iconClass="slds-button__icon_hint" variant="bare" alternativeText="Edit Records" /> 
+                                                                                    </aura:if>
+                                                                                <aura:set attribute="else">
+                                                                                    <lightning:input class="slds-col slds-size_1-of-3 slds-text-align_right" aura:id="inputLocalidad" value="{!v.proforma.proforma.LOCAL_REGISTRO}" />
+                                                                                </aura:set>
+                                                                                </aura:if>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                       </article>
+                                  </div>
+                                  <div class="slds-col ">
+                                       <article class="slds-card ">
+                                           <div class="slds-card__body slds-card__body_inner">
+                                               <strong>DATOS DE INSCRIPCIÓN</strong>
+                                           <div class="slds-grid slds-grid_vertical">
+                                               <div class="slds-col">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_1-of-2">
+                                                           <span>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                            <div class="slds-col slds-size_2-of-3">Partida N°</div>
+                                                                            <aura:if isTrue="{!v.verCampo}">
+                                                                                <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.PARTIDA_NO}"/></div>
+                                                                                <aura:if isTrue="{!v.activeProfile}">
+                                                                                    <lightning:buttonIcon iconName="utility:edit" onclick="{!c.showHide}" class="slds-col_bump-left" iconClass="slds-button__icon_hint" variant="bare" alternativeText="Edit Records" /> 
+                                                                                </aura:if>
+                                                                            <aura:set attribute="else">
+                                                                                <lightning:input class="slds-col slds-size_1-of-3 slds-text-align_right" aura:id="inputPartidaNo" value="{!v.proforma.proforma.PARTIDA_NO}" />
+                                                                            </aura:set>
+                                                                            </aura:if>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                                <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                    <div class="slds-col slds-border_bottom">
+                                                                        <div class="slds-grid">
+                                                                            <div class="slds-col slds-size_2-of-3">Kardex</div>
+                                                                            <aura:if isTrue="{!v.verCampo}">
+                                                                                <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.NUMERO_KARDEX}"/></div>
+                                                                                <aura:if isTrue="{!v.activeProfile}">
+                                                                                    <lightning:buttonIcon iconName="utility:edit" onclick="{!c.showHide}" class="slds-col_bump-left" iconClass="slds-button__icon_hint" variant="bare" alternativeText="Edit Records" /> 
+                                                                                </aura:if>
+                                                                            <aura:set attribute="else">
+                                                                                <lightning:input class="slds-col slds-size_1-of-3 slds-text-align_right" aura:id="inputNumeroKardex" value="{!v.proforma.proforma.NUMERO_KARDEX}" />
+                                                                            </aura:set>
+                                                                            </aura:if>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                           </span>
+                                                       </div>
+                                                       <div class="slds-col slds-size_1-of-2">
+                                                           <span>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                           <div class="slds-col slds-size_1-of-3">Observación</div>
+                                                                           <div class="slds-col slds-size_2-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.OBSERVACION}"/></div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                           </span>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               </div>
+                                            </div>
+                                       </article>
+                                  </div>
+                                  <div class="slds-col ">
+                                       <article class="slds-card ">
+                                           <div class="slds-card__body slds-card__body_inner">
+                                               <strong >FECHA DE ENTREGA Felipe3</strong>
+                                           <div class="slds-grid slds-grid_vertical">
+                                               <div class="slds-col">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_1-of-2">
+                                                           <span>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                           <div class="slds-col slds-size_2-of-3">Tipo de Entrega</div>
+                                                                           <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.TIPO_ENTREGA2}"/></div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                            <div class="slds-col slds-size_2-of-3">Fecha Entrega NIIF</div>
+                                                                            <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.FECHA_ENTREGA_NIFF2}"/></div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                           </span>
+                                                       </div>
+                                                       <div class="slds-col slds-size_1-of-2">
+                                                           <span>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                            <div class="slds-col slds-size_2-of-3">Fecha Entrega Tácita</div>
+                                                                            <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.FECHA_ENTR_TAC}"/></div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                            <div class="slds-col slds-size_2-of-3">Fecha Entrega Física</div>
+                                                                            <aura:if isTrue="{!v.verCampo}">
+                                                                                <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.FECHA_ENTREGA_FIS2}"/></div>
+                                                                                <aura:if isTrue="{!v.activeProfile}">
+                                                                                    <aura:if isTrue="{!and(v.proforma.proforma.ESTADO2 == 'E', v.proforma.proforma.SUBESTADO == 'NI')}">
+                                                                                        <lightning:buttonIcon iconName="utility:edit" onclick="{!c.showHide}" class="slds-col_bump-left" iconClass="slds-button__icon_hint" variant="bare" alternativeText="Edit Records" /> 
+                                                                                    </aura:if>
+                                                                                </aura:if>
+                                                                            <aura:set attribute="else">
+                                                                                <aura:if isTrue="{!and(v.proforma.proforma.ESTADO2 == 'E', v.proforma.proforma.SUBESTADO == 'NI')}">
+                                                                                    <lightning:input class="slds-col slds-size_1-of-3 slds-text-align_right" aura:id="inputFechaEntregaFis2" value="{!v.proforma.proforma.FECHA_ENTREGA_FIS2}" />
+                                                                                <aura:set attribute="else">
+                                                                                    <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.FECHA_ENTREGA_FIS2}"/></div>
+                                                                                </aura:set>
+                                                                                </aura:if>
+                                                                            </aura:set>
+                                                                            </aura:if>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                               <!-- INICIO Campo nuevo que trae cuentas 2 24/06/2025 -->
+                                                               <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                                   <div class="slds-col slds-border_bottom">
+                                                                       <div class="slds-grid">
+                                                                            <div class="slds-col slds-size_2-of-3">Fecha Entrega Lote Contrato</div>
+                                                                            <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proformaDetalles[0].FechaEntregaLoteContrato}"/></div>
+                                                                       </div>
+                                                                   </div>
+                                                               </div>
+                                                               <!-- FIN campo nuevo 24/06/2025 -->
+                                                           </span>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               </div>
+                                            </div>
+                                       </article>
+                                  </div>
+                               </div>
+                           </lightning:tab>
+                           <lightning:tab label="Otros datos" id="3">
+                               <div class="slds-grid slds-grid_vertical">
+                                   <div class="slds-col">
+                               <div class="slds-grid">
+                                   <div class="slds-col slds-size_1-of-3">
+                                       <span>
+                                           <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">Proceso</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right">{!v.proforma.proforma.PROCESSO}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">Cod Propiedad</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.COD_PROPIEDAD}"/></div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">Apo. Centenario 1</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputNumber format="#" value="{!v.proforma.proforma.APODERADO_CENTENARIO1}"/></div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">Apo. Centenario 2</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputNumber format="#" value="{!v.proforma.proforma.APODERADO_CENTENARIO2}"/></div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </span>
+                                   </div>
+                                   <div class="slds-col slds-size_1-of-3">
+                                       <span>
+                                           <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">                                                       
+                                                       <div class="slds-col slds-size_8-of-12">Cuota inic. (imp)</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.CUOTA_INIC_IMP}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">                                                       
+                                                       <div class="slds-col slds-size_2-of-3">CI n° cuotas</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputNumber format="#" value="{!v.proforma.proforma.CUOTA_INIC_NO_CUOTAS}"/></div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">                                                       
+                                                       <div class="slds-col slds-size_8-of-12">CI: Interes</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.CUOTA_INIC_INTERES}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">Saldo: cuotas</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputNumber format="#" value="{!v.proforma.proforma.SALDO_NO_CUOTAS}"/></div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </span>
+                                   </div>
+                                   <div class="slds-col slds-size_1-of-3">
+                                       <span>
+                                           <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">Vendedor</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right">{!v.proforma.proforma.PROMOTOR}</div>
+                                                   </div>
+                                               </div><div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">Creado por</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right">{!v.proforma.proforma.CREADO_POR}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">                                                       
+                                                       <div class="slds-col slds-size_8-of-12">Saldo: intereses</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.SALDO_INTERESES}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">N° Financiamiento ant.</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputText value="{!v.proforma.proforma.PROFORMA_ANT}"/></div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </span>
+                                   </div>
+                               </div>
+                                       </div>
+                                   <div class="slds-col">
+                               <div class="slds-grid slds-p-top_large">
+                                   <div class="slds-col slds-size_1-of-3">
+                                       <span>
+                                           <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">Situación Financiamiento</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right">{!v.proforma.proforma.SITUACION_FINANCIAMIENTO}</div>
+                                                   </div>
+                                               </div>
+                                               
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">Código Minuta</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right">{!v.proforma.proforma.COD_MINUTA}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">Clave de moneda</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                                <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Tipo de cambio</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###.###" value="{!v.proforma.proforma.TIPO_CAMBIO}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </span>
+                                   </div>
+                                   <div class="slds-col slds-size_1-of-3">
+                                       <span>
+                                           <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">Propiedades</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right">{!v.proforma.proforma.PROPIEDADES}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">Fecha de vencimiento</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.FECHA_FINANCIAMIENTO!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.FECHA_FINANCIAMIENTO}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">Sociedad</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right">{!v.proforma.proforma.BUKRS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">Días de pago</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right"><ui:outputNumber format="#" value="{!v.proforma.proforma.DIAS_PAGO}"/></div>
+                                                   </div>
+                                               </div>
+                                              <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Importe de cuota inicial</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.IMPORTE_RESERVA}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Importe cuota</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.IMPORTE_CUOTA}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </span>
+                                   </div>
+                                   <div class="slds-col slds-size_1-of-3">
+                                       <span>
+                                           <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                                <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Importe restante de la cuota cash</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.CUOTA_INIC_IMP_R}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                                <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Importe saldo precio</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputCurrency format="#,###,###,##0.00######" value="{!v.proforma.proforma.IMPORTE_SALDO_PRECIO}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">T.A. Interés (por Proyecto)</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.TASA_ANUAL_INTERES_FINAN}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">T.A. Gastos Adm.D.L.716 (por Proyecto)</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.TASA_ANUAL_GASTOS_ADMIN}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Tasa Mensual Interés</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.TASA_MENSUAL_INTERES_FINAN}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                              <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Tasa Mensual Gastos Administrativos</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.TASA_MENSUAL_GASTOS_ADMIN}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </span>
+                                   </div>
+                               </div>
+                                       </div>
+                               </div>
+                               <div class="slds-grid  slds-p-top_large">
+                                   <div class="slds-col slds-col slds-size_1-of-3">
+                                       <span>
+                                           <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Costo Total Mensual</div>  
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.COSTO_TOTAL_MENSUAL}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Costo Total Anual</div>                   
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.COSTO_TOTAL_ANUAL}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                               
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Contacto / Cliente</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.TIP_CLI_CONT}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha de creación</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.ERSDA!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.ERSDA}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha de última modificación</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.AEDAT!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.AEDAT}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Última modificación por</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.AENAM}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha de documento en documento</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.CASH_BLDAT!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.CASH_BLDAT}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Importe de cuota cash</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.CASH}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Importe de la cuota</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.BFH}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Cuota inicial porcentaje</div>  
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.CUOTA_INIC_POR}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Tipo de interes de int + gastos</div>                   
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.CUOTA_INIC_INTGAS}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">N° Días del periodo</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,###" value="{!v.proforma.proforma.PERIODO_DIAS}"/></div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Intereses cuota saldo</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.SALDO_INTERESES}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Tipo de interes de int + gastos</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.SALDO_INTGAS}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Mantener cuota</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.MANTENER_CUOTA}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Disminuir cuota</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.DISMINUIR_CUOTA}</div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </span>
+                                   </div>
+                                   <div class="slds-col slds-col slds-size_1-of-3">
+                                       <span>
+                                           <div class="slds-grid slds-grid_vertical slds-p-right_large"> 
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha de inicio de los pagos</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.FECHA_INICIO!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.FECHA_INICIO}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Número de personal 1</div>                                                       
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,###" value="{!v.proforma.proforma.REP_LEG1}"/></div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Número de personal 2</div>                                                       
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,###" value="{!v.proforma.proforma.REP_LEG2}"/></div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Tipo de proforma</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.TIPO_PROFORMA}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Motivo Grupo</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.COD_MOTGRUP}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Código Motivo detalle</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.COD_MOTDET}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha de inactivación</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.FECHA_INACTIVO!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.FECHA_INACTIVO}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Tipo Prepago</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.TIPO_PREPAGO}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha de prepago</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.FECHA_PREPAGO!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.FECHA_PREPAGO}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha de reversión prepago</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.FECHA_REVERSION_PREPAGO!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.FECHA_REVERSION_PREPAGO}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha Cierre 2</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.FECHA_CIERRE2!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.FECHA_CIERRE2}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                                <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha para tipo de cambio</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.FECHA_TC_ENTREGA!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.FECHA_TC_ENTREGA}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha Entrega Tácita</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.FECHA_ENTREGA_TC!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.FECHA_ENTREGA_TC}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha Entrega NIIF</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.FECHA_ENTREGA_NIFF!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.FECHA_ENTREGA_NIFF}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha Entrega Normal</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.FECHA_ENTREGA_FIS!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.FECHA_ENTREGA_FIS}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Tipo de Entrega</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.TIPO_ENTREGA}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha Camb Cont</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.FECHA_CAMB_CONT!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.FECHA_CAMB_CONT}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </span>
+                                   </div>
+                                   <div class="slds-col slds-col slds-size_1-of-3">
+                                       <span>
+                                           <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha Desembolso</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.FECHA_DESEMBOLSO!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.FECHA_DESEMBOLSO}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Banco</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.BANCO}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Superficie Construida</div>  
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.SUP_CONSTRUIDA}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">m<sup>2</sup></div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Bloque</div>                   
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.BLOQUE_PORTAL}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Número/Lote</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,###" value="{!v.proforma.proforma.NUMEROLETRA}"/></div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Cantidad de lotes</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,###" value="{!v.proforma.proforma.CANTIDAD_LOTES}"/></div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Check Telemarketing</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.TELEMARKETING}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Firma mecanizada</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.FIRMA_MECANIZ}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Proforma: Tipo de contrato</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.TIPO_CONTRATO}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Perímetro de Frente</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.PERIMETRO_FRENTE}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">m</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Perímetro de Fondo</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.PERIMETRO_FONDO}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">m</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Perímetro de Izquierda</div>                                                       
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.PERIMETRO_IZQUI}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">m</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Perímetro de Derecha</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.PERIMETRO_DEREC}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">m</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Código Perfil de Cobranza</div>                                                       
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.PERFIL_COBRAN}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Estado de proforma</div>                                                       
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.ESTADO}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Motivo de Inactividad</div>                                                       
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.MOTIVO}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Pedido</div>                                                       
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##" value="{!v.proforma.proforma.VBELN}"/></div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </span>
+                                   </div>
+                               </div>
+                               <div class="slds-grid slds-p-top_large">
+                                   <div class="slds-col slds-col slds-size_1-of-3">
+                                       <span>
+                                           <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Indicador general</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.CUOTA_INICIAL_FINANCIA}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">Fecha de entrega del proyecto</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.FECHA_ENT_PROY!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.FECHA_ENT_PROY}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Interlocutor 1</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.INTERLOCUTOR1}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Interlocutor 2</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.INTERLOCUTOR2}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Interlocutor 3</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.INTERLOCUTOR3}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Interlocutor 4</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.INTERLOCUTOR4}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Interlocutor 5</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.INTERLOCUTOR5}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Interlocutor 6</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.INTERLOCUTOR6}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Interlocutor 7</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.INTERLOCUTOR7}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Interlocutor 8</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.INTERLOCUTOR8}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Interlocutor 9</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.INTERLOCUTOR9}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Interlocutor 10</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.INTERLOCUTOR10}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Apoderado 1</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.APODERADO1}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Apoderado 2</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.APODERADO2}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Código de Zona Venta</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.ZZZONAVENTA}</div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </span>
+                                   </div>
+                                   <div class="slds-col slds-col slds-size_1-of-3">
+                                       <span>       
+                                           <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Indicador - Cuota Inicial fue financiada</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.IND_FINAN_CI}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_2-of-3">Financiamiento de C.I. con intereses</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.INTERESES_CI}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha de Carta Notarial</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.FECHA_CARTA_NOTARIAL!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.FECHA_CARTA_NOTARIAL}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Código de resolución</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right"><ui:outputNumber format="#" value="{!v.proforma.proforma.RESOLUCION}"/></div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Pendiente de resolver</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.PENDIENTE_RESOLVER}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Resolución pendiente de aprobación</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.RESOL_PEND_APRO}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha resolver</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.FECHA_RESOLVER!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.FECHA_RESOLVER}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">% Penalidad Resolución Puntual</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.PORCEN_RESOL_PUNTUAL}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Interlocutor 7</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.INTERLOCUTOR7}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">% Resolucion Centenario</div>                                                       
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.PORCEN_RESOL_CENTENARIO}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">%  moroso</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.PORCEN_RESOL_MOROSO}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Opción solicitud comprador</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.OPCION_SOL_COMPRADOR}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Opción solicitud vendedor</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.OPCION_SOL_VENDEDOR}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Opción de capital</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.OPCION_CAPITAL}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Opción capital + interes + gastos</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.OPCION_CAPITAL_INTERES_GASTOS}</div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </span>
+                                   </div>
+                                   <div class="slds-col slds-col slds-size_1-of-3">
+                                       <span>       
+                                           <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">% resolución puntual  final</div>                                                       
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.PORCEN_RESOL_PUNTUAL_FINAL}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">% resolución centenario  final</div>                                                       
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.PORCEN_RESOL_CENTENARIO_FINAL}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">% de comisión de ventas</div>                                                       
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.PORCEN_COMISION_VENTAS}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">% de otros gastos</div>                                                       
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.OTROS_GASTOS}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">% otros montos pagados  por el cliente</div>
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.OTROS_GASTOS_CLIENTE}"/></div>                                                       
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">% cargos por cuenta del cliente</div>                                                       
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.CARGOS_POR_CTA_CLIENTE}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Total descontar penalidad</div>                                                                                                              
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.TOTAL_DESCONTAR_PENALIDAD}"/></div>                                                       
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Monto nc cap pagado</div>                                                                                                              
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.MONTO_NC_CAPITAL_PAGADO}"/></div>                                                       
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Monto nc cap no pagado</div>                                                       
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.MONTO_NC_CAPITAL_NO_PAGADO}"/></div>                                                       
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Monto nc Int. pagado</div>                                                       
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.MONTO_NC_INTERESES_PAGADO}"/></div>                                                       
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Monto nc Int. no pagado</div>                  
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.MONTO_NC_INTERESES_NO_PAGADO}"/></div>                                                       
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Monto nc penalidad</div>                       
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.MONTO_NC_PENALIDAD}"/></div>                                                       
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">{!v.proforma.proforma.WAERS}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Flag variación de área</div>                                                       
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.FLAG_VARIACION_AREA}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Variación de Área</div>                                                       
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00######" value="{!v.proforma.proforma.METROS_VARIACION_AREA}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">m<sup>2</sup></div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Monto de variación de área</div>                                                       
+                                                       <div class="slds-col slds-size_3-of-12 slds-text-align_right"><ui:outputNumber format="#,###,###,##0.00############" value="{!v.proforma.proforma.MONTO_VARIACION_AREA}"/></div>
+                                                       <div class="slds-col slds-size_1-of-12 slds-text-align_right">%</div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </span>
+                                   </div>
+                               </div>
+                               <div class="slds-grid slds-p-top_large">
+                                   <div class="slds-col slds-col slds-size_1-of-3">
+                                       <span>
+                                           <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Número de asignación</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.ZAC_DOC_SUNAT}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Saldo: nº de cuotas</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right"><ui:outputNumber format="#" value="{!v.proforma.proforma.NCUOTAS_SALDO_ORIGINAL}"/></div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Código de motivo</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.MOTIVO_COMPRA}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Asiento de apoderado comprador 1</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.ASIENTOAP1}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Asiento de apoderado comprador 2</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.ASIENTOAP2}</div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </span>
+                                   </div>
+                                   <div class="slds-col slds-col slds-size_2-of-3">
+                                       <span>
+                                           <div class="slds-grid slds-grid_vertical slds-p-right_large">
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Cambiante de situacion financiera a compromiso de pago</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.USRCOMPPAGO}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Status de aprobación de firma electrónica</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.ESIGN_ESTADO}</div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Fecha de aprobación de firma electrónica</div>
+                                                       <div class="slds-col slds-size_1-of-3 slds-text-align_right">
+                                                           <aura:if isTrue="{!v.proforma.proforma.ESIGN_FECHA!='0000-00-00'}">
+                                                               <ui:outputDate format="EEE, d MMM yyyy" value="{!v.proforma.proforma.ESIGN_FECHA}"/>
+                                                           </aura:if>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="slds-col slds-border_bottom">
+                                                   <div class="slds-grid">
+                                                       <div class="slds-col slds-size_8-of-12">Clave referencia 1 interna para cabecera documento</div>
+                                                       <div class="slds-col slds-size_4-of-12 slds-text-align_right">{!v.proforma.proforma.COMPROB_ORACLE}</div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </span>
+                                   </div>
+                               </div>                                               
+                           </lightning:tab>
+                       </lightning:tabset>
+                   <!--*************************************************************************************************************************************************-->                     
+                       </div>
+                        <footer class="slds-modal__footer">
+                            <aura:if isTrue="{!v.verCampo}">
+                                <aura:set attribute="else">
+                                    <!-- <aura:iteration items="{!v.data}" var="item"> -->
+                                    <lightning:button variant="brand"
+                                                    label="Guardar"
+                                                    title="Guardar"
+                                                    onclick="{!c.SaveFinancing}"/>
+                                    <!-- </aura:iteration> -->
+                                </aura:set>
+                            </aura:if>
+
+                            <lightning:button variant="brand"
+                                            label="Cerrar"
+                                            title="Cerrar"
+                                            onclick="{!c.CerrarDetalleProforma}"/>
+
+                        </footer>
+
+                        <aura:if isTrue="{!v.loaded}">
+                            <div class="slds-spinner_container">
+                                <lightning:spinner alternativeText="Loading" size="medium" />
+                            </div>
+                        </aura:if> 
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>    
+    </div>
+    </aura:if>
+
+</aura:component>

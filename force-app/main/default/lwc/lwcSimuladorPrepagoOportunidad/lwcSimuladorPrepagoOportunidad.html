@@ -1,0 +1,259 @@
+<template>
+  <lightning-card style="width: 100%; max-width: fit-content">
+    <div class="slds-card__header slds-grid">
+      <header class="slds-media_center slds-has-flexi-truncate slds-align_absolute-center">
+        <h2 class="slds-card__header-title slds-text-heading_large" style="font-weight: normal">Simulación</h2>
+      </header>
+    </div>
+    <div class="slds-card__body slds-card__body_inner">
+      <div
+        class="slds-page-header slds-page-header__title slds-p-left_medium"
+        style="color: #ffffff; background-color: #1b5297; border-radius: 0px; font-weight: 400"
+      >
+        Financiamiento Prepago
+      </div>
+      <div class="slds-grid slds-wrap">
+        <div
+          class="slds-box_x-small slds-col slds-p-left_medium slds-size_2-of-4 slds-text-heading_small"
+          style="background-color: #e6e6e6da; font-weight: 400; padding-left: 2%"
+        >
+          Parámetros a simular
+        </div>
+        <div
+          class="slds-box_x-small slds-col slds-p-left_medium slds-size_2-of-4 slds-text-heading_small"
+          style="background-color: #e6e6e6da; font-weight: 400; padding-left: 2%"
+        >
+          Resultado de la simulación
+        </div>
+        <div class="slds-col slds-grid slds-grid_vertical slds-size_1-of-2">
+          <div class="slds-col slds-p-horizontal_small slds-p-top_x-small slds-size_1-of-1">
+            <lightning-combobox
+              name="ModalidadPrepago"
+              label="Modalidad Prepago"
+              value=""
+              placeholder="Selecciona la Acción"
+              options={options}
+              onchange={handleChange}
+              required
+            ></lightning-combobox>
+          </div>
+          <div class="slds-col slds-p-horizontal_small slds-p-top_x-small slds-size_1-of-1">
+            <lightning-input
+              data-type="Monto_Prepago"
+              type="number"
+              name="MontoPrepago"
+              label="Monto Prepago"
+              onkeyup={handleInputChange}
+              required
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-grid slds-size_1-of-1">
+            <div class="slds-col slds-p-horizontal_small slds-p-top_x-small slds-size_1-of-2">
+              <lightning-input
+                data-type="Saldo_Nro_Cuotas"
+                type="number"
+                name="vSaldoNCuotasPrepago"
+                label="Saldo N° Cuotas Prepago"
+                disabled
+                value={saldoNroCuotasPrepago}
+                onkeyup={handleInputChange}
+                required={hacerObligatorio}
+              ></lightning-input>
+            </div>
+            <div class="slds-col slds-p-horizontal_small slds-p-top_x-small slds-size_1-of-2">
+              <lightning-input
+                type="number"
+                name="TotalDeCuotasSaldo"
+                label="Total De Cuotas Saldo"
+                disabled
+                value={totalDeCuotasSaldo}
+              ></lightning-input>
+            </div>
+          </div>
+          <div class="slds-col slds-grid slds-size_1-of-1">
+            <div class="slds-col slds-p-horizontal_small slds-p-top_x-small slds-size_1-of-3">
+              <lightning-input
+                data-type="Fecha_Prepago"
+                type="date"
+                min={fechaPrimeraCuotaSaldo}
+                name="vFechaPrepago"
+                label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fecha Prepago"
+                onchange={handleInputChange}
+                value={fechaPrepago}
+                required
+              ></lightning-input>
+            </div>
+            <div class="slds-col slds-p-horizontal_small slds-p-top_x-small slds-size_1-of-3">
+              <lightning-input
+                type="date"
+                name="FechaPrimeraCuotaSaldo"
+                label="Fecha Primera Cuota Saldo"
+                value={fechaPrimeraCuotaSaldo}
+                disabled
+              ></lightning-input>
+            </div>
+            <div class="slds-col slds-p-horizontal_small slds-p-top_x-small slds-size_1-of-3">
+              <lightning-input
+                type="date"
+                name="FechaUltimaCuotaSaldo"
+                label="Fecha Ultima Cuota Saldo"
+                value={fechaUltimaCuotaSaldoOriginal}
+                disabled
+              ></lightning-input>
+            </div>
+          </div>
+          <div class="slds-col slds-p-horizontal_small slds-p-vertical_x-small slds-size_1-of-1">
+            <lightning-input
+              data-type="nroProforma"
+              type="text"
+              value={nroProforma}
+              name="vProforma"
+              label="Proforma"
+              disabled
+            ></lightning-input>
+          </div>
+        </div>
+        <div class="slds-col slds-grid slds-grid_vertical slds-size_1-of-2">
+          <template if:false={mostrarDiferenciaDeCuotas}>
+            <div class="slds-col slds-p-horizontal_small slds-m-vertical_x-large slds-size_1-of-1">
+              <!-- <lightning-input
+            type={tipoDeInput}
+            formatter="currency"
+            name="vCuotasFacilote"
+            label="Cuotas Facilote (1-2)"
+            value={cuotaFacilote}
+            disabled
+          ></lightning-input> -->
+            </div>
+          </template>
+          <div class="slds-col slds-p-horizontal_small slds-p-top_x-small slds-size_1-of-1">
+            <lightning-input
+              type="number"
+              formatter="currency"
+              name="vCuotasRestantes"
+              label={cuotasRestantes}
+              value={cuotasInicialRestantes}
+              disabled
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-p-horizontal_small slds-p-top_x-small slds-size_1-of-1">
+            <lightning-input
+              style={negrita}
+              type="number"
+              formatter="currency"
+              name="vCuotaSaldoAnteriorAPrepago"
+              label="Cuota Saldo Anterior a Prepago"
+              value={cuotaSaldoAnteriorAPrepago}
+              disabled
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-p-horizontal_small slds-p-top_x-small slds-size_1-of-1">
+            <lightning-input
+              style={negrita}
+              type="number"
+              formatter="currency"
+              name="vCuotaSaldoPosteriorAPrepago"
+              label="Cuota Saldo Posterior al Prepago"
+              value={cuotaSaldoPosteriorAPrepago}
+              disabled
+            ></lightning-input>
+          </div>
+          <template if:true={mostrarDiferenciaDeCuotas}>
+            <div class="slds-col slds-p-horizontal_small slds-p-top_x-small slds-size_1-of-1">
+              <lightning-input
+                style={negrita}
+                type="number"
+                formatter="currency"
+                name="MontoReducidoDeLaCuota"
+                label="Monto Reducido de la Cuota"
+                value={montoReducidoDeLaCuota}
+                disabled
+              ></lightning-input>
+            </div>
+          </template>
+          <div class="slds-col slds-grid slds-size_1-of-1">
+            <div class="slds-col slds-p-horizontal_small slds-p-vertical_x-small slds-size_1-of-2">
+              <lightning-input
+                type="number"
+                formatter="currency"
+                name="Ultima Cuota Saldo"
+                label="Ultima Cuota Saldo"
+                value={ultimaCuotaSaldo}
+                disabled
+              ></lightning-input>
+            </div>
+            <div class="slds-col slds-p-horizontal_small slds-p-vertical_x-small slds-size_1-of-2">
+              <lightning-input
+                type="date"
+                name="FechaUltimaCuotaSaldo"
+                label="Fecha Ultima Cuota Saldo Simulada"
+                value={fechaUltimaCuotaSaldo}
+                disabled
+              ></lightning-input>
+            </div>
+          </div>
+        </div>
+        <div
+          class="slds-box_x-small slds-col slds-size_4-of-4 slds-text-heading_small"
+          style="background-color: #e6e6e6da; font-weight: 400; padding-left: 2%"
+        >
+          Optimización de Intereses
+        </div>
+        <div class="slds-col slds-p-horizontal_small slds-p-vertical_x-small slds-size_1-of-4">
+          <lightning-input
+            type="number"
+            value={nroCuotasFinanciamientoInicial}
+            name="NroCuotasFinanciamientoInicial"
+            label="Nro Cuotas Financiamiento Inicial"
+            disabled
+          ></lightning-input>
+        </div>
+        <div class="slds-col slds-p-horizontal_small slds-p-vertical_x-small slds-size_1-of-4">
+          <lightning-input
+            type="number"
+            value={nroCuotasNuevoFinanciamiento}
+            name="NroCuotasNuevoFinanciamiento"
+            label="Nro Cuotas Nuevo Financiamiento"
+            disabled
+          ></lightning-input>
+        </div>
+        <div class="slds-col slds-p-horizontal_small slds-p-vertical_x-small slds-size_1-of-4">
+          <lightning-input
+            style="font-weight: bold; -webkit-text-fill-color: black"
+            type="number"
+            name="ReduccionDeCuotas"
+            label="Reducción de Cuotas"
+            value={reduccionDeCuotas}
+            disabled
+          ></lightning-input>
+        </div>
+        <div class="slds-col slds-p-horizontal_small slds-p-vertical_x-small slds-size_1-of-4">
+          <lightning-input
+            style="font-weight: bold; -webkit-text-fill-color: black"
+            type="number"
+            formatter="currency"
+            name="RebajadeIntereses"
+            label="Rebaja de Intereses"
+            value={rebajaDeIntereses}
+            disabled
+          ></lightning-input>
+        </div>
+        <template if:true={showSpinner}>
+          <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+      </div>
+      <div class="slds-m-horizontal_small">
+        <p style="font-weight: bold; color: #d1230c">{errorMessage}</p>
+        <!-- {numCuotas}|{totalDeCuotasSaldo}<br/>{fecCuotaSaldoFin}|{fechaUltimaCuotaSaldo}<br/>{fecCuotaSaldoIni} -->
+      </div>
+    </div>
+    <footer class="slds-card__footer">
+      <lightning-button
+        class="slds-float_right slds-m-bottom_small"
+        label="Calcular"
+        onclick={consultaPrepago}
+        variant="brand"
+      ></lightning-button>
+    </footer>
+  </lightning-card>
+</template>

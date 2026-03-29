@@ -1,0 +1,177 @@
+<!--
+  @description       : 
+  @author            : Richard Villafana - NTT DATA
+  @group             : 
+  @last modified on  : 11-29-2024
+  @last modified by  : Richard Villafana - NTT DATA
+-->
+<!-- <apex:page contentType="application/pdf" renderAs="pdf" applyHtmlTag="false" showHeader="false" cache="true" readOnly="true" controller="CEN_SimularPrepago">  -->
+<apex:page renderAs="pdf" controller="CEN_SimularPrepago" contentType="application/pdf" standardStylesheets="false"> 
+    
+    <div style=" position: absolute; top: 10px; right: 10px;">
+        <apex:image url="/resource/CEN_CentenarioPago_logo" width="100" height="100" style="right:10px;" />
+    </div>
+    <br/><br/><br/><br/><br/>
+    <table style=" width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto; " border="0">
+        <tbody>
+            <tr style="height: 18px; font-size: 16px;">
+                <td style="width: 90%; text-align: center; height: 18px; padding: 10px 0;" colspan="5"><strong><span style="text-decoration: underline;">Simulaci&oacute;n Prepago</span></strong></td>
+            </tr>
+            <tr style="height: 18px; font-size: 12px;">
+                <td style="width: 37.1467%; height: 18px; ">Importe de prepago Simulado</td>
+                <td style="width: 6.55693%; height: 18px; text-align: center;">:</td>
+                <td style="height: 18px; width: 56.2963%;" colspan="3">{!importeSimulado}</td>
+                
+            </tr>
+            <tr style="height: 18px; font-size: 12px;">
+                <td style="width: 37.1467%; height: 18px;">Tipo de simulaci&oacute;n de prepago</td>
+                <td style="width: 6.55693%; height: 18px; text-align: center;">:</td>
+                <td style="height: 18px; width: 56.2963%;" colspan="3">{!tipoDeSimulacion}</td>
+            </tr>
+        </tbody>
+    </table> <br/>
+    <table style="height: 50px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto; font-size: 14px;" border="0">
+        <tbody>
+            <tr style="height: 18px;">
+                <td style="width: 33.3333%; text-align: center; height: 18px;"><strong>Importe de cuota actual</strong></td>
+                <td style="width: 33.3333%; text-align: center; height: 18px;"><strong>Importe de nueva cuota</strong></td>
+                <td style="width: 33.3333%; text-align: center; height: 18px;"><strong>Importe de &uacute;ltima cuota</strong></td>
+            </tr>
+            <tr style="height: 18px;">
+                <td style="width: 33.3333%; height: 18px; text-align: center;">{!cuotaActual}</td>
+                <td style="width: 33.3333%; height: 18px; text-align: center;">{!nuevaCuota}</td>
+                <td style="width: 33.3333%; height: 18px; text-align: center;">{!ultimaCuota}</td>
+            </tr>
+        </tbody>
+    </table><br/>
+    <table style=" width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto; font-size: 12px;" border="0">
+        <tbody>
+
+            <tr style="height: 18px;">
+                <td style="width: 37.1467%; height: 18px;">N&deg; Financiamiento</td>
+                <td style="width: 6.55693%; height: 18px; text-align: center;">:</td>
+                <td style="width: 23.155%; height: 18px;">{!nroFinanciamiento}</td>
+                <td style="width: 9.3004%; height: 18px;">&nbsp;</td>
+                <td style="width: 23.8409%; height: 18px;">&nbsp;</td>
+            </tr>
+            <tr style="height: 18px;">
+                <td style="width: 37.1467%; height: 18px;">Fecha de vencimiento de tu pr&oacute;xima cuota</td>
+                <td style="width: 6.55693%; height: 18px; text-align: center;">:</td>
+                <td style="height: 18px; width: 23.155%;">{!vencimientoProximaCuota}</td>
+                <td style="width: 9.3004%; height: 18px;">&nbsp;</td>
+                <td style="width: 23.8409%; height: 18px;">&nbsp;</td>
+            </tr>
+            <tr style="height: 36px;">
+                <td style="width: 37.1467%; height: 36px;">Fecha de vencimiento de tu &uacute;ltima cuota</td>
+                <td style="width: 6.55693%; text-align: center; height: 36px;">:</td>
+                <td style="width: 23.155%; height: 36px;" width="240">{!vencimientoUltimaCuota}</td>
+                <td style="width: 9.3004%; height: 36px;">&nbsp;</td>
+                <td style="width: 23.8409%; height: 36px;">&nbsp;</td>
+            </tr>
+            <tr style="height: 18px;">
+                <td style="width: 37.1467%; height: 18px;" width="266">N&uacute;mero de cuotas por pagar</td>
+                <td style="width: 6.55693%; text-align: center; height: 18px;">:</td>
+                <td style="width: 23.155%; height: 18px;" width="240">{!cuotasPorPagar}</td>
+                <td style="width: 9.3004%; height: 18px;">&nbsp;</td>
+                <td style="width: 23.8409%; height: 18px;">&nbsp;</td>
+            </tr>
+            <tr style="height: 18px;">
+                <td style="width: 37.1467%; height: 18px;">&nbsp;</td>
+                <td style="width: 6.55693%; text-align: center; height: 18px;">&nbsp;</td>
+                <td style="width: 23.155%; height: 18px;">&nbsp;</td>
+                <td style="width: 9.3004%; height: 18px;">&nbsp;</td>
+                <td style="width: 23.8409%; height: 18px;">&nbsp;</td>
+            </tr>
+            <tr style="height: 36px;">
+                <td style="width: 37.1467%; height: 36px;" width="266"><strong><span style="text-decoration: underline;">Comparaci&oacute;n:</span></strong></td>
+                <td style="width: 6.55693%; text-align: center; height: 36px;">&nbsp;</td>
+                <td style="width: 23.155%; height: 36px;  text-align: center;"><em>Antes del Prepago</em></td>
+                <td style="width: 9.3004%; height: 36px;">&nbsp;</td>
+                <td style="width: 23.8409%; height: 36px; text-align: center;"><em>Despues del Prepago</em></td>
+            </tr>
+            <tr>
+                <td style="width: 37.1467%;" width="266">Precio de venta</td>
+                <td style="width: 6.55693%; text-align: center; height: 18px;">:</td>
+                <td style="width: 23.155%; height: 18px; text-align: right;">{!precioDeVentas}</td>
+                <td style="width: 9.3004%; height: 18px;">&nbsp;</td>
+                <td style="width: 23.8409%; height: 18px; text-align: right;">{!precioDeVentas}</td>
+            </tr>
+            <tr>
+                <td style="width: 37.1467%;" width="266">Capital pagado</td>
+                <td style="width: 6.55693%; text-align: center; height: 18px;">:</td>
+                <td style="width: 23.155%; height: 18px; text-align: right;">{!capitalAmortizado}</td>
+                <td style="width: 9.3004%; height: 18px;">&nbsp;</td>
+                <td style="width: 23.8409%; height: 18px; text-align: right;">{!capitalAmortizadoDespues}</td>
+            </tr>
+            <tr>
+                <td style="width: 37.1467%;" width="266">Saldo capital por pagar</td>
+                <td style="width: 6.55693%; text-align: center; height: 18px;">:</td>
+                <td style="width: 23.155%; height: 18px; text-align: right;">{!saldoDeCapital}</td>
+                <td style="width: 9.3004%; height: 18px;">&nbsp;</td>
+                <td style="width: 23.8409%; height: 18px; text-align: right;">{!saldoDeCapitalDespues}</td>
+            </tr>
+            <tr>
+                <td style="width: 37.1467%;" width="266">Intereses por pagar</td>
+                <td style="width: 6.55693%; text-align: center; height: 18px;">:</td>
+                <td style="width: 23.155%; height: 18px; text-align: right;">{!resumeninteresxPagSinPrepagoPDF}</td>
+                <td style="width: 9.3004%; height: 18px;">&nbsp;</td>
+                <td style="width: 23.8409%; height: 18px; text-align: right;">{!interesesPorPagarDespues}</td>
+            </tr>
+        </tbody>
+    </table>   <br/>
+        <p style=" font-size: 18px; text-align: center; background-color: #f3f3f3; color: #333333; margin-top: 20px; padding: 10px 0;">Detalle de Cronograma </p>
+                
+        <table style="border-collapse: collapse; width: 99%;" border="1">
+            <thead>
+                <tr style="font-size: 11px;">
+                    <!-- <td style="width: 5%;">N&deg;<br />Financiamiento</td> -->
+                    
+                    <th style="width: 10%; text-align: center; background-color: #f3f3f3; color: #333333;"><strong>TIPO DE</strong><br /><strong>CUOTA</strong></th>
+                    <th style="width: 10%; text-align: center; background-color: #f3f3f3; color: #333333;"><strong>FECHA</strong><br /><strong>VENCIMIENTO</strong></th>
+                    <th style="width: 10%; text-align: center; background-color: #f3f3f3; color: #333333;"><strong>SALDO INICIAL-</strong><br /><strong>CAPITAL A</strong> <br/> <strong>FINANCIAR</strong></th>
+                    <th style="width: 10%; text-align: center; background-color: #f3f3f3; color: #333333;"><strong>INTERESES</strong><br /><strong>COMPENSATORIOS / </strong><strong>GASTOS</strong><br/><strong>ADMINISTRATIVOS</strong></th>
+                    <th style="width: 10%; text-align: center; background-color: #f3f3f3; color: #333333;"><strong>AMORTIZACION A</strong><br/><strong>CAPITAL</strong></th>
+                    <th style="width: 10%; text-align: center; background-color: #f3f3f3; color: #333333;"><strong>TOTAL CUOTA</strong></th>
+                    <th style="width: 10%; text-align: center; background-color: #f3f3f3; color: #333333;"><strong>FECHA DE PAGO</strong></th>
+                    <th style="width: 10%; text-align: center; background-color: #f3f3f3; color: #333333;"><strong>SALDO CAPITAL</strong></th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                <apex:repeat value="{!detalles}" var="detalle" >
+                    <tr style="font-size: 11px; font-weight: {!IF(CONTAINS(detalle.tipoCuota, 'TOTALES'), 'bold', 'normal')}">
+                        <!-- <td style="width: 5%;">{!detalle.proforma}</td> -->
+                        <td style="width: 10%;">{!detalle.tipoCuota}</td>
+                        <td style="width: 10%; text-align:center;">{!detalle.fechaVencimiento}</td>
+                        <td style="width: 10%; text-align:right;">{!detalle.saldoInicialFormato}</td>
+                        <td style="width: 10%; text-align:right;">{!detalle.interesesFormato}</td>
+                        <td style="width: 10%; text-align:right;">{!detalle.amortizacionFormato}</td>
+                        <td style="width: 10%; text-align:right;">{!detalle.impCuotaFormato}</td>
+                        <td style="width: 10%; text-align:center;">{!detalle.fechaPago}</td>
+                        <td style="width: 10%; text-align:right;">{!detalle.saldoFinalFormato}</td>                        
+                    </tr>
+                </apex:repeat>
+            </tbody>
+        </table>
+        <br/>
+        <table style=" width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto; font-size: 10px;" border="0">
+            <tbody>
+                <tr style="height: 18px;">
+                    <td style="width: 33.3333%; text-align: center; height: 18px;">CI=Cuota Inicial</td>
+                    <td style="width: 33.3333%; text-align: center; height: 18px;">CS=Cuota Saldo</td>
+                    <td style="width: 33.3333%; text-align: center; height: 18px;">CP=Cuota Prepago</td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <br/>
+                        El simulador es referencial y no constituye aprobación o aplicación del prepago. Los intereses compensatorios se calculan y aplican de manera diaria, por lo tanto, la información sobre los montos es válida solo para la fecha de hoy {!today}.
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        Si desea más información sobre la simulación y el procedimiento de prepago, puede comunicarse a través de nuestra central telefónica (01) 616 - 9009 opción 3
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</apex:page>

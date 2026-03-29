@@ -1,0 +1,12 @@
+<template>
+  <template if:true={subEtapaArras}>
+    <div class="slds-size_1-of-1 slds-box slds-theme_default slds-text-heading_small">
+      <h1>Estados del lote: <b>{statusLot}</b> con SUB ETAPA: <b>{subEtapaArras}</b></h1>
+    </div>
+  </template>
+  <template if:false={subEtapaArras}>
+    <div class="slds-size_1-of-1 slds-box slds-theme_default slds-text-heading_small">
+      <h1>Estados del lote: <b>{statusLot}</b> con SUB ETAPA: <b>{subEstado}</b></h1>
+    </div>
+  </template>
+</template>

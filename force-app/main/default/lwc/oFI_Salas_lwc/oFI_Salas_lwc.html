@@ -1,0 +1,287 @@
+<template>
+    {currentStage}
+    <lightning-card title="Calendario de Disponibilidad de Sala" icon-name="standard:event">
+        <div class="slds-p-around_medium">
+            
+            <template if:true={stage1}>
+            
+            <lightning-combobox
+                label="Seleccionar Sala"
+                value={selectedRoomId}
+                options={roomOptions}
+                onchange={handleRoomChange}>
+            </lightning-combobox>
+
+            <div class="calendar-header slds-grid slds-wrap slds-m-top_medium">
+                <lightning-button variant="neutral" label="<<" onclick={handle} style="float: left"></lightning-button>
+                <lightning-button variant="brand" label="Reservar" onclick={handleNextStage} style="margin:auto"></lightning-button>
+                <lightning-button variant="neutral" label=">>" onclick={handle} style="right:16px;display:block;position:absolute"></lightning-button>
+                <div class="slds-col slds-size_1-of-1 slds-align_absolute-center slds-text-heading_medium slds-m-bottom_medium">
+                    {currentMonthYear}
+                </div>
+
+                
+                
+            </div>
+
+            <div class="calendar-grid">
+                <!-- Días de la semana -->
+                <template for:each={weekDays} for:item="dayName">
+                    <div key={dayName} class="calendar-header-day slds-align_absolute-center slds-text-title_bold">{dayName}</div>
+                </template>
+
+                <!-- Días del mes -->
+                <template for:each={calendarDays} for:item="day">
+                    <div key={day.dateString} class={day.classes} data-datestring={day.dateString} data-daymonth={day.dayOfMonth} style="display: block" onclick={handleDayClick}>
+                        <span class="day-number">{day.dayOfMonth}</span>
+                        <div class="status-icons">
+                            <!-- Icono Full Day -->
+                            <template if:true={day.isFullDayBooked}>
+                                <lightning-icon icon-name="utility:border_all" alternative-text="Reservado Full Day" size="small" class="full-booked-icon"></lightning-icon>
+                            </template>
+
+                            <!-- Iconos Half Day -->
+                            <template if:false={day.isFullDayBooked}>
+                                <template if:true={day.isHalfDayAMBooked}>
+                                    <lightning-icon icon-name="utility:border_bottom" alternative-text="Mañana reservada" size="small" class="half-am-booked-icon"></lightning-icon>
+                                </template>
+                                <template if:true={day.isHalfDayPMBooked}>
+                                    <lightning-icon icon-name="utility:border_top" alternative-text="Tarde reservada" size="small" class="half-pm-booked-icon"></lightning-icon>
+                                </template>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            
+                
+        </template>
+        <template if:true={stage2}>
+            <div>
+                <span>Sala Seleccionada:</span><span>{selectedRoomName}</span>
+            </div>
+            <div>
+                <span>Fecha Seleccionada:</span><span>{selectedDate}</span>
+            </div>
+
+
+            <div>
+                <span></span>
+            </div>
+
+            <div>
+                <span>Disponibilidad:</span>
+                
+                
+                <lightning-layout multiple>
+                    <lightning-layout-item size="3" padding="around-small">
+                    
+                    <lightning-combobox  
+                    label="Inicio"
+                    placeholder="Seleccionar Inicio"
+                    name="startTime"
+                    options={startTimeOpts} 
+                    value={startTime} 
+                    lwc:ref="startTime" 
+                    onchange={handleStartTime}></lightning-combobox>
+                </lightning-layout-item>
+                <lightning-layout-item size="3" padding="around-small">
+                    <lightning-combobox 
+                    label="Fin"
+                    placeholder="Seleccionar Fin"
+                    name="endTime"
+                    options={endTimeOpts}   
+                    value={endTime} 
+                    lwc:ref="endTime"   ></lightning-combobox>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="2" padding="around-small">
+
+                    <lightning-combobox 
+                    label="Montaje"
+                    placeholder="Seleccionar Montaje"
+                    name="officeSetup"
+                    options={officeSetupOpts}   
+                    value={officeSetup} 
+                    lwc:ref="officeSetup"   ></lightning-combobox>
+
+                </lightning-layout-item>
+
+                <lightning-layout-item size="2" padding="around-small">
+
+                    <lightning-input lwc:ref="totalAmount" label="Precio Total" value="0.00" placeholder="Precio Total" type="currency" step=".01" ></lightning-input>
+
+                </lightning-layout-item>
+
+                <lightning-layout-item size="2" padding="around-small" style="line-height:70px">
+                    <lightning-button variant="brand" label="Agregar" onclick={handleAddTime}></lightning-button>  
+                
+                </lightning-layout-item>
+                
+            </lightning-layout>
+
+            <div style="    padding: 10px;
+    margin: 10px;
+    border: 1px dashed;
+    border-radius: 10px;">
+
+            <lightning-card title="Reservado">
+                <lightning-layout>
+
+                    <lightning-layout-item size="12" padding="around-small" style="line-height:70px">
+
+                        <lightning-datatable
+                        hide-checkbox-column
+                        data={roomAvailability} 
+                        columns={columnsAv} 
+                        key-field="id"
+                        
+
+                        >
+        
+                        </lightning-datatable >
+
+                    </lightning-layout-item>
+
+                </lightning-layout>
+            </lightning-card>
+
+        </div>
+
+        <lightning-card title="">
+            <lightning-layout>
+
+                <lightning-layout-item size="12" padding="around-small" style="line-height:70px">
+
+                    <lightning-datatable
+                    hide-checkbox-column
+                    data={roomBooking} 
+                    columns={columns} 
+                    key-field="id"
+                    onrowaction={handleRowAction}
+
+                    >
+    
+                    </lightning-datatable >
+
+                </lightning-layout-item>
+
+            </lightning-layout>
+
+        </lightning-card>
+
+
+        
+        
+                
+                
+                <ul>
+                    <template if:true={o} for:each={availableSlots} for:item="slot">
+                        <li key={slot.value}>
+                            <lightning-input type="checkbox" label={slot.label} value={slot.value}
+                                checked={slot.checked} disabled={slot.disabled} onchange={handleSlotChange} data-value={slot.value}></lightning-input>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+           
+        </template>
+
+        <template if:true={stage3}>
+
+
+            <lightning-card title="A Reservar">
+                <lightning-layout>
+    
+                    <lightning-layout-item size="12" padding="around-small" style="line-height:70px">
+    
+                        <lightning-datatable
+                        hide-checkbox-column
+                        data={roomBooking} 
+                        columns={columns} 
+                        key-field="id"
+                        onrowaction={handleRowAction}
+    
+                        >
+        
+                        </lightning-datatable >
+    
+                    </lightning-layout-item>
+    
+                </lightning-layout>
+    
+            </lightning-card>
+
+            <lightning-card title="Adicionales">
+                <lightning-layout>
+    
+                    <lightning-layout-item size="2" padding="around-small" style="">
+                        <lightning-input placeholder="Equipo" type="text" name="equipment" lwc:ref="equipment"></lightning-input>  
+                    </lightning-layout-item>
+
+                    <lightning-layout-item size="2" padding="around-small" style="">
+                        <lightning-input placeholder="Fecha" type="date" name="rDate" lwc:ref="rDate"></lightning-input>  
+                    </lightning-layout-item>
+
+                    <lightning-layout-item size="2" padding="around-small" style="">
+                        <lightning-input placeholder="Cantidad" type="number" name="qty" step="1" lwc:ref="qty"></lightning-input>  
+                    </lightning-layout-item>
+
+                    <lightning-layout-item size="2" padding="around-small" style="">
+                        <lightning-input placeholder="Precio Unitario" type="number" step=".001" name="unitAmount" lwc:ref="unitAmount"></lightning-input>  
+                    </lightning-layout-item>
+
+                    <lightning-layout-item size="2" padding="around-small" style="">
+                        <lightning-input style="display:none" placeholder="Precio Total" type="number" step=".001" name="totalAmount" lwc:ref="totalAmount"></lightning-input>  
+                    </lightning-layout-item>
+
+                    <lightning-layout-item size="2" padding="around-small" style="line-height:70px">
+                        <lightning-button variant="brand" label="Agregar" onclick={handleAddEquipment}></lightning-button>  
+                    </lightning-layout-item>
+                    
+                </lightning-layout>
+                <lightning-layout>
+    
+                    <lightning-layout-item size="12" padding="around-small" style="line-height:70px">
+    
+                        <lightning-datatable
+                        hide-checkbox-column
+                        data={equipment} 
+                        columns={equipmentCols} 
+                        key-field="id"
+                        
+                onrowaction={handleRowActionE}
+                        >
+        
+                        </lightning-datatable >
+    
+                    </lightning-layout-item>
+    
+                </lightning-layout>
+            </lightning-card>
+        </template>
+
+
+        <template if:true={stage4}>
+            <div>
+              <lightning-layout >
+                <lightning-layout-item size="12" padding="around-small">
+                  <div class="slds-is-relative" style="height: 100px;">
+                    <lightning-spinner alternative-text="Loading..." size="medium" variant="brand"></lightning-spinner>
+                </div>
+                </lightning-layout-item>
+                </lightning-layout>
+                </div>
+                </template>
+
+        <template if:false={stageV}>
+            <div style="padding-bottom:25px">
+                <lightning-button variant="neutral" label="Atras" onclick={handlePrevStage} style="float: left"></lightning-button>
+                <lightning-button variant="brand" label={nextStageLabel}   onclick={handleNextStage} style="float: right"></lightning-button>  
+            </div>
+
+        </template>
+        </div>
+    </lightning-card>
+</template>

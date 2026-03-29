@@ -1,0 +1,111 @@
+.my-modal-body {
+  --sds-c-modal-content-color-background: LightBlue;
+}
+
+.slds-modal__container{
+  width: 50%;
+}
+
+.slds-popover.slds-nubbin_left{
+  position: absolute;
+  left:102%;
+  /*top:28%;*/
+}
+
+/* .slds-modal__content{
+  padding-bottom: 100px;
+} */
+/* .slds-popover.slds-nubbin_left-top{
+} */
+
+/* .slds-nubbin_left:before, .slds-nubbin--left:before{
+  top: 20px;
+} 
+
+.slds-nubbin_left:after, .slds-nubbin--left:after{
+  top: 20px;
+} */
+
+/* .slds-modal__content{
+  z-index: 1
+}
+
+.slds-form-element{
+  z-index: -1
+} */
+
+/* .my-align {
+  width: 60%;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: white;
+}
+
+.informativa-container {
+  height: 100%;
+  width: 100%;
+  padding: 0px;
+  background-color: rgb(27, 82, 151);
+  color: white;
+}
+
+.height-4 {
+  height: 25%;
+}
+
+.height-3 {
+  height: 33.33%;
+}
+
+th,
+td {
+  text-align: center;
+}
+
+th {
+  background-color: #1b5297;
+  color: white;
+  height: 30px;
+}
+.informativa-w {
+  width: 20%;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.col-w-1 {
+  width: 15%;
+}
+
+.col-w-2 {
+  width: 20%;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.blue-salesforce {
+  --sds-c-icon-color-background: rgb(27, 82, 151);
+}
+
+.row-height {
+  height: 100px;
+}
+
+.my-animation:active {
+  opacity: 1;
+  animation: my-animation 3s ease;
+}
+
+@keyframes my-animation {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+} */

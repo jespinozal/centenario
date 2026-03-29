@@ -1,0 +1,17 @@
+<aura:component controller="CEN_cls_cargaImagenDinamico_cc" access="global" >
+    
+	<aura:attribute name="recordId" type="Id" access="global"/>
+    <aura:attribute name="imagenSrc" type="String" default="" access="global"/>    
+    <aura:attribute name="message" type="String" default="" access="private"/>
+    <aura:attribute name="estaCargando" type="Boolean" default="false" access="private"/>    
+    
+    <aura:registerEvent name="eventoCargaImagen" type="c:CEN_cmp_cargaImagenEvento_evt"/>
+    
+    <div ondragover="{!c.onDragOver}" ondrop="{!c.onDrop}">
+        <img src="{!v.imagenSrc}"/>
+        <p><ui:outputText value="{!v.message}"/></p>
+        <aura:if isTrue="{!v.estaCargando}">
+            <lightning:spinner alternativeText="Loading" variant="brand" />
+        </aura:if>
+    </div>
+</aura:component>

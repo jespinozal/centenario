@@ -1,0 +1,117 @@
+<template>
+  <template if:true={isModalOpen}>
+    <!-- Modal/Popup Box LWC starts here -->
+    <section
+      role="dialog"
+      tabindex="-1"
+      aria-labelledby="modal-heading-01"
+      aria-modal="true"
+      aria-describedby="modal-content-id-1"
+      class="slds-modal slds-fade-in-open"
+    >
+      <div class="slds-modal__container">
+        <!-- Modal/Popup Box LWC header here -->
+        <button
+          class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+          title="Close"
+          onclick={closeModal}
+        >
+
+        <lightning-icon
+            icon-name="utility:close"
+            alternative-text="close"
+            variant="inverse"
+            size="small"
+          ></lightning-icon>
+          <span class="slds-assistive-text">Close</span>
+        </button>
+
+        <div class="slds-modal__header">
+          <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Gestion de Descuento</h1>
+        </div>
+
+        <!-- Modal/Popup Box LWC body starts here -->
+        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+          <div class="slds-grid slds-wrap slds-border_bottom slds-p-bottom_large slds-p-top_large slds-theme_alt-inverse">
+              <div class="slds-text-align_center slds-size_3-of-12"><b>Palanca</b></div>
+              <div class="slds-text-align_center slds-size_6-of-12"><b>% Descuento</b></div>
+              <div class="slds-text-align_center slds-size_3-of-12"><b>Aplica</b></div>
+          </div>
+          <template for:each={groupPalanca} for:item="gp">
+            <div key={gp.key} class="slds-grid slds-wrap slds-border_bottom slds-p-bottom_small" data-id={gp.selectedValue} onmouseover={handleMouse} onmouseout={handleMouse}>
+              <div class="slds-text-align_center slds-var-m-top_xx-large slds-col slds-size_3-of-12">
+                {gp.description}
+              </div>
+              <div class="slds-text-align_center slds-col slds-size_6-of-12">
+                <!-- <div > -->
+                <lightning-combobox
+                        name="progress"
+                        value={gp.selectedValue}
+                        placeholder="--None--"
+                        options={gp.options}
+                        onchange={handleChange}
+                        disabled={gp.activeDiscount}
+                        >
+                </lightning-combobox>
+                <p >Importe Descuento: <lightning-formatted-number value={gp.importe} minimum-fraction-digits="2" maximum-fraction-digits="2" format-style="decimal"></lightning-formatted-number> {gp.moneda}</p>
+              </div>
+              <div class="slds-text-align_center slds-var-m-top_xx-large slds-col slds-size_3-of-12">
+                <lightning-input class="slds-p-left_xx-large" type="checkbox" label="" value={gp.selectedValue} checked={gp.ischecked} disabled={gp.active} onchange={handleChangeChecked}></lightning-input>
+              </div>
+
+              <section if:true={gp.show} aria-describedby="dialog-body-id-112" aria-labelledby="dialog-heading-id-117" class="slds-popover slds-nubbin_left slds-popover_medium" role="dialog">
+                <div class="slds-popover__body" id="dialog-body-id-112">
+                  <div class="slds-popover__meta">
+                    <span class="slds-badge">Informativa</span>
+                  </div>
+                  <div class="slds-media">
+                    <div class="slds-media__body">
+                      <template for:each={gp.motivoArray} for:item="motive">
+                        <div key={motive.key} class="slds-grid slds-wrap">
+                          <div class="slds-box slds-theme_shade">
+                            <p>{motive}</p>
+                          </div>
+                          <br>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </template>
+
+          <template if:true={fileRequired}>
+            <div class="slds-grid slds-wrap slds-var-m-top_x-large">
+              <div class="slds-text-align_center slds-col slds-size_6-of-12">
+                <lightning-input type="file"
+                  label="Archivo Adjunto"
+                  accept={acceptedFormats}
+                  required={fileRequired}
+                  message-when-value-missing={messageRequired}
+                  multiple
+                  onchange={handleFileChanges}
+                  >
+                </lightning-input>
+              </div>
+              <div class="slds-text-align_center slds-col slds-var-m-top_xx-large slds-text-color_success slds-size_6-of-12">
+                {messageFiles}
+              </div>
+            </div>
+          </template>
+
+        </div>
+        <!-- Modal/Popup Box LWC footer starts here -->
+        <div class="slds-modal__footer slds-float_right">
+          <lightning-button label="Aplicar Descuento" onclick={applyDiscount} variant="brand"></lightning-button>
+        </div>
+      </div>
+    </section>
+    <template if:true={loaded}>
+      <div class="slds-spinner_container">
+          <lightning-spinner alternative-text="Loading"></lightning-spinner>
+      </div>
+    </template>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+  </template>
+</template>

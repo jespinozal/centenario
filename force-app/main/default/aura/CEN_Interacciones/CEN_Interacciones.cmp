@@ -1,0 +1,253 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                access="global" 
+                controller="CEN_cls_Interacciones">
+	<aura:attribute name="recordId" type="String" default=""/>
+    <aura:attribute name="caseRecord" type="Object"/>
+    <aura:attribute name="isModal" type="boolean" default="false"/>
+    <aura:attribute name="observacion" type="String"/>
+    <aura:attribute name="selectedLookUpRecord" type="sObject" default="{}"/>
+    <aura:handler event="force:refreshView" action="{!c.forceRefreshViewHandler}"/>
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }"/>    
+   
+   
+   <aura:if isTrue="{!and(v.caseRecord.CEN_flag_postergar_gestion__c==true,v.caseRecord.CEN_Actualizar_Datos__c==true)}">
+      <div aura:id="gestion-div" class="slds-show">
+          <lightning:card title="">
+        <aura:set attribute="actions">
+            <lightning:button class="slds-float_left slds-button slds-button_neutral"  variant="brand-outline"
+                             label="Gestionar/No Gestionar" title="Gestionar o No Gestionar" 
+                             onclick="{!c.AbrirModal}" iconName="utility:shortcuts" iconPosition="left" />
+        </aura:set>
+    </lightning:card>
+           
+        </div>
+    </aura:if> 
+    
+       	<!--************************************************************************  MODAL  *********************************************************************-->  
+    	<!--Use aura:if tag to display/hide popup based on isModalOpen value-->  
+        <aura:if isTrue="{!v.isModal}">
+                <!-- Modal/Popup Box starts here-->
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <!-- Modal/Popup Box Header Starts here-->
+                        <header class="slds-modal__header">
+                            
+                            <lightning:buttonIcon iconName="utility:skip"
+                                                  onclick="{! c.postergar }"
+                                                  alternativeText="Postergar"
+                                                  variant="bare-inverse"
+                                                  class="slds-modal__close"/>	
+                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate"><b>Actualización de datos</b></h2>
+                        </header>
+                        <div class="slds-show slds-container">
+                       <!--Modal/Popup Box Body Starts here-->
+                       <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1"> 
+                           
+                        <!--****************************************************** Cabecera del Componente *****************************************************************--> 
+                         
+                               <p>Se solicitaron las siguientes actualizaciones del cliente 
+                                   <b><a href="{!'/lightning/r/' + v.caseRecord.Contact.Id + '/view'}" target="_blank">{!v.caseRecord.Contact.Name}</a></b> </p>
+                               <br/>
+                           <table>
+                               <tr>
+                                   <th></th>
+                                   <th><b>Actual</b></th>
+                                   <th><b>Cambio solicitado</b></th>
+                               </tr>
+                           <aura:if isTrue="{!v.caseRecord.Contact.FirstName != v.caseRecord.CEN_nombre_actualizado__c}">
+                               <tr>
+                                   <td><b>Nombres</b></td>
+                                   <td>{!v.caseRecord.Contact.FirstName}</td>
+                                   <td>{!v.caseRecord.CEN_nombre_actualizado__c}</td>
+                               </tr>
+                           </aura:if>
+                           <aura:if isTrue="{!v.caseRecord.Contact.LastName != v.caseRecord.CEN_apellido_actualizado__c}">
+                               <tr>
+                                   <td><b>Apellidos</b></td>
+                                   <td>{!v.caseRecord.Contact.LastName}</td>
+                                   <td>{!v.caseRecord.CEN_apellido_actualizado__c}</td>
+                               </tr>
+                           </aura:if>
+                               <aura:if isTrue="{!v.caseRecord.Contact.CEN_Direccion__c != v.caseRecord.CEN_direccion_actualizado__c}">
+                               <tr>
+                                   <td><b>Dirección</b></td>
+                                   <td>{!v.caseRecord.Contact.CEN_Direccion__c}</td>
+                                   <td>{!v.caseRecord.CEN_direccion_actualizado__c}</td>
+                               </tr>
+                           </aura:if>
+                           <aura:if isTrue="{!v.caseRecord.Contact.CEN_Distrito__c != v.caseRecord.CEN_distrito_actualizado__c}">
+                               <tr>
+                                   <td><b>Distrito</b></td>
+                                   <td>{!v.caseRecord.Contact.CEN_Distrito__r.Name+' - ' + v.caseRecord.Contact.CEN_Distrito__r.Provincia__c +' - '+ v.caseRecord.Contact.CEN_Distrito__r.Departamento__c}</td>
+                                   <td>{!v.caseRecord.CEN_distrito_actualizado__r.Name+' - ' + v.caseRecord.CEN_distrito_actualizado__r.Provincia__c +' - '+ v.caseRecord.CEN_distrito_actualizado__r.Departamento__c}</td>
+                               </tr>
+                           </aura:if>
+                           <aura:if isTrue="{!v.caseRecord.Contact.Email != v.caseRecord.correo_actualizado__c}">
+                               <tr>
+                                   <td><b>Correo</b></td>
+                                   <td>{!v.caseRecord.Contact.Email}</td>
+                                   <td>{!v.caseRecord.correo_actualizado__c}</td>
+                               </tr>
+                           </aura:if>
+                           <aura:if isTrue="{!v.caseRecord.Contact.Phone != v.caseRecord.CEN_celular_actualizado__c}">
+                               <tr>
+                                   <td><b>Celular</b></td>
+                                   <td>{!v.caseRecord.Contact.Phone}</td>
+                                   <td>{!v.caseRecord.CEN_celular_actualizado__c}</td>
+                               </tr>
+                           </aura:if>                                                          
+                           </table>
+                       <!--*************************************************************************************************************************************************--> 
+                       </div>
+                            <div  aura:id="modal-container-msg">
+                            <!--Modal/Popup Box Footer Starts here-->
+                            <footer class="slds-modal__footer">                               
+                                <div style='{!v.display}'>                                
+                                 <lightning:button   class="slds-float_left slds-button slds-button_neutral"  variant="brand-outline"
+                                                   label="Gestionar" title="Gestionar" 
+                                                   onclick="{!c.Gestionar}"/>
+                                </div>
+                                
+                                <lightning:button class="slds-button slds-button_neutral" variant="destructive-text"
+                                                        label="No Gestionar" title="No Gestionar" onclick="{!c.NoGestionar}"/>                
+                            </footer>
+                            </div>
+                            <div aura:id="dc-gestionar" class="slds-hide">
+                                <div class="slds-theme_default slds-p-bottom_large slds-p-horizontal_large">
+                                
+                                    <!--****************************************************** Cabecera del Componente *****************************************************************--> 
+                                       <div id='Detalle' >
+                                                        <p style="text-align: center;">
+                                                            <b>La información registrada es la siguiente</b>
+                                                        </p>
+                                                        <table>
+                                                        <tr class="slds-text-color_default">
+                                                        <td>
+                                                        <ui:outputText class="slds-output" value="Nombres"/>
+                                                        </td>
+                                                        <td colspan="2">
+                                                            <div class="slds-form-element">
+                                                                <label aura:id="NombreRegistradoL" class="slds-form-element__label" for="text-input-id-1">Antes: {!v.caseRecord.Contact.FirstName}</label>
+                                                                <div class="slds-form-element__control">
+                                                                    <ui:inputText aura:id="NombreRegistrado" class="slds-input" value="{!v.caseRecord.CEN_nombre_actualizado__c}"/>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        </tr>
+                                                            
+                                                        <tr class="slds-text-color_default">
+                                                        <td>
+                                                        <ui:outputText class="slds-output" value="Apellidos"/>
+                                                        </td>
+                                                        <td colspan="2">
+                                                            <div class="slds-form-element">
+                                                                <label aura:id="ApellidoRegistradoL" class="slds-form-element__label" for="text-input-id-1">Antes: {!v.caseRecord.Contact.LastName}</label>
+                                                                <div class="slds-form-element__control">
+                                                                    <ui:inputText aura:id="ApellidoRegistrado" class="slds-input" value="{!v.caseRecord.CEN_apellido_actualizado__c}"/>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        </tr>
+                                                         <tr class="slds-text-color_default">
+                                                        <td>
+                                                        <ui:outputText class="slds-output" value="Dirección"/>
+                                                        </td>
+                                                        <td colspan="2">
+                                                            <div class="slds-form-element">
+                                                                <label aura:id="DireccionRegistradoL" class="slds-form-element__label" for="text-input-id-1">Antes: {!v.caseRecord.Contact.CEN_Direccion__c}</label>
+                                                                <div class="slds-form-element__control">
+                                                                    <ui:inputText aura:id="DireccionRegistrado" class="slds-input" value="{!v.caseRecord.CEN_direccion_actualizado__c}"/>
+                                                                </div>
+                                                            </div>                                                        	
+                                                        </td>
+                                                        </tr>
+                                                        <tr class="slds-text-color_default slds-m-top_x-small">
+                                                        <td>
+                                                        <ui:outputText class="slds-output slds-m-top_x-small" value="Distrito"/>
+                                                        </td>
+                                                        <td colspan="2">
+                                                            <div class="slds-form-element">
+                                                                <label aura:id="DistritoRegistradoL" class="slds-form-element__label" for="text-input-id-1">Antes: {!v.caseRecord.Contact.CEN_Distrito__r.Name+' - '+v.caseRecord.Contact.CEN_Distrito__r.Provincia__c+' - '+v.caseRecord.Contact.CEN_Distrito__r.Departamento__c}</label>
+                                                                <div class="slds-form-element__control">
+                                                                    <c:CEN_lookup_Distrito objectAPIName="Tabla_maestra__c " IconName="standard:store_group" selectedRecord="{!v.selectedLookUpRecord}"/>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        </tr>
+                                                        
+                                                            
+                                                        <tr class="slds-text-color_default">
+                                                        <td>
+                                                        <ui:outputText class="slds-output" value="Correo"/>
+                                                        </td>
+                                                        <td colspan="2">
+                                                             <div class="slds-form-element">
+                                                                <label aura:id="CorreoRegistradoL" class="slds-form-element__label" for="text-input-id-1">Antes: {!v.caseRecord.Contact.Email}</label>
+                                                                <div class="slds-form-element__control" aura:id="DistritoRegistrado">
+                                                                    <ui:inputText aura:id="CorreoRegistrado" class="slds-input" value="{!v.caseRecord.correo_actualizado__c}"/>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        </tr>
+                                                            
+                                                        <tr class="slds-text-color_default">
+                                                        <td>
+                                                        <ui:outputText class="slds-output" value="Celular"/>
+                                                        </td>
+                                                        <td colspan="2">
+                                                             <div class="slds-form-element">
+                                                                <label aura:id="CelularRegistradoL"  class="slds-form-element__label" for="text-input-id-1">Antes: {!v.caseRecord.Contact.Phone}</label>
+                                                                <div class="slds-form-element__control">
+                                                                    <ui:inputText aura:id="CelularRegistrado" class="slds-input" value="{!v.caseRecord.CEN_celular_actualizado__c}"/>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        </tr>
+                                                            
+
+                                                            
+                                                        </table>                     
+                                                    </div>
+                                           
+                                   <!--*************************************************************************************************************************************************--> 
+                                </div>
+                                <footer class="slds-modal__footer">
+                                      <div>
+                                          <lightning:button class="slds-float_left slds-button slds-button_neutral" variant="destructive-text"
+                                                        label="No Gestionar" title="No Gestionar" onclick="{!c.NoGestionar}"/>
+                                      </div>
+                                      <lightning:button class="slds-button slds-button_neutral"  
+                                                            variant="brand-outline" label="Actualizar Datos" title="Actualizar Datos" 
+                                                            onclick="{!c.actualizarDatos}"/> 
+                                  </footer>
+                                </div>
+                            
+                            <div aura:id="dc-no-gestionar" class="slds-hide">
+                            <div class="slds-theme_default slds-p-bottom_large slds-p-horizontal_large">
+                                <lightning:textarea name="observaciones" label="Observaciones (máximo 32000 caracteres)" value="{!v.observacion}" 
+                                                    maxlength="32000" placeholder="Escriba alguna observación aquí..."  required="true"
+                                                    messageWhenTooLong="Solo puede registrar observaciones menos de 32000 caracteres." 
+                                                    messageWhenValueMissing="Debe registrar una observación"/>
+                           </div> 
+                            <footer class="slds-modal__footer">
+                                <div>
+                                    <lightning:button class="slds-float_left slds-button slds-button_neutral"  variant="brand-outline"
+                                                   label="Gestionar" title="Gestionar" 
+                                                   onclick="{!c.Gestionar}"/>
+                                </div>
+                                <lightning:button class="slds-button slds-button_neutral"  
+                                                      variant="destructive-text" label="Guardar Observación" title="Guardar Observación" 
+                                                      onclick="{!c.guardarObservacion}"/> 
+                                 
+                            </footer>
+                        </div>
+                            
+                        </div>
+                        
+                        
+                    </div>
+                           
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+     	</aura:if>
+</aura:component>

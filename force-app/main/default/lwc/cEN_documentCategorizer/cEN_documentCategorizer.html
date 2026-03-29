@@ -1,0 +1,60 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 08-14-2025
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+    <template if:true={showError}>
+        <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+            <span class="slds-assistive-text">Error</span>
+            <h2>{errorMessage}</h2>
+        </div>
+    </template>
+
+    <div class="slds-box slds-theme_default slds-m-top_small">
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th scope="col"><div class="slds-truncate" title="Nombre del Archivo">Nombre del Archivo</div></th>
+                    <th scope="col"><div class="slds-truncate" title="Origen">Origen</div></th>
+                    <th scope="col"><div class="slds-truncate" title="Tipo de Documento">Tipo de Documento</div></th>
+                    <th scope="col" style="width: 50px;">
+                        <div class="slds-truncate" title="Vista Previa"></div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <template for:each={documents} for:item="doc">
+                    <tr key={doc.CEN_ID_Original__c} class="slds-hint-parent">
+                        <td data-label="Nombre del Archivo"><div class="slds-truncate">{doc.Name}</div></td>
+                        <td data-label="Relacionado A"><div class="slds-truncate">{doc.CEN_Origen_del_Archivo__c}</div></td>
+                        <td data-label="Tipo de Documento">
+                            <lightning-combobox
+                                name="picklist"
+                                label="Tipo de Documento"
+                                variant="label-hidden"
+                                value={doc.CEN_Categoria_Seleccionada__c}
+                                placeholder="Seleccione un tipo de documento..."
+                                options={picklistOptions}
+                                onchange={handleCategoryChange}
+                                data-id={doc.CEN_ID_Original__c} 
+                            ></lightning-combobox>
+                        </td>
+                        <td data-label="Vista Previa">
+                            <lightning-button-icon 
+                                icon-name="utility:preview" 
+                                variant="border-filled"
+                                alternative-text="Previsualizar"
+                                title="Previsualizar Archivo"
+                                onclick={handlePreviewClick}
+                                data-id={doc.CEN_ID_Original__c}>
+                            </lightning-button-icon>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+</template>

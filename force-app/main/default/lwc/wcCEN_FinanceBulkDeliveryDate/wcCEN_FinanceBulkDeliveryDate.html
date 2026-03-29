@@ -1,0 +1,127 @@
+<template>
+    <article class="slds-card">
+      <div class="slds-card__body slds-card__body_inner">
+        <div class="slds-card__header slds-grid">
+          <header class="slds-media slds-media_center slds-has-flexi-truncate">
+          <div class="slds-media__figure">
+              <lightning-icon icon-name="standard:filter" size="small"></lightning-icon>
+          </div>
+          <div class="slds-media__body">
+              <h3>
+                  Filtros
+              </h3>
+          </div>
+          </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+          <div class="slds-grid slds-wrap">
+            <div class="slds-col slds-size_1-of-1 slds-large-size_12-of-12 slds-m-bottom_small">
+              <div class="slds-p-vertical_x-small">Proyecto</div>
+              <lightning-record-edit-form object-api-name="Product2" id="createProjectForm" >
+                <lightning-input-field field-name="CEN_Proyecto__c" variant="label-hidden" onchange={handleProjectSelection} required> </lightning-input-field>
+              </lightning-record-edit-form>
+            </div>
+            <!-- <div class="slds-col slds-size_1-of-1 slds-large-size_6-of-12">
+              <lightning-input type="search" onchange={searchProduct2} class="slds-m-bottom_small slds-p-right_small" label="Descripción Lote" value={searchDes}></lightning-input>
+            </div> -->
+            <div class="slds-col slds-size_1-of-1 slds-large-size_12-of-12">
+              <lightning-input type="search" onchange={searchProduct} class="slds-m-bottom_small" label="Descripción" value={searchKey}></lightning-input>
+            </div>
+          </div>
+        </div>
+        <div class="slds-card__header slds-grid slds-m-top_large">
+          <header class="slds-media slds-media_center slds-has-flexi-truncate">
+          <div class="slds-media__figure">
+              <lightning-icon icon-name="standard:picklist_type" size="small"></lightning-icon>
+          </div>
+          <div class="slds-media__body">
+              <h3>
+                Productos
+              </h3>
+          </div>
+          </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+          <lightning-datatable
+          data-id="datarow"
+          columns={columns}
+          data={data}
+          key-field="Id"
+          selected-rows={selection}
+          onrowselection={rowSelection}
+          >
+          </lightning-datatable>
+        </div>
+        <div class="slds-align_absolute-center" style="height:5rem">
+          <lightning-button
+                label="Prev"
+                icon-name="utility:chevronleft"
+                icon-position="left"
+                onclick={previousEve}
+                disabled={disPre}
+              >
+              </lightning-button>
+              <span class="slds-p-horizontal_small">
+                Página: {pageNumber} | {recordCount} | Total Registro: {totalRecord}
+              </span>
+              <lightning-button
+                label="Next"
+                icon-name="utility:chevronright"
+                icon-position="right"
+                disabled={isLastPage}
+                onclick={nextEve}
+              >
+              </lightning-button>
+        </div>
+      </div>
+      <footer class="slds-card__footer">
+          <div class="slds-clearfix">
+              <div class="slds-float_right">
+                  <button class="slds-button slds-button_brand" onclick={viewModalCharge} >Cargar</button>
+              </div>
+            </div>
+      </footer>
+
+      <template if:true={isModalChargeOpen}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalCharge}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Carga Masiva</h2>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="slds-size_6-of-6">
+                      <lightning-input type="date" name="vDate" label="Fecha Entrega" value={deliverDate} required></lightning-input>
+                    </div>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={sendChargeToSap} title="Envia a SAP">Enviar a SAP</button>
+                    <button class="slds-button slds-button_brand" onclick={closeModalCharge} title="Cancel">Cerrar</button>
+                </footer>
+            </div>
+            <template if:false={loaded}>
+              <div class="slds-spinner_container">
+                  <lightning-spinner alternative-text="Loading"></lightning-spinner>
+              </div>
+            </template>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+      </template>
+
+      <template if:false={loaded}>
+        <div class="slds-spinner_container">
+            <lightning-spinner alternative-text="Loading"></lightning-spinner>
+        </div>
+      </template>
+
+    </article>
+</template>

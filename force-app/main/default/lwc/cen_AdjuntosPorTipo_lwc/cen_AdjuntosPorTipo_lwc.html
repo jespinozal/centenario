@@ -1,0 +1,44 @@
+<!-- 
+Developer: Jose Miguel Espinoza Mestanza
+Email: josemiguel.espinozamestanza@emeal.nttdata.com 
+-->
+<template>
+    <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-spread slds-m-medium">
+        <div class="cen-titulo-sustentos">Adjuntos</div>
+        <div>
+            <a
+                class="slds-button slds-button_brand"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Ver en Sharepoint
+            </a>
+        </div>
+    </div>
+    <template for:each={grupos} for:item="grupo">
+        <section key={grupo.nombreGrupo} class="slds-m-bottom_medium">
+            <div class="slds-media slds-align-center cen-header">
+                <div class="slds-media__figure">
+                    <span class="record-avatar-container slds-avatar slds-avatar_small icon" style="background-color:#5a9cdd">
+                        <lightning-icon
+                            icon-name="custom:custom57"
+                            size="small"
+                            alternative-text="Adjuntos Relacionados"
+                        ></lightning-icon>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <span class="slds-truncate slds-m-right--xx-small cen-header-text"
+                        title={grupo.nombreGrupo}>
+                        {grupo.nombreGrupo}
+                    </span>
+                </div>
+            </div>
+            <c-cen-tabla-adjuntos-relacionados
+                adjuntos={grupo.adjuntos}
+                nombre-grupo={grupo.nombreGrupo}>
+            </c-cen-tabla-adjuntos-relacionados>
+        </section>
+    </template>
+</template>

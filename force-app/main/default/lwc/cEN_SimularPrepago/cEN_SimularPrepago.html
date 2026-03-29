@@ -1,0 +1,384 @@
+<!--
+  @description       : 
+  @author            : Richard Villafana - NTT DATA
+  @group             : 
+  @last modified on  : 11-29-2024
+  @last modified by  : Richard Villafana - NTT DATA
+  @last modified by  : Felipe Bermudez - NTT DATA / linea 199 (resumeninteresxPagSinPrepago)
+-->
+<template>
+    <lightning-card  variant="Narrow"  title="Simular Prepago" icon-name="standard:ai_accelerator_card">
+        <!--BOTONES DE ACCION-->
+        <template if:true={financiamientoActivo}>
+        <p class="slds-p-horizontal_small">
+            <lightning-radio-group name="radioInicial"
+            label="Seleccionar:"
+            options={optionsRadioInicial}
+            value={value}
+            type="radio"
+            onchange={seleccionRadioInicial}></lightning-radio-group>
+        </p>
+            <lightning-button variant="border-filled" label="Siguiente" slot="footer" title="Siguiente" onclick={openModal} class="slds-m-left_x-small" disabled={desactivarBotonSiguienteInicial}></lightning-button>
+        </template>
+        <template if:true={financiamientoInactivo}>
+            <p style="text-align: center; color:red;">
+                <strong>Advertencia</strong>
+            </p>
+            <p style="text-align: center;">
+                Para poder realizar la simulación de Prepago, deberá seleccionar previamente un <strong>financiamiento activo.</strong>
+            </p>
+        </template>
+        </lightning-card>
+    <!-- MODAL DE COMPONENTE-->
+    <template if:true={isModalOpen}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_medium slds-backdrop">
+            <div class="slds-modal__container" >
+                <template if:true={mostrarSpinner} style="height: 200px; position:relative">
+                    <lightning-spinner alternative-text="Loading" variant="base" size="medium"></lightning-spinner>
+                </template>
+                <!-- HEADER DE MODAL -->
+                <header class="slds-modal__header">
+                    <!-- BOTON PARA CERRAR EL MODAL-->
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="Cerrar"
+                            variant="brand"
+                            size="small" ></lightning-icon>
+                        <label class="slds-assistive-text">Cerrar</label>
+                    </button>
+                    <!-- TITULO DE HEADER-->
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{tituloModalSimulacion}</h2>
+                </header>
+                <!-- BODY DE MODAL-->
+                <div class="slds-modal__content slds-var-p-around_large" id="modal-content-id-1">
+                    <!-- GUIA DE USUARIO-->
+                    <lightning-progress-indicator current-step={pasoSeleccionado} type="base" variant="base">
+                        <template for:each={steps} for:item="step">
+                            <lightning-progress-step label={step.label} value={step.value} key={step.label}></lightning-progress-step>
+                        </template>
+                    </lightning-progress-indicator>
+                    <!--PANTALLAS DE SIMULACION DE PREPAGO-->
+                    <!--PANTALLA 1-->
+                    <template if:true={P1SimulacionResumenFinanciamiento}>
+                        <!-- sldsValidatorIgnoreNextLine -->
+                        <lightning-datatable
+                        key-field   =   "id"
+                        data        =   {dataSimulacionResumenFinanciamiento}
+                        columns     =   {columnsSimulacionResumenFinanciamiento}
+                        hide-checkbox-column	
+                        >
+                        </lightning-datatable>
+                    </template>
+                    <!-- PANTALLA 2-->
+                    <template if:true={P2SimulacionTipoDeCuotas}>
+                        <!-- sldsValidatorIgnoreNextLine -->
+                        <lightning-radio-group name="radioP2SimulacionTipoDeCuotas"
+                            label="Seleccionar tipo de cuotas:"
+                            options={optionsRadioP2SimulacionTipoDeCuotas}
+                            value={value}
+                            type="radio"
+                            onchange={seleccionRadioP2SimulacionTipoDeCuotas}>
+                        </lightning-radio-group>
+                        <template if:true={mostrarimporteRefinanciacion}>
+                            <br/>
+                            <lightning-input type="number" name="importeRefinanciacion" label="Importe de Refinanciación" placeholder="Monto" onchange={importeRefinanciacionCambio}></lightning-input>
+                            <lightning-input type="date" name="fechaDePrepago" label="Fecha de Prepago" value={fechaPrepago} onchange={handleFechaChange}></lightning-input>
+                        </template>
+                    </template>
+                    <!-- PANTALLA 3-->
+                    <template if:true={P3SimulacionResumenDePagos}>
+                        <!-- sldsValidatorIgnoreNextLine -->
+                        <template if:true={mostrarResumen}>
+                        
+                              <table style="height: 144px; width: 70%; border-collapse: collapse; margin-left: auto; margin-right: auto;" border="0">
+                                <tbody>
+                                <tr style="height: 18px;">
+                                <td style="width: 99.9999%; text-align: center; height: 18px;" colspan="5"><strong><span style="text-decoration: underline;">Simulaci&oacute;n Prepago</span></strong></td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                <td style="width: 37.1467%; height: 18px;">Importe de prepago Simulado</td>
+                                <td style="width: 6.55693%; height: 18px; text-align: center;">:</td>
+                                <td style="width: 23.0178%; height: 18px;">{resumenImporteSimulado}</td>
+                                <td style="width: 9.71196%; height: 18px;">&nbsp;</td>
+                                <td style="width: 23.5665%; height: 18px;">&nbsp;</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                <td style="width: 37.1467%; height: 18px;">Tipo de simulaci&oacute;n de prepago</td>
+                                <td style="width: 6.55693%; height: 18px; text-align: center;">:</td>
+                                <td style="height: 18px; width: 56.2963%;" colspan="3">{resumentipoSimulacion}</td>
+                                </tr>
+                                </tbody>
+                                </table>
+                                <table style="height: 50px; width: 70%; border-collapse: collapse; margin-left: auto; margin-right: auto;" border="0">
+                                <tbody>
+                                
+                                <tr style="height: 18px;">
+                                <td style="width: 33.3333%; text-align: center; height: 18px;"><strong>Importe de cuota actual</strong></td>
+                                <td style="width: 33.3333%; text-align: center; height: 18px;"><strong>Importe de nueva cuota</strong></td>
+                                <td style="width: 33.3333%; text-align: center; height: 18px;"><strong>Importe de &uacute;ltima cuota</strong></td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                <td style="width: 33.3333%; height: 18px; text-align: center;">{resumenCuotaActual}</td>
+                                <td style="width: 33.3333%; height: 18px; text-align: center;">{resumenNuevaCuota}</td>
+                                <td style="width: 33.3333%; height: 18px; text-align: center;">{resumenUltimaCuota}</td>
+                                </tr>
+                                </tbody>
+                                </table>
+                                <table style="height: 144px; width: 70%; border-collapse: collapse; margin-left: auto; margin-right: auto;" border="0">
+                                <tbody>
+                                <tr style="height: 18px;">
+                                <td style="width: 100%; text-align: center; height: 18px;" colspan="5">&nbsp;</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                <td style="width: 37.1467%; height: 18px;">N&deg; Financiamiento</td>
+                                <td style="width: 6.55693%; height: 18px; text-align: center;">:</td>
+                                <td style="width: 23.155%; height: 18px;">{resumenNroFinanciamiento}</td>
+                                <td style="width: 9.3004%; height: 18px;">&nbsp;</td>
+                                <td style="width: 23.8409%; height: 18px;">&nbsp;</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                <td style="width: 37.1467%; height: 18px;">Fecha de vencimiento de tu pr&oacute;xima cuota</td>
+                                <td style="width: 6.55693%; height: 18px; text-align: center;">:</td>
+                                <td style="height: 18px; width: 23.155%;">{resumenfechaVencimientoProximaCuota}</td>
+                                <td style="width: 9.3004%; height: 18px;">&nbsp;</td>
+                                <td style="width: 23.8409%; height: 18px;">&nbsp;</td>
+                                </tr>
+                                <tr style="height: 36px;">
+                                <td style="width: 37.1467%; height: 36px;">Fecha de vencimiento de tu &uacute;ltima cuota</td>
+                                <td style="width: 6.55693%; text-align: center; height: 36px;">:</td>
+                                <td style="width: 23.155%; height: 36px;" width="240">{resumenfechaVencimientoUltimaCuota}</td>
+                                <td style="width: 9.3004%; height: 36px;">&nbsp;</td>
+                                <td style="width: 23.8409%; height: 36px;">&nbsp;</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                <td style="width: 37.1467%; height: 18px;" width="266">N&uacute;mero de cuotas por pagar</td>
+                                <td style="width: 6.55693%; text-align: center; height: 18px;">:</td>
+                                <td style="width: 23.155%; height: 18px;" width="240">{resumenCuotasPorPagar}</td>
+                                <td style="width: 9.3004%; height: 18px;">&nbsp;</td>
+                                <td style="width: 23.8409%; height: 18px;">&nbsp;</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                <td style="width: 37.1467%; height: 18px;">&nbsp;</td>
+                                <td style="width: 6.55693%; text-align: center; height: 18px;">&nbsp;</td>
+                                <td style="width: 23.155%; height: 18px;">&nbsp;</td>
+                                <td style="width: 9.3004%; height: 18px;">&nbsp;</td>
+                                <td style="width: 23.8409%; height: 18px;">&nbsp;</td>
+                                </tr>
+                                <tr style="height: 36px;">
+                                <td style="width: 37.1467%; height: 36px;" width="266"><strong><span style="text-decoration: underline;">Comparaci&oacute;n:</span></strong></td>
+                                <td style="width: 6.55693%; text-align: center; height: 36px;">&nbsp;</td>
+                                <td style="width: 23.155%; height: 36px;  text-align: center;"><em>Antes del Prepago</em></td>
+                                <td style="width: 9.3004%; height: 36px;">&nbsp;</td>
+                                <td style="width: 23.8409%; height: 36px; text-align: center;"><em>Despues del Prepago</em></td>
+                                </tr>
+                                <tr>
+                                <td style="width: 37.1467%;" width="266">Precio de venta</td>
+                                <td style="width: 6.55693%; text-align: center; height: 18px;">:</td>
+                                <td style="width: 23.155%; height: 18px; text-align: right;">{resumenPrecioDeVentas}</td>
+                                <td style="width: 9.3004%; height: 18px;">&nbsp;</td>
+                                <td style="width: 23.8409%; height: 18px; text-align: right;">{resumenPrecioDeVentas}</td>
+                                </tr>
+                                <tr>
+                                <td style="width: 37.1467%;" width="266">Capital pagado</td>
+                                <td style="width: 6.55693%; text-align: center; height: 18px;">:</td>
+                                <td style="width: 23.155%; height: 18px; text-align: right;">{resumenCapitalAmortizado}</td>
+                                <td style="width: 9.3004%; height: 18px;">&nbsp;</td>
+                                <td style="width: 23.8409%; height: 18px; text-align: right;">{resumencapitalAmortizadoDespues}</td>
+                                </tr>
+                                <tr>
+                                <td style="width: 37.1467%;" width="266">Saldo capital por pagar</td>
+                                <td style="width: 6.55693%; text-align: center; height: 18px;">:</td>
+                                <td style="width: 23.155%; height: 18px; text-align: right;">{resumenSaldoDeCapital}</td>
+                                <td style="width: 9.3004%; height: 18px;">&nbsp;</td>
+                                <td style="width: 23.8409%; height: 18px; text-align: right;">{resumensaldoDeCapitalDespues}</td>
+                                </tr>
+                                <tr>
+                                <td style="width: 37.1467%;" width="266">Intereses por pagar</td>
+                                <td style="width: 6.55693%; text-align: center; height: 18px;">:</td>
+                                <!-- <td style="width: 23.155%; height: 18px; text-align: right;">{resumeninteresesPorPagarAntes}</td> -->
+                                <td style="width: 23.155%; height: 18px; text-align: right;">{resumeninteresxPagSinPrepago}</td>
+                                <td style="width: 9.3004%; height: 18px;">&nbsp;</td>
+                                <td style="width: 23.8409%; height: 18px; text-align: right;">{resumeninteresesPorPagarDespues}</td>
+                                </tr>
+                                </tbody>
+                                </table>
+                           
+                            <br/>
+                            <lightning-datatable
+                            key-field="id"
+                            data={dataPreview}
+                            columns={columnsPreview}
+                            hide-checkbox-column
+                            ></lightning-datatable>
+                        </template>
+                        <template if:true={mostrarError}>
+                            <table style="border-collapse: collapse; width: 100%; height: 310px;" border="0">
+                                <tr style="height: 18px;">
+                                    <td style="width: 25%; text-align: center; height: 18px;"><span style="color: #c91515;">Mensaje de Servicio:</span></td>
+                                    <td style="width: 75%; height: 18px;">{resumenMensajeServicio}</td>
+                                </tr>
+                            </table>
+                        </template>
+                    </template>
+                    <!--PANTALLAS DE EJECUCIÓN DE PREPAGO-->
+                     <!-- PANTALLA 1-->
+                     <template if:true={P1EjecucionValidacionDatos}>
+                        <lightning-radio-group name="radioP1EjecucionValidacionDatos"
+                            label="Seleccionar tipo de cuotas:"
+                            options={optionsRadioP1EjecucionValidacionDatos}
+                            value={valueRadioP1EjecucionValidacionDatos}
+                            type="radio"
+                            onchange={seleccionRadioP1EjecucionValidacionDatos}>
+                        </lightning-radio-group>
+                        <br/>
+                            <lightning-input type="number" name="importeRefinanciacionEjecucion" label="Importe de Refinanciación" placeholder="Monto" onchange={importeRefinanciacionCambioEjecucion} value={valueimporteRefinanciacionCambioEjecucion}></lightning-input>
+                            <lightning-input type="date" name="fechaDePrepago" label="Fecha de Prepago" value={fechaPrepagoEjecucion} onchange={handleFechaEjecucionChange}></lightning-input>
+                            <!--BUSQUEDA DE APODERADOS-->
+                            
+                            <c-cen-lookup-reusable label="Apoderado 1" selected-icon-name="standard:account" object-label="Apoderado"
+                                object-api-name="CEN_Apoderado__c" field-api-name="CEN_ApoderadoFormula__c" other-field-api-name="CEN_NombreApoderado__c"
+                                onvalueselected={handleValueSelectedOnAccount}>
+                            </c-cen-lookup-reusable>
+                            <c-cen-lookup-reusable label="Apoderado 2" selected-icon-name="standard:account" object-label="Apoderado"
+                                object-api-name="CEN_Apoderado__c" field-api-name="CEN_ApoderadoFormula__c" other-field-api-name="CEN_NombreApoderado__c"
+                                onvalueselected={handleValueSelectedOnAccount2}>
+                            </c-cen-lookup-reusable>
+                     </template>
+                     <template if:true={openConfirmacion}>  
+                        <div class="slds-modal slds-fade-in-open slds-backdrop">
+                            <div class="slds-modal__container">
+                                <div class="sldas-modal__header slds-theme_warning slds-p-vertical_medium">
+                                    <h3 class="slds-text-heading_medium slds-align_absolute-center">Confirmación</h3>  
+                                </div>
+                                <div class="slds-modal__content slds-p-around_medium">
+                                    <div class="slds-align_absolute-center"> <p>¿Está seguro de Ejecutar el Prepago?</p> </div>
+                                </div>
+                                <div class="slds-modal__footer">  
+                                    <lightning-button  class="slds-m-left_x-small" label="Cerrar" variant="brand" onclick={closeModalConfirmacion}> </lightning-button>
+                                    <lightning-button  class="slds-m-left_x-small" label="Confirmar" variant="brand"  onclick={confirmacionEjecutarPrepago}>   </lightning-button>  
+                                </div>  
+                            </div>  
+                        </div>  
+                    </template>
+                     <!-- PANTALLA 2-->
+                     <template if:true={P2EjecucionResumen}>
+                        <table style="border-collapse: collapse; width: 100%; height: 72px;" border="0">
+                            <tbody>
+                                <tr style="height: 18px;">
+                                    <td style="width: 100%; height: 18px;" colspan="3"><span style="color: #808080;">Enviar los siguientes datos del cliente para realizar su Prepago:</span></td>
+                                    </tr>
+                                <tr style="height: 18px;">
+                                    <td style="width: 45%; height: 18px; text-align: right;"><strong>Importe Ejecutado</strong></td>
+                                    <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                    <td style="width: 45%; height: 18px;">{resumenImporteSimulado}</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                    <td style="width: 45%; height: 18px; text-align: right;"><strong>Tipo de Prepago</strong></td>
+                                    <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                    <td style="width: 45%; height: 18px;">{tipoDePrepagoResumen}</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                    <td style="width: 45%; height: 18px; text-align: right;"><strong>Cuota Actual</strong></td>
+                                    <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                    <td style="width: 45%; height: 18px;">{resumenCuotaActual}</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                    <td style="width: 45%; height: 18px; text-align: right;"><strong>Nueva Cuota</strong></td>
+                                    <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                    <td style="width: 45%; height: 18px;">{resumenNuevaCuota}</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                    <td style="width: 45%; height: 18px; text-align: right;"><strong>Última Cuota</strong></td>
+                                    <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                    <td style="width: 45%; height: 18px;">{resumenUltimaCuota}</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                    <td style="width: 45%; height: 18px; text-align: right;"><strong>Fecha de Término</strong></td>
+                                    <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                    <td style="width: 45%; height: 18px;">{resumenFechaDeTermino}</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                    <td style="width: 45%; height: 18px; text-align: right;"><strong>Total de Cuotas</strong></td>
+                                    <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                    <td style="width: 45%; height: 18px;">{resumenTotalDeCuotas}</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                    <td style="width: 45%; height: 18px; text-align: right;"><strong>Cuotas por pagar</strong></td>
+                                    <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                    <td style="width: 45%; height: 18px;">{resumenCuotasPorPagar}</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                    <td style="width: 45%; height: 18px; text-align: right;"><strong>Precio de venta</strong></td>
+                                    <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                    <td style="width: 45%; height: 18px;">{resumenPrecioDeVentas}</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                    <td style="width: 45%; height: 18px; text-align: right;"><strong>Capital amortizado</strong></td>
+                                    <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                    <td style="width: 45%; height: 18px;">{resumenCapitalAmortizado}</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                    <td style="width: 45%; height: 18px; text-align: right;"><strong>Saldo de capital</strong></td>
+                                    <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                    <td style="width: 45%; height: 18px;">{resumenSaldoDeCapital}</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                    <td style="width: 45%; height: 18px; text-align: right;"><strong>Prepago</strong></td>
+                                    <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                    <td style="width: 45%; height: 18px;">{resumenPrepago}</td>
+                                </tr>
+                                <tr style="height: 18px;">
+                                    <td style="width: 45%; height: 18px; text-align: right;"><strong>Mensaje de Servicio</strong></td>
+                                    <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                    <td style="width: 45%; height: 18px;">{resumenMensajeServicio}</td>
+                                </tr>
+                            </tbody>
+                            </table>
+                     </template>
+                     <!-- GENERAR DOCUMENTOS-->
+                     <template if:true={P1GenerarDocumentos}>
+                        <br/>
+                        <p class="slds-align_absolute-center">¿Está seguro de generar los documentos de prepago?</p>
+                     </template>
+                     <template if:true={P2GenerarDocumentos}>
+                        <table style="border-collapse: collapse; width: 100%; height: 72px;" border="0">
+                            <tbody>
+                            <tr style="height: 18px;">
+                                <td style="width: 95%; height: 18px;" colspan="3"><span style="color: #808080;">Datos de documentación de Prepago</span></td>
+                            </tr>
+                            <tr style="height: 18px;">
+                                <td style="width: 45%; height: 18px; text-align: right;"><strong>URL documentos de Prepago:</strong></td>
+                                <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                <td style="width: 45%; height: 18px;"><a href={documentoUrl} target="_blank">Documentos de Prepago</a></td>
+                            </tr>
+                            
+                            <tr style="height: 18px;">
+                                <td style="width: 45%; height: 18px; text-align: right;"><strong>Fecha y Hora de Registro:</strong></td>
+                                <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                <td style="width: 45%; height: 18px;">{documentoFechaCarga}</td>
+                            </tr>
+                            <tr style="height: 18px;">
+                                <td style="width: 45%; height: 18px; text-align: right;"><strong>Estado:</strong></td>
+                                <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                <td style="width: 45%; height: 18px;">{documentoRespuesta}</td>
+                            </tr>
+                            <tr style="height: 18px;">
+                                <td style="width: 45%; height: 18px; text-align: right;"><strong>Mensaje:</strong></td>
+                                <td style="width: 5%; text-align: right; height: 18px;"><strong>&nbsp;</strong></td>
+                                <td style="width: 45%; height: 18px;">{documentoMensaje}</td>
+                            </tr>
+                            </tbody>
+                            </table>
+                     </template>
+
+                </div>
+                <!-- FOOTER DE MODAL-->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_brand" onclick={pasoAnterior}    disabled={desactivarAnterior}   title="Anterior">   Anterior    </button>
+                    <button class="slds-button slds-button_brand" onclick={pasoSiguiente}   disabled={desactivarSiguiente}  title={botonSiguiente}>  {botonSiguiente}   </button>
+                </footer>
+            </div>
+        </section>
+          
+    </template>
+</template>

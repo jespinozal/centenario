@@ -1,0 +1,86 @@
+<!-- apex page with Account standard controller renderAs="pdf"-->  
+<apex:page standardController="Account"
+            applyHtmlTag="false"
+            applyBodyTag="false"
+            showHeader="false"
+            renderAs="pdf"
+            title="Croquis"
+            extensions="CEN_AccountCroquis_cls">
+<head>
+    <style type="text/css">
+        /* @import url('http://fonts.cdnfonts.com/css/trebuchet-ms-2');
+
+        @page {
+        size: A4 portrait;
+        margin: 20px 30px 20px 30px;
+        padding: 20px 0 20px 0;
+        font-family: Trebuchet-MS;
+        @top-center {
+            content: element(header);
+        }
+        @bottom-center {
+            content: element(footer);
+        } 
+        }*/
+        html,
+        body {
+            font: 400 18px Roboto, Arial, sans-serif;
+            font-size: 12px;
+            height: 90%;
+            margin: 20px 30px 20px 30px;
+            padding: 0;
+            /*padding: 80px 0 20px 0;*/
+        }
+        .centerText {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <apex:form >
+        <h2 class="centerText">
+            <u>Referencia Dirección del cliente</u>
+        </h2>
+            <p>
+                NOMBRE: &nbsp;<apex:outputField value="{!Account.Name}"/>
+            </p>
+            <div style="display: {!IF(tipoCuenta == 'PersonAccount', '', 'none')};">
+                <p>
+                    <apex:outputField value="{!Account.CEN_Tipo_de_documento__pc}"/>: &nbsp;<apex:outputField value="{!Account.CEN_N_mero_de_documento__pc}"/>
+                </p>
+            </div>
+            <div style="display: {!IF(tipoCuenta != 'PersonAccount', '', 'none')};">
+                <p>
+                    <apex:outputField value="{!Account.CEN_Tipo_de_documento__c}"/>: &nbsp;<apex:outputField value="{!Account.CEN_Numero_de_documento_del__c}"/>
+                </p>
+            </div>
+
+            <p>
+                DIRECCION: &nbsp;<apex:outputField value="{!Account.CEN_Direccion__c} "/>
+            </p>
+            <!-- <p>
+                UBICACION: &nbsp;<apex:outputField value="{!Account.CEN_Ubicacion__c} "/>,&nbsp;
+            </p> -->
+            <p>
+                REFERENCIA: &nbsp;<apex:outputField value="{!Account.CEN_Referencia_direccion__c}"/>
+            </p>
+
+            <apex:image url="{!MapaReferencia}"/>
+            {!Account.CEN_URL_map__c}
+
+            <br></br>
+
+            <p>
+                <strong>
+                    * Favor indicar el nombre de las calles y lugares relevantes. 
+                </strong>
+            </p>
+            <br></br>
+            <br></br>
+            <br></br>
+            <p>_____________________</p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Firma Cliente</p>
+    </apex:form>
+</body>
+</apex:page>

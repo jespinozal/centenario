@@ -1,0 +1,95 @@
+<template>
+    <lightning-card title="Simulador de Financiamiento" icon-name="custom:custom63">
+        <div class="slds-p-around_medium">
+
+            <!--FORMULARIO DE ENTRADA-->
+            <div class="slds-box slds-theme_default slds-m-bottom_medium">
+                <h2 class="slds-text-heading_small slds-m-bottom_small">Datos de Entrada</h2>
+
+                <div class="slds-grid slds-wrap slds-gutters">
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input label="Producto" value={producto} onchange={handleChange} data-field="producto"></lightning-input>
+                    </div>
+
+                    <!--<div class="slds-col slds-size_1-of-2">
+                        <lightning-input label="% Inicial" type="number" value={porcentajeInicial} onchange={handleChange} data-field="porcentajeInicial"></lightning-input>
+                    </div>-->
+
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input label="Área (m²)" style="display:none" type="double" value={area} onchange={handleChange} data-field="area"></lightning-input>
+                    </div>
+
+                    <div class="slds-col slds-size_1-of-2" style="display:none">
+                        <lightning-input label="Precio por m²" type="double" value={precioM2} onchange={handleChange} data-field="precioM2"></lightning-input>
+                    </div>
+
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input label="Monto a Financiar" disabled="true" type="double" value={montoFinanciar} onchange={handleChange} data-field="montoFinanciar"></lightning-input>
+                    </div>
+
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input label="TEA (%)" type="number" value={tea} min="11" max="13" onchange={handleChange} data-field="tea"></lightning-input>
+                    </div>
+
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input label="N° Cuotas" type="number" value={numCuotas} max="48" onchange={handleChange} data-field="numCuotas"></lightning-input>
+                    </div>
+
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input label="Fecha de Vencimiento" type="date" value={fechaVencimiento} onchange={handleChange} data-field="fechaVencimiento"></lightning-input>
+                    </div>
+                </div>
+
+                <div class="slds-m-top_medium slds-align_absolute-center">
+                    <lightning-button variant="brand" label="Calcular" onclick={calcular}></lightning-button>
+                </div>
+            </div>
+
+            <!--RESULTADOS GENERALES-->
+            <div class="slds-box slds-theme_shade slds-m-bottom_medium">
+                <h2 class="slds-text-heading_small slds-m-bottom_small">Resultados del Cálculo</h2>
+
+                <div class="slds-grid slds-wrap slds-gutters">
+                    <template for:each={resultados} for:item="res">
+                        <div key={res.label} class="slds-col slds-size_1-of-3 slds-p-bottom_small">
+                            <p class="slds-text-title">{res.label}</p>
+                            <p class="slds-text-body_regular slds-text-color_success"><strong>{res.value}</strong></p>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!--TABLA DE AMORTIZACIÓN-->
+            <div class="slds-box slds-theme_default">
+                <h2 class="slds-text-heading_small slds-m-bottom_small">Tabla de Amortización</h2>
+
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th scope="col">N°</th>
+                            <th scope="col">Fecha Vcto</th>
+                            <th scope="col">Saldo Capital</th>
+                            <th scope="col">Intereses</th>
+                            <th scope="col">Capital</th>
+                            <th scope="col">Total Cuota</th>
+                            <th scope="col">Total Pago</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={tablaAmortizacion} for:item="cuota">                            
+                            <tr key={cuota.numero} class={cuota.rowClass}>
+                                <td>{cuota.numero}</td>
+                                <td>{cuota.fechaVcto}</td>
+                                <td>{cuota.saldoCapital}</td>
+                                <td>{cuota.intereses}</td>
+                                <td>{cuota.capital}</td>
+                                <td>{cuota.totalCuota}</td>
+                                <td>{cuota.totalPago}</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </lightning-card>
+</template>

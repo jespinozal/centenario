@@ -1,0 +1,83 @@
+<!--
+ /********************************************************************* 
+* @author: @everis.com 
+* @date: 2021-06-26
+* @description: Visualforce para la generación de PDF de la solicitud
+                de cambio de titularidad
+* Name: CEN_OwnershipTransferPDF_vf
+* ClassController: CEN_OwnershipTransferPDF_ctr
+* 
+* VERSION      DATE                 AUTOR                   ACTION 
+* 0.1          2021-06-26           augusto.nayib.tamayo.bedregal@nttdata.com             Creación 
+*  
+*********************************************************************/
+-->
+
+<apex:page applyHtmlTag="false"
+  applyBodyTag="false"
+  showHeader="false"
+  renderAs="pdf"
+  standardController="Opportunity"
+  extensions="CEN_OwnershipTransferPDF_ctr"
+  title="PDF Cesión de abonos"
+>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <style type="text/css">
+
+      @import url('http://fonts.cdnfonts.com/css/trebuchet-ms-2');
+
+      @page {
+        size: A4 portrait;
+        margin: 2.5cm 3cm 2.5cm 3cm;
+        padding: 0px 0 15px 0;
+        font-family: Trebuchet-MS;        
+      }
+
+      .bodyStyle {
+        font-family: "Trebuchet MS", sans-serif;
+        font-size: 12px;
+        text-align: justify;
+      }
+
+    </style>
+  </head>
+  <div class="header bodyStyle">
+    <div>
+      <!--Header PDF-->
+      <p style="text-align: center; font-weight: bold">CESION DE ABONOS</p>
+      <p><br/></p>
+    </div>
+    <div>
+      <p style = "align=justify style;line-height:170%;font-size:110%">Estimados señores&nbsp;<apex:outputText value="{!societyName}"/>.</p>
+      <p style = "align=justify style;line-height:170%;font-size:110%">Yo,&nbsp;<apex:outputText value="{!cuenta.name}"/>, identificado(a) con&nbsp;<apex:outputText value="{!tipoDocumento}"/>&nbsp;N°&nbsp;<apex:outputText value="{!documento}"/>&nbsp;y domicilio ubicado en&nbsp;<apex:outputText value="{!domicilio}"/>&nbsp;en adelante EL CEDENTE, cedo a favor de&nbsp;<apex:outputText value="{!cuentaNueva.name}"/>, identificado(a) con&nbsp;<apex:outputText value="{!tipoDocumentoNueva}"/>&nbsp;N°&nbsp;<apex:outputText value="{!documentoNueva}"/>&nbsp;y domicilio ubicado en&nbsp;<apex:outputText value="{!domicilioNueva}"/>, en adelante EL CESIONARIO, los abonos realizados a favor de&nbsp;<apex:outputText value="{!societyName}"/>&nbsp;por un monto total de&nbsp;<apex:outputText value="{!oportunidad.CEN_AmountPaidDate__c}"/>&nbsp;<apex:outputText value="{!moneda}"/> y acepto el levantamiento de la reserva de los lotes&nbsp;<apex:outputText value="{!loteConcat}"/>.</p>
+      <p><br/></p>
+      <p style = "align=justify style;line-height:170%;font-size:110%">En ese sentido EL CESIONARIO podrá utilizar los referidos abonos para la reserva o compra de lotes a cualquiera de las empresas del Grupo CENTENARIO o excepcionalmente, para solicitar la devolución del dinero abonado.</p>
+      <p><br/></p>
+      <p style = "align=justify style;line-height:170%;font-size:110%">Finalmente EL CEDENTE y EL CESIONARIO dejamos constancia de que el acuerdo se realizó en la relación interna y declaramos que&nbsp;<apex:outputText value="{!societyName}"/>&nbsp;no tiene conocimiento de los referidos acuerdos.</p>
+    </div>
+    <div>
+      <p><br/></p>
+      <p style="color: rgb(0, 0, 0); font-weight: bold"><apex:outputText value="{!writeToday}" /><apex:outputText value="{!CASE(MONTH(DATEVALUE(NOW())),
+        1, 'Enero',
+        2, 'Febrero',
+        3, 'Marzo', 
+        4, 'Abril', 
+        5, 'Mayo', 
+        6, 'Junio',
+        7, 'Julio',
+        8, 'Agosto',
+        9, 'Setiembre',
+        10, 'Octubre',
+        11, 'Noviembre',
+        12, 'Diciembre',
+        '-')}" /><apex:outputText value="{!writeTodayB}" /></p>
+      <p><br/></p>
+      <p><br/></p>
+      <p><br/></p>
+      <p><br/></p>
+      <p><br/></p>
+      <p style="text-align: center;font-weight: bold">FIRMA DEL CEDENTE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FIRMA DEL CESIONARIO</p>
+    </div>
+  </div>  
+</apex:page>

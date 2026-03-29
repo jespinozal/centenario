@@ -1,0 +1,127 @@
+<aura:component access="global">
+  <aura:attribute name="objInputBuscador" type="Object" access="global" />
+  <aura:attribute name="optionsTipoDocumento" type="List" access="global" />
+
+  <!--data inputs-->
+  <aura:attribute name="in_nroCotizacion" type="String" access="private" />
+  <aura:attribute name="in_fechaCotizacion" type="Date" access="private" />
+  <aura:attribute name="in_nombreCliente" type="String" access="private" />
+  <aura:attribute name="in_apellidoCliente" type="String" access="private" />
+  <aura:attribute name="in_tipoDocumento" type="String" access="private" />
+  <aura:attribute name="in_nroDocumento" type="String" access="private" />
+
+  <!--HANDLER-->
+  <aura:handler
+    name="change"
+    value="{!v.in_nroCotizacion}"
+    action="{!c.onChangeObjInputBuscador}"
+  />
+  <aura:handler
+    name="change"
+    value="{!v.in_fechaCotizacion}"
+    action="{!c.onChangeObjInputBuscador}"
+  />
+  <aura:handler
+    name="change"
+    value="{!v.in_nombreCliente}"
+    action="{!c.onChangeObjInputBuscador}"
+  />
+  <aura:handler
+    name="change"
+    value="{!v.in_apellidoCliente}"
+    action="{!c.onChangeObjInputBuscador}"
+  />
+  <aura:handler
+    name="change"
+    value="{!v.in_tipoDocumento}"
+    action="{!c.onChangeObjInputBuscador}"
+  />
+  <aura:handler
+    name="change"
+    value="{!v.in_nroDocumento}"
+    action="{!c.onChangeObjInputBuscador}"
+  />
+
+  <!--EVENTS-->
+  <aura:registerEvent
+    name="eventoEnviarAccion"
+    type="c:CEN_cmp_buscarCotizacionlibre_evt"
+  />
+
+  <div
+    class="sdls-grid slds-grid_vertical slds-wrapper slds-gutters_x-small slds-p-bottom_x-small"
+  >
+    <div class="slds-col slds-size_1_of_1 slds-grid">
+      <div class="slds-col slds-size_3-of-12">
+        <lightning:input
+          name="Nombres"
+          label="Nombres"
+          value="{!v.in_nombreCliente}"
+        />
+      </div>
+      <div class="slds-col slds-size_3-of-12">
+        <lightning:input
+          name="Apellidos"
+          label="Apellidos"
+          value="{!v.in_apellidoCliente}"
+        />
+      </div>
+      <div class="slds-col slds-size_3-of-12">
+        <lightning:select
+          aura:id="tipoDocumento"
+          name="Tipo de Documento"
+          label="Tipo de Documento"
+          onchange="{!c.onchangeTipoDocumento}"
+        >
+          <aura:iteration items="{!v.optionsTipoDocumento}" var="option">
+            <option
+              text="{!option.label}"
+              value="{!option.value}"
+              selected="{!option.selected}"
+            />
+          </aura:iteration>
+        </lightning:select>
+      </div>
+      <div class="slds-col slds-size_3-of-12">
+        <lightning:input
+          name="Nro de Documento"
+          label="Nro de Documento"
+          value="{!v.in_nroDocumento}"
+        />
+      </div>
+    </div>
+    <div class="slds-col slds-size_1_of_1 slds-grid">
+      <div class="slds-col slds-size_3-of-12">
+        <lightning:input
+          name="Nro Cotización"
+          label="Nro Cotización"
+          value="{!v.in_nroCotizacion}"
+        />
+      </div>
+      <div class="slds-col slds-size_3-of-12">
+        <lightning:input
+          name="Fecha Cotización"
+          label="Fecha Cotización"
+          value="{!v.in_fechaCotizacion}"
+          type="date"
+        />
+      </div>
+      <div
+        class="slds-col slds-size_6-of-12"
+        style="align-self: flex-end; text-align-last: right"
+      >
+        <lightning:button
+          label="Buscar"
+          title="Buscar cotizaciones libres"
+          onclick="{! c.onclickBuscar }"
+          variant="brand"
+        />
+        <lightning:button
+          label="Limpiar"
+          title="Limpiar los filtros ingresados"
+          onclick="{! c.onclickLimpiarFiltros }"
+        />
+      </div>
+    </div>
+  </div>
+</aura:component>

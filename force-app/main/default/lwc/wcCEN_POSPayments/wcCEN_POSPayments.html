@@ -1,0 +1,76 @@
+<template>
+    <lightning-card>
+        <h3>
+            <lightning-icon icon-name="standard:filter" size="small"></lightning-icon>
+            &nbsp;&nbsp;Filtros de busqueda
+        </h3>
+        <br/>
+        <div class="slds-grid slds-wrap">
+            <div class="slds-size_6-of-12">
+                <lightning-input type="text" name="vAmount" label="Monto" placeholder="Ingresar monto"></lightning-input>
+            </div>
+            <div class="slds-size_6-of-12 slds-p-left_small">
+                <lightning-input type="text" name="vAutorizacion" label="Código Autorización" placeholder="Ingresar código de autorización"></lightning-input>
+            </div>
+            <div class="slds-size_6-of-12">
+                <lightning-input type="text" name="vCode" label="Código Pago" placeholder="Ingresar el código"></lightning-input>
+            </div>
+            <div class="slds-size_6-of-12 slds-p-left_small">
+                <lightning-input type="text" name="vCard" label="Últimos 4 dígitos de la tarjeta" placeholder="Ingresar los 4 últimos digitos de la tarjeta"></lightning-input>
+            </div>
+            <div class="slds-size_6-of-12">
+                <lightning-input type="date" name="vCreationDateFrom" label="Fecha Desde" required></lightning-input>
+            </div>
+            <div class="slds-size_6-of-12 slds-p-left_small">
+                <lightning-input type="date" name="vCreationDateTo" label="Fecha Hasta" required></lightning-input>
+            </div>
+            <div class="slds-size_6-of-12 slds-p-left_small">
+                <br/>
+                <lightning-input type="toggle" name="vTrasladoAbonos" label="Traslado de Abonos" onchange={changeToggle}></lightning-input>
+            </div>
+            <div class="slds-size_6-of-12 slds-p-left_small">
+                <br/>
+                <div class="slds-float_right">
+                    <lightning-button label="Buscar" onclick={searchClick} variant="brand"></lightning-button>
+                </div>
+            </div>
+        </div>
+        <br/> 
+        <h3>
+            <lightning-icon icon-name="standard:picklist_type" size="small"></lightning-icon>
+            &nbsp;&nbsp;Lista de Cargos Culqi
+        </h3>
+        <br/>
+        <div style="height: 200px">
+        <lightning-datatable
+            key-field="id"
+            data={getPaymentData}
+            columns={columns}
+            selected-rows={selectedRows}
+            onrowselection={getSelectedName}
+            sorted-by={sortBy}
+            sorted-direction={sortDirection}
+            onsort={handleSortAccountData}
+        >
+        </lightning-datatable>
+        </div>
+        <br/>
+
+        <template if:false={loaded}>
+            <div class="slds-spinner_container">
+                <lightning-spinner alternative-text="Loading"></lightning-spinner>
+            </div>
+        </template>
+        <div slot="footer" class="slds-box slds-box_small slds-theme_shade">
+            <div class="slds-clearfix">
+                <div class="slds-float_right">
+                    <lightning-button class="slds-p-left_small" label="Generar Pago" onclick={generateClick} variant="brand"></lightning-button>
+                    <lightning-button class="slds-p-left_small" label="Regresar" onclick={backClick}></lightning-button>
+                    <lightning-button class="slds-p-left_small" label="Cancelar" onclick={cancelClick}></lightning-button>
+                </div>
+            </div>
+        </div>
+    </lightning-card>
+       
+    
+</template>

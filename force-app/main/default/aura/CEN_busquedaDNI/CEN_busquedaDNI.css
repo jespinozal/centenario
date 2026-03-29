@@ -1,0 +1,109 @@
+.THIS lightning-button {
+    flex: 1; 
+    margin: 0 10px; 
+}
+
+.THIS .button-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.THIS .left-buttons, .THIS .right-buttons {
+    display: flex;
+}
+
+.THIS .left-buttons lightning-button, .THIS .right-buttons lightning-button {
+    margin: 0 5px; /* Ajusta el espacio entre los botones */
+}
+
+.THIS .alert-message{
+    border: 2px solid #FFCA5F;
+    border-radius: 15px;
+    padding: 12px;
+    background-color: #FEF9B4;
+    text-align: center;
+}
+
+.THIS .display-section-none{
+    display: none;
+}
+
+.THIS .info-prospecto-cita{
+    border: 2px solid #36932f;
+    border-radius: 15px;
+    padding: 12px;
+    background-color: #acefd6;
+    text-align: center;
+    width: -webkit-fill-available;
+}
+
+.THIS .info-prospecto-no-cita{
+    border: 2px solid #FFCA5F;
+    border-radius: 15px;
+    padding: 12px;
+    background-color: #FEF9B4;
+    text-align: center;
+}
+
+.THIS .info-prospecto-asignacion{
+    border: 2px solid #407ebb;
+    border-radius: 15px;
+    padding: 12px;
+    background-color: #bbd0ff;
+    text-align: center;
+    width: -webkit-fill-available;
+}
+
+.THIS .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 2px solid #000000;
+    border-radius: 10px;
+    padding: 5px;
+    background-color: #E8E8E8;
+    margin: 8px;
+}
+  
+.THIS .left {
+    flex: 1.5;
+    width: 200px;
+    height: 100%;
+    padding: 8px;
+    padding-left: 25px;
+    text-align: left;
+    font-size: 14px;
+}
+  
+.THIS .right {
+    flex: 1;
+    height: 100%; 
+    padding: 8px;
+}
+
+.THIS .custom-button{
+    font-size: 14px;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.THIS .actualizar-info-post-venta{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.THIS .content-modal-style{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.THIS .titulo-prospecto-cuenta{
+    font-size: 17px;
+    margin: 10px;
+}
+
+.THIS .content-modal-verde{
+    display: grid;
+}

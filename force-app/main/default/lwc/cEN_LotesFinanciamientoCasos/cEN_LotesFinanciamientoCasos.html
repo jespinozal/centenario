@@ -1,0 +1,101 @@
+<template>
+    <!-- COMPONENTE INICIAL-->
+    <lightning-card  variant="Narrow"  title="Financiamiento y Lotes Relacionados" icon-name="standard:search">
+        <!--BOTON DE BUSQUEDA-->
+        <lightning-button variant="border-filled" label="Seleccionar" slot="actions" title="Modificar Financiamiento y Lotes Relacionados" onclick={openModal} class="slds-m-left_x-small">
+        </lightning-button>
+        <template if:true={showFinanciamiento}>
+            
+            <p class="slds-p-horizontal_small">
+                 Financiamiento: {numeroFinanciamiento}
+                 &nbsp;&nbsp;Estado: {estadoFinanciamiento}
+            </p>
+        </template>
+        
+        <template for:each={lotesResumen} for:item="loteResumen">
+            
+            <p class="slds-p-horizontal_small" key={loteResumen.nombreLote}><br/>
+                <lightning-icon icon-name="action:new_account" size="xx-small" alternative-text="Account" title="Account">
+                </lightning-icon>
+                &nbsp;<a href={loteResumen.idLote}>{loteResumen.nombreLote}</a>
+            </p>
+        </template>
+        
+    </lightning-card>
+    
+    <!-- MODAL DE BUSQUEDA DE LOTES-->
+    <!-- CONDICIONAL PARA MOSTRAR EL MODAL-->
+    <template if:true={isModalOpen}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_medium ">
+            <div class="slds-modal__container" >
+                <template if:true={mostrarSpinner} style="height: 200px; position:relative">
+                    <lightning-spinner alternative-text="Loading" variant="base" size="medium"></lightning-spinner>
+                </template>
+                <!-- HEADER DE MODAL -->
+                <header class="slds-modal__header">
+                    <!-- BOTON PARA CERRAR EL MODAL-->
+                    <button class="slds-button slds-button_icon slds-modal__close " title="Cerrar" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="Cerrar"
+                            variant="brand"
+                            size="small" ></lightning-icon>
+                        <label class="slds-assistive-text">Cerrar</label>
+                    </button>
+                    <!-- TITULO DE HEADER-->
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Búsqueda de {financiamientoLoteTitulo}</h2>
+                </header>
+                <!-- BODY DE MODAL-->
+                <div class="slds-modal__content slds-var-p-around_large" id="modal-content-id-1">
+                    <!-- GUIA DE USUARIO-->
+                    <lightning-progress-indicator current-step={pasoSeleccionado} type="base" variant="base">
+                        <template for:each={steps} for:item="step">
+                            <lightning-progress-step label={step.label} value={step.value} key={step.label}></lightning-progress-step>
+                        </template>
+                    </lightning-progress-indicator>
+                    <!--PANTALLA 1-->
+                    <template if:true={financiamientoLoteOpenP1}>
+                        <lightning-radio-group name="radioGroup"
+                            label="Busqueda por:"
+                            options={options}
+                            value={value}
+                            type="radio"
+                            onchange={seleccionRadio}></lightning-radio-group>
+                    </template>
+                    <!-- PANTALLA 2-->
+                    <template if:true={financiamientoOpenP2}>
+                        <!-- sldsValidatorIgnoreNextLine -->
+                        <lightning-datatable
+                        key-field="id"
+                        data={dataFinanciamiento}
+                        columns={columnsFinanciamiento}
+                        onrowselection={financiamientoSeleccionado}
+                        max-row-selection="1"
+                        >
+                        </lightning-datatable>
+                    </template>
+                    <!-- PANTALLA 3-->
+                    <template if:true={lotesOpenP3}>
+                        <!-- sldsValidatorIgnoreNextLine -->
+                        <lightning-datatable
+                        key-field="id"
+                        data={dataLotes}
+                        columns={columnsLotes}
+                        onrowselection={loteSeleccionado}
+                        >
+                        </lightning-datatable>
+                    </template>
+                     <!-- PANTALLA 4-->
+                     <!--<template if:true={confirmacionOpenP4}>
+                        Selección guardada con éxito.
+                     </template>-->
+                </div>
+                <!-- FOOTER DE MODAL-->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_brand" onclick={pasoAnterior}    disabled={desactivarAnterior}   title="Anterior">   Anterior    </button>
+                    <button class="slds-button slds-button_brand" onclick={pasoSiguiente}   disabled={desactivarSiguiente}  title={botonSiguiente}>  {botonSiguiente}   </button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

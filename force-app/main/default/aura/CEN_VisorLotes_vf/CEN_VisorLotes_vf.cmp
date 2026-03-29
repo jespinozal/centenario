@@ -1,0 +1,342 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens,lightning:availableForFlowScreens"
+                access="global" 
+                controller="dataTableCtrl">
+    <!-- call doInit method on component load -->
+    <aura:attribute name="idProyecto" default="false" type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+	<!-- aura attributes to store data/values --> 
+    <aura:attribute name="listOfAllAccountsFilter" type="Object"/>
+    
+    <aura:attribute name="dataCharged" default="false" type="Boolean"/>
+	<aura:attribute name="listOfAllAccounts" type="list"/> 
+    <aura:attribute name="dataVisible" type="list"/>
+    <aura:attribute name="PaginationList" type="list"/> 
+    <aura:attribute name="selectedCount" type="integer" default="0" description="selected Records Count"/>
+    <aura:attribute name="startPage" type="Integer" />
+    <aura:attribute name="endPage" type="Integer"/>
+    <aura:attribute name="totalRecordsCount" type="Integer"/>
+    <aura:attribute name="pageSize" type="Integer" default="9" description="number of records to be display on per page"/>
+    <aura:attribute name="currentPage" type="integer" default="1"/>
+    <aura:attribute name="totalPagesCount" type="integer"/>
+    <aura:attribute name="bNoRecordsFound" type="boolean"/>
+    <aura:attribute name="serviceMensaje" type="String"/>
+    
+    <aura:attribute name="selectChangeTamanioEnabled" default="false" type="Boolean"/>
+    <aura:attribute name="selectChangePrecioEnabled" default="false" type="Boolean"/>
+    
+    <aura:attribute name="sliderTamaniomin" default="0.00" type="Decimal"/>
+    <aura:attribute name="sliderTamaniomax" default="0.00" type="Decimal"/>
+    <aura:attribute name="sliderTamanio1Value" default="0.00" type="Decimal"/>
+    <aura:attribute name="sliderTamanio2Value" default="0.00" type="Decimal"/>
+    
+    <aura:attribute name="sliderPreciomin" default="0.00" type="Decimal"/>
+    <aura:attribute name="sliderPreciomax" default="0.00" type="Decimal"/>
+    <aura:attribute name="sliderPrecio1Value" default="0.00" type="Decimal"/>
+    <aura:attribute name="sliderPrecio2Value" default="0.00" type="Decimal"/>
+    
+    <aura:attribute name="selectedValueEstado" default="Libre" type="String"/>
+    
+    <!--Valores usados para la salida del componente-->
+    <aura:attribute name="idlote" default="" type="integer"/>
+    <aura:attribute name="area" default="" type="integer"/>
+    <aura:attribute name="preciom2" default="" type="integer"/>
+    
+    
+    <aura:attribute name="lote" default="" type="string"/>
+    <aura:attribute name="manzana" default="" type="string"/>
+    <aura:attribute name="tipologia" default="" type="string"/>
+    <aura:attribute name="estado" default="" type="string"/>
+    
+    <aura:if isTrue="{!v.bNoRecordsFound}">
+        
+        <!--display error message if there is no records available -->
+		<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_info" role="alert">
+            <span class="slds-assistive-text">error</span>
+            <h2>No se encontraron lotes. {!v.serviceMensaje}</h2>
+        </div>
+        
+        <!-- message if there is records available -->
+        <aura:set attribute="else">
+            
+            <div class="slds-grid">
+                <div class="slds-col">
+                    <lightning:input name="manzana"
+                                class="slds-size_2-of-2  slds-p-around_xxx-small"
+                                             required="false"
+                                             placeholder="Ingrese la Manzana (A)"
+                                             aura:id="manzana"
+                                             label="Ingrese la Manzana"/>
+                    <lightning:input name="lote"	
+                                class="slds-size_2-of-2 slds-p-around_xxx-small"
+                                             required="false"
+                                             placeholder="Ingrese el Lote (Lt.1)"
+                                             aura:id="lote"
+                                             label="Ingrese el lote"/>
+                    <lightning:select name="selectEstado" label="¿Estado del Lote?" required="false" value="{!v.selectedValueEstado}">
+                        <option value="">Seleccione un estado</option>
+                        <option value="Entregado">Entregado</option>
+                        <option value="Borrado">Borrado</option>
+                        <option value="Libre">Libre</option>
+                        <option value="Bloqueado">Bloqueado</option>
+                        <option value="Vendido">Vendido</option>
+                        <option value="Reservado">Reservado</option>
+                    </lightning:select>
+                </div>
+            
+           		<div class="slds-col">
+           			<div class="slds-m-around--large">
+                          <!--PART 1 for create toggle switch/checkbox form element-->    
+                        	<div class="slds-form-element">
+                                <label class="slds-checkbox_toggle slds-grid">
+                                  <span class="slds-form-element__label slds-m-bottom_none">Por tamaño</span>
+                                   <ui:inputCheckbox change="{!c.selectChange}"/>
+                                  <span id="toggle-desc" class="slds-checkbox_faux_container" aria-live="assertive">
+                                    <span class="slds-checkbox_faux"></span>
+                                    <span class="slds-checkbox_on">On</span>
+                                    <span class="slds-checkbox_off">Off</span>
+                                  </span>
+                                </label>
+                       		</div>
+                            <!--PART 2 : create a Div with slds-hide class, control by toggle checkbox-->        
+                           	<div aura:id="DivID" class="slds-hide">
+                              	<fieldset class="slds-form-element">
+                                	<legend class="slds-form-element__legend slds-form-element__label">M2</legend>	
+                                   		<div class="slds-form-element">
+                                         	<label class="slds-form-element__label" for="slider-id-01">
+                                                <span class="slds-slider-label">
+                                                  <span class="slds-slider-label__range">{!v.sliderTamanio1min} - {!v.sliderTamanio2max}</span>
+                                                </span>
+                                          	</label>
+                                     	<div class="slds-form-element__control">
+                                              <div class="slds-size_2-of-2">
+                                                  <lightning:input type="number"
+                                                                   name="tamanio1Value"
+                                                                   label="{!'Mayor a ' + v.sliderTamaniomin}"
+                                                                   value="{!v.sliderTamanio1Value}"
+                                                                   min="{!v.sliderTamaniomin}"
+                                                                   max="{!v.sliderTamaniomax}"/>
+                                              </div>
+                                              <div class="slds-size_2-of-2">
+                                                  <lightning:input type="number"
+                                                                   name="tamanio2Value" 
+                                                                   label="{!'Menor a ' + v.sliderTamaniomax}" 
+                                                                   value="{!v.sliderTamanio2Value}"
+                                                                   min="{!v.sliderTamaniomin}" 
+                                                                   max="{!v.sliderTamaniomax}"/>
+                                              </div>
+                                     	</div>
+                                        </div>	
+                                  </fieldset> 
+                       		</div>
+              	</div>
+            </div>
+            
+            <div class="slds-col">
+               <div class="slds-m-around--large">
+                  <!--PART 1 for create toggle switch/checkbox form element-->    
+                  <div class="slds-form-element">
+                    <label class="slds-checkbox_toggle slds-grid">
+                      <span class="slds-form-element__label slds-m-bottom_none">Por precio</span>
+                       <ui:inputCheckbox change="{!c.selectChange2}"/>
+                      <span id="toggle-desc" class="slds-checkbox_faux_container" aria-live="assertive">
+                        <span class="slds-checkbox_faux"></span>
+                        <span class="slds-checkbox_on">On</span>
+                        <span class="slds-checkbox_off">Off</span>
+                      </span>
+                    </label>
+                  </div>
+                    <!--PART 2 : create a Div with slds-hide class, control by toggle checkbox-->        
+                       <div aura:id="DivID2" class="slds-hide">
+                           <fieldset class="slds-form-element">
+                               <legend class="slds-form-element__legend slds-form-element__label">S/.Mil</legend>	
+                                <div class="slds-form-element">
+                                  <label class="slds-form-element__label" for="slider-id-01">
+                                    <span class="slds-slider-label">
+                                      <span class="slds-slider-label__range">{!v.sliderPrecio1min} - {!v.sliderPrecio2max}</span>
+                                    </span>
+                                  </label>
+                                  <div class="slds-form-element__control">
+                                     <div class="slds-size_2-of-2">
+                                          <lightning:input type="number" 
+                                                           name="precio1Value" 
+                                                           label="{!'Mayor a ' + v.sliderPreciomin}"
+                                                           value="{!v.sliderPrecio1Value}"
+                                                           min="{!v.sliderPreciomin}" 
+                                                           max="{!v.sliderPreciomax}"/>
+                                      </div>
+                                      <div class="slds-size_2-of-2">
+                                          <lightning:input type="number"
+                                                           name="precio2Value" 
+                                                           label="{!'Menor a ' + v.sliderPreciomax}"
+                                                           value="{!v.sliderPrecio2Value}" 
+                                                           min="{!v.sliderPreciomin}"
+                                                           max="{!v.sliderPreciomax}"/>
+                                      </div>
+                                  </div>
+                                </div>	
+                          </fieldset> 
+                       </div>
+                </div>
+        	</div>
+            </div>   
+            
+            
+            
+            
+            
+            
+            
+            <div style="height: 40px" class="slds-size_2-of-2 slds-p-around_xxx-small">
+                <div class ="slds-align_absolute-center">
+                	<lightning:button variant="brand"
+                                  label="Filtrar " 
+                                  title="Filtrar Tabla" 
+                                  disabled="{!v.dataCharged}"	
+                                  onclick="{! c.filterDataTable }" />
+                	<lightning:button variant="Neutral"
+                                  label="Limpiar filtros" 
+                                  title="Limpiar filtros de la tabla" 
+                                  disabled="{!v.dataCharged}"	
+                                  onclick="{! c.cleanFilters }" />
+               	</div>
+        	</div>
+            
+		 <!-- lightning:button to get selected rows data -->
+            <!--
+            <div class="slds-clearfix slds-m-around_small">
+                <div class="slds-clearfix">
+                    <div class="slds-float_right">
+                        <lightning:button variant="destructive"
+                                          label="Cotizar Lote"
+                                          onclick="{! c.getSelectedRecords }"
+                                          disabled="{!v.selectedCount == 0}"/>
+                    </div>
+                </div>
+            </div>
+			-->
+         <!-- display total record and selected record count -->    
+            <p class="slds-m-around_small">
+                <span class="slds-badge slds-badge_lightest" style="display:inline-block">
+                    Total de Registros : {!v.selectedCount > 0 ? v.selectedCount + '/' : ''} {!v.totalRecordsCount} 
+                </span>
+            </p>
+			
+           <!-- data table start-->  
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                <lightning:spinner class="spins" aura:id="mySpinner" variant="brand" alternativeText="Loading"/>
+                <thead>
+                    <tr class="slds-text-title_caps">
+					<!--header checkbox for select all-->
+                        <th style="width:3.25rem;" class="slds-text-align_right">
+                           <!-- <div class="slds-form-element">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-checkbox">
+                                        <ui:inputCheckbox disabled="{!v.totalRecordsCount == 0}"
+                                                          aura:id="selectAllId"
+                                                          change="{!c.selectAllCheckbox}"/>
+                                        <span class="slds-checkbox_faux"></span>
+                                        <span class="slds-form-element__label"></span>
+                                    </label>
+                                </div>
+                            </div>-->
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Name">Lote</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Phone">Área</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Type">Precio M2</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Type">Precio Total</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Type">Manzana</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Type">Estado</div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <aura:iteration items="{!v.PaginationList}" var="obj">
+                        <tr>
+                            <th scope="row" class="slds-text-align_right" style="width:3.25rem;">
+                                <div class="slds-form-element">
+                                    <div class="slds-form-element__control">
+                                        <label class="slds-checkbox">
+                                            <ui:inputCheckbox text="{!obj.objAccount.Id}"
+                                                              value="{!obj.isChecked}"
+                                                              change="{!c.checkboxSelect}"/>
+                                            <span class="slds-checkbox_faux"></span>
+                                            <span class="slds-form-element__label text"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </th>
+                            <th scope="row">
+                                <div class="slds-truncate" title="{!obj.Descripcionlote}">
+                                    {!obj.Descripcionlote}
+                                </div>
+                            </th> 
+                            <th scope="row">
+                                <div class="slds-truncate" title="{!obj.Area}">
+                                    {!obj.Area}
+                                </div>
+                            </th>
+                            <th scope="row">
+                                <div class="slds-truncate" title="{!obj.Precioventam2fun}">
+                                    {!obj.Precioventam2fun}
+                                </div>
+                            </th>
+                            <th scope="row">
+                                <div class="slds-truncate" title="{!obj.Precioventafun}">
+                                    {!obj.Precioventafun}
+                                </div>
+                            </th>
+                            <th scope="row">
+                                <div class="slds-truncate" title="{!obj.Manzana}">
+                                    {!obj.Manzana}
+                                </div>
+                            </th>
+                            <th scope="row">
+                                <div class="slds-truncate" title="{!obj.Codestadolote}">
+                                    {!obj.Codestadolote}
+                                </div>
+                            </th>
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+             <!-- DataTable End -->
+            <br/>
+            <!--  Pagination Buttons Start -->
+            <div class="slds-align_absolute-center">         
+                <lightning:button label="Anterior"
+                                  disabled="{!v.startPage == 0}"  
+                                  onclick="{!c.navigation}"
+                                  variant="brand"
+                                  iconName="utility:back"
+                                  name="Previous"/>
+                
+                <span class="slds-badge slds-badge_lightest"
+                      style="margin-right: 10px;margin-left: 10px;">
+                    Página {!v.currentPage} de {!v.totalPagesCount}
+                </span>
+                
+                <lightning:button label="Siguiente"
+                                  disabled="{!(v.endPage + 1) >= v.totalRecordsCount}" 
+                                  onclick="{!c.navigation}"
+                                  variant="brand"
+                                  iconName="utility:forward"
+                                  iconPosition="right"
+                                  name="Next"/>
+            </div>  
+            <!--  Pagination Buttons End -->
+        </aura:set> 
+    </aura:if>
+</aura:component>

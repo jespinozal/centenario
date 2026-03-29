@@ -1,0 +1,49 @@
+.THIS .sangria {
+    width: 80%;
+    margin-left: 8.5%;
+    margin-right: 8.5%;
+}
+
+.THIS.scrollerSize {
+    height: 300px;
+}
+
+.THIS .slds-spinner_container {
+    z-index: 10000;
+    position: fixed;
+}
+.THIS .slds-spinner_container {
+    background-color: transparent;
+}
+
+.THIS .slds-spinner_container {
+    background-color: transparent;
+}
+
+.THIS .myCustomClass {
+    text-align: right;
+}
+
+.THIS .colspan {
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+}
+
+.THIS .colmarg {
+    margin-right: 0.75rem;
+    margin-left: 0.75rem;
+}
+
+.THIS .textCB {
+    width: 75%;
+    border: none;
+    border-style: none;
+}
+
+.THIS .casillaCB {
+    width: 20%;
+}
+
+.THIS .fuentePeq {
+    font-size: 10px;
+}

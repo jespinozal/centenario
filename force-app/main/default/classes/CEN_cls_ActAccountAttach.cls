@@ -1,0 +1,30 @@
+public class CEN_cls_ActAccountAttach {
+	public Account pr;   
+    
+    
+    public  CEN_cls_ActAccountAttach (ApexPages.StandardController standardPageController)
+    {
+        pr = (Account)standardPageController.getRecord();
+    }
+    
+    public PageReference attach(){
+        PageReference pdfPage = Page.CEN_pdfactualizardatoscliente2;
+        pdfPage.getParameters().put('id',pr.id);
+        Blob pdfBlob;
+        
+        system.debug('refe'+pdfPage);
+        
+        Datetime now = Datetime.now();
+		Integer offset = UserInfo.getTimezone().getOffset(now);
+		Datetime local = now.addSeconds(offset/1000);
+        
+        
+        if(Test.isRunningTest()) {pdfBlob = blob.valueOf('Unit.Test');} else {pdfBlob = pdfPage.getContent();}
+		Attachment attach = new Attachment(parentId = pr.id, Name = 'Autorización de actualización de Datos Personales ' + local+'.pdf', body = pdfBlob, contentType='application/pdf', isPrivate=false);
+		insert attach;
+        
+        PageReference pageWhereWeWantToGo = new ApexPages.StandardController(pr).view();
+		pageWhereWeWantToGo.setRedirect(true); 
+		return pageWhereWeWantToGo;
+}
+}

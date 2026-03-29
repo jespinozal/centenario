@@ -1,0 +1,49 @@
+<aura:component access="global">
+  <aura:attribute
+    name="listaCotizacionLibreWrapper"
+    type="List"
+    access="global"
+  />
+  <aura:attribute
+    name="idCotizacionSeleccionado"
+    type="String"
+    access="global"
+  />
+  <aura:attribute name="idPDF" type="String" access="global" />
+  <!--data table dtRLCotizaciones-->
+  <aura:attribute name="columnsdtRLCotizaciones" type="List" access="private" />
+  <aura:attribute
+    name="selectedRowsdtRLCotizaciones"
+    type="List"
+    access="private"
+  />
+  <aura:attribute
+    name="maxRowSelectiondtRLCotizaciones"
+    type="Integer"
+    default="1"
+    access="private"
+  />
+  <aura:attribute name="sortedBydtRLCotizaciones" type="String" />
+  <aura:attribute name="sortDirectiondtRLCotizaciones" type="String" default="asc" />
+  <aura:attribute name="defaultSortDirectiondtRLCotizaciones" type="String" default="asc" />
+  <!--HANDLER-->
+  <aura:handler name="init" value="{! this }" action="{!c.doInit}" />
+  <!--BODY-->
+  <div>
+    <lightning:datatable
+      class="dtRLCotizacionesClass"
+      aura:id="dtRLCotizaciones"
+      columns="{! v.columnsdtRLCotizaciones }"
+      data="{! v.listaCotizacionLibreWrapper }"
+      keyField="idCotizacion"
+      selectedRows="{! v.selectedRowsdtRLCotizaciones }"
+      showRowNumberColumn="true"
+      maxRowSelection="{! v.maxRowSelectiondtRLCotizaciones }"
+      onrowselection="{!c.onrowselectiondtRLCotizaciones}"
+      onsort="{!c.sortdtRLCotizaciones}"
+      defaultSortDirection="{!v.defaultSortDirectiondtRLCotizaciones}"
+      sortedBy="{!v.sortedBydtRLCotizaciones}"
+      sortedDirection="{!v.sortDirectiondtRLCotizaciones}"
+    />
+  </div>
+</aura:component>

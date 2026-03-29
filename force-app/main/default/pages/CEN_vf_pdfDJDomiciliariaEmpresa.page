@@ -1,0 +1,303 @@
+<!--
+  @name               : 
+  @author             : Luis Maldonado
+  @creation date      : 
+  @modification date  : 30-01-2025
+  @last modified by   : Luis Maldonado
+  @description        : 
+  @versions           : version 1.0: clase apex inicial 
+  Modifications Log
+  Ver   Date         Author           Modification
+  1.0   29-01-2025   Luis Maldonado   Initial Version
+-->
+<apex:page applyHtmlTag="false"
+  applyBodyTag="false"
+  showHeader="false"
+  renderAs="pdf"
+  standardController="Account"
+  title="Declaracion Jurada Domiciliaria"
+  extensions="CEN_pdfDeclaracionJuradaDomiciliaria"
+>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <style type="text/css">
+
+      /* @import url('http://fonts.cdnfonts.com/css/trebuchet-ms-2');
+
+      @page {
+        size: A4 portrait;
+        margin: 20px 30px 20px 30px;
+        padding: 80px 0 20px 0;
+        font-family: Trebuchet-MS;
+        @top-center {
+          content: element(header);
+        }
+        @bottom-center {
+          content: element(footer);
+        }
+      } */
+
+      html,
+      body {
+          font: 400 18px Roboto, Arial, sans-serif;
+          font-size: 12px;
+          height: 90%;
+          margin: 20px 30px 20px 30px;
+          padding: 0;
+          /*padding: 80px 0 20px 0;*/
+      }
+
+      div.header {
+        position: running(header);
+      }
+
+      div.footer {
+        display: block;
+        padding: 2px 2px 2px 2px;
+        margin: 0 0 0 0;
+        width: 100%;
+        text-align: center;
+        position: running(footer);
+      }
+
+      .pagenumber:before {
+        content: counter(page);
+      }
+
+      .pagecount:before {
+        content: counter(pages);
+      }
+
+      .content {
+        margin: 0 0 0 0;
+        padding: 0 0 0 0;
+      }
+
+      .bodyStyle {
+        /*font-family: "Trebuchet MS", sans-serif;*/
+        font: 400 18px Roboto, Arial, sans-serif;
+        font-size: 12px;
+      }
+
+      .tableFecha{
+        width: 15%;
+        font-size: 10px;
+        margin: 0 0 0 0;
+        padding: 0 0 0 0;
+        border-collapse: collapse;
+      }
+
+      .tableFecha tr td {
+        width: 45%;
+        font-weight: normal;
+        height: 15px;
+        background: #f2f2f2;
+      }
+
+      .tableFecha tr th {
+        width: 25%;
+        font-weight: bold;
+      }
+
+      .tableDomiciliario {
+        width: 100%;
+        font-size: 10px;
+        margin: 0 0 0 0;
+        padding: 0 0 0 0;
+        border-collapse: collapse;
+        /*text-transform: uppercase;*/
+      }
+
+      .tableDomiciliario tr td {
+        width: 25%;
+        font-weight: normal;
+        height: 15px;
+        background: #f2f2f2;
+      }
+
+      .tableDomiciliario tr th {
+        width: 25%;
+        font-weight: bold;
+      }
+
+      table, td, th {
+        padding: 5px;
+        border: 1px solid;
+      }
+
+      .noBorder {
+        border: none !important;
+      }
+
+      .centerText{
+        text-align: center;
+      }
+
+      .center {
+        text-align: center;
+        width: 70%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 10%;
+      }
+
+    </style>
+  </head>
+  <div class="content bodyStyle">
+    <h2 class="centerText">DECLARACIÓN JURADA DOMICILIARIA</h2>
+    <p>Conste por el presente documento,</p>
+    <p>
+      <b>Yo, &nbsp; <apex:outputText value="{!Account.CEN_fld_Nombres_Apoderado__c}"/>&nbsp; <apex:outputText value="{!Account.CEN_fld_Apellidos_apoderado__c}"/>&nbsp; <apex:outputText value="{!Account.CEN_fld_Apellido_mat_apoderado__c}"/></b>
+    </p>
+    <p>
+      <b>de Nacionalidad peruana identificado con &nbsp;<apex:outputText value="{!Account.CEN_fld_Tipo_de_documento_de_apoderado__c}"/> &nbsp;
+        <apex:outputText value="{!Account.CEN_fld_Numero_de_documento_apoderado__c}"/>, en representación de &nbsp;<apex:outputText value="{!Account.Name}"/>&nbsp;
+        según poderes inscritos en la partida electrónica N° &nbsp;<apex:outputText value="{!Account.CEN_fld_Numero_de_partida_registral__c}"/>&nbsp;
+        del Registro de Personas jurídicas de &nbsp;<apex:outputText value="{!Account.CEN_fld_Zona_Registral__c}"/>&nbsp; en el pleno goce de los Derechos Constitucionales.
+      </b>
+    </p>
+
+  <h3>DECLARO BAJO JURAMENTO: </h3>
+  <p>
+    Que, <b>la dirección que señalo en este documento, es mi domicilio real, actual, efectivo y verdadero</b>, donde mi representada tiene domicilio permanente;
+    en caso de comprobarse falsedad alguna, la Autoridad correspondiente podrá someterme a las sanciones contempladas en el Art. 427° del Código Penal.
+  </p>
+
+  <!-- Tabla Domicilio -->
+  <table class="tableDomiciliario">
+    <tbody>
+      <tr class="centerText">
+        <th colspan="6">EMPRESA</th>
+      </tr>
+      <tr class="centerText">
+        <td colspan="6"><apex:outputText value="{!Account.Name}"/></td>
+      </tr>
+      <tr>
+        <th>N° <apex:outputText value="{!Account.CEN_Tipo_de_documento__c}"/></th>
+        <td colspan="5"><apex:outputText value="{!Account.CEN_Numero_de_documento_del__c}"/></td>
+      </tr>
+      <tr class="centerText">
+        <th>Distrito</th>
+        <th>Provincia</th>
+        <th>Departamento</th>
+        <th colspan="3">País</th>
+      </tr>
+      <tr class="centerText">
+        <td><apex:outputText value="{!Account.CEN_Distrito__r.Name}"/></td>
+        <td><apex:outputText value="{!Account.CEN_Distrito__r.Provincia__c}"/></td>
+        <td><apex:outputText value="{!Account.CEN_Distrito__r.Departamento__c}"/></td>
+        <td colspan="3"><apex:outputField value="{!Account.CEN_fld_Nacionalidad_apoderado__c}"/></td>
+      </tr>
+      <tr>
+        <th>Dirección</th>
+        <th>
+            <table class="noBorder">
+                <tr>
+                    <th class="noBorder">Av.</th>
+                    <th class="noBorder"><apex:image value="{!If(Account.CEN_Tipo_Via__c == "Av.", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/></th>
+                    <th class="noBorder">Calle</th>
+                    <th class="noBorder"><apex:image value="{!If(Account.CEN_Tipo_Via__c == "Calle", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/></th>
+                </tr>
+                <tr class="noBorder">
+                    <th class="noBorder">Jr.</th>
+                    <th class="noBorder"><apex:image value="{!If(Account.CEN_Tipo_Via__c == "Jr.", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/></th>
+                    <th class="noBorder">Psje.</th>
+                    <th class="noBorder"><apex:image value="{!If(Account.CEN_Tipo_Via__c == "Psje.", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/></th>
+                </tr>
+                <tr class="noBorder">
+                    <th class="noBorder">Urb.</th>
+                    <th class="noBorder"><apex:image value="{!If(Account.CEN_Tipo_Via__c == "Urb.", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/></th>
+                    <th class="noBorder">Lote</th>
+                    <th class="noBorder"><apex:image value="{!If(Account.CEN_Tipo_Via__c == "Lote", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/></th>
+                </tr>
+            </table>
+          </th>
+        <td colspan="4"><apex:outputText value="{!Account.CEN_Direcci_n__c}"/></td>
+      </tr>
+      <tr>
+        <th>Referencia</th>
+        <td colspan="5"><apex:outputText value="{!Account.CEN_Referencia_direccion__c}"/></td>
+      </tr>
+      <tr>
+        <th>Situación de Vivienda</th>
+        <td colspan="5">
+          <table class="noBorder">
+            <tr>
+              <th class="noBorder">Propia</th>
+              <td class="noBorder"><apex:image value="{!If(Account.CEN_Situacion_vivienda__c == "Propia", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/></td>
+              <th class="noBorder">Alquilada</th>
+              <td class="noBorder"><apex:image value="{!If(Account.CEN_Situacion_vivienda__c == "Alquilada", $Resource.CEN_CheckSquare, $Resource.CEN_BlankSquare)}" styleClass="imageStyle myImg"/></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <th>Correo Electrónico</th>
+        <td colspan="5"><apex:outputText value="{!Account.CEN_fld_Correo_empresa__c}"/></td>
+      </tr>
+      <tr>
+        <th>Tiempo Residencia</th>
+        <th class="centerText"><apex:outputText value="{!Account.CEN_Tiempo_de_Residencia__c}"/></th>
+        <td colspan="4" class="centerText"><apex:outputText value="{!Account.CEN_Numero_Tiempo_Residencia__c}"/></td>
+      </tr>
+      <tr>
+        <th>Teléfono Fijo</th>
+        <td colspan="5" class="centerText"><apex:outputText value="{!Account.CEN_Telefono_Trabajo_Empresa__c}"/></td>
+      </tr>
+      <tr>
+        <th>Celular 1</th>
+        <td class="centerText"><apex:outputText value="{!Account.Phone}"/></td>
+        <th>Celular 2</th>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <br></br>
+
+  
+  <!-- Tabla de fecha -->
+  <table class="tableFecha">
+    <tbody>
+      <tr>
+        <th>Ciudad</th>
+        <td class="centerText"><apex:outputText value="{!Account.CEN_Distrito__r.Departamento__c}"/></td>
+      </tr>
+      <tr>
+        <th>Día</th>
+        <td class="centerText"><apex:outputText value="{!DAY(TODAY())}"/></td>
+      </tr>
+      <tr>
+        <th>Mes</th>
+        <td class="centerText"><apex:outputText value="{!MONTH(TODAY())}"/></td>
+      </tr>
+      <tr>
+        <th>Año</th>
+        <td class="centerText"><apex:outputText value="{!YEAR(TODAY())}"/></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="center noBorder">
+    <tbody>
+      <tr class="centerText">
+        <td class="noBorder">___________________</td>
+        <td class="noBorder">___________________</td>
+      </tr>
+      <tr class="centerText">
+        <td class="noBorder">Firma</td>
+        <td class="noBorder">Huella Digital</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer bodyStyle">
+    <div>
+      <span class="pagenumber" /> de
+      <span class="pagecount" />
+    </div>
+  </div>
+
+</div>
+</apex:page>

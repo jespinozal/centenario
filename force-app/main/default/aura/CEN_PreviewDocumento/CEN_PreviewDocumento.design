@@ -1,0 +1,5 @@
+<design:component>
+    
+    <design:attribute name="OportunidadId" Label="OportunidadId"/>
+	
+</design:component>

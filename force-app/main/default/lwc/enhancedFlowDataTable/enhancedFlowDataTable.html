@@ -1,0 +1,31 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 08-14-2025
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+    <div class="slds-m-bottom_small">
+        <lightning-input
+            type="search"
+            label="Buscar Documentos"
+            variant="label-hidden"
+            placeholder="Escriba aqui"
+            onchange={handleSearchChange}
+        ></lightning-input>
+    </div>
+    <div class={tableClass}>
+    <lightning-datatable
+            key-field="CEN_ID_Original__c"
+            data={tableData}
+            columns={columns}
+            onrowselection={handleRowSelection}
+            onrowaction={handleRowAction}
+            selected-rows={selectedRowIds}
+            onsort={handleSort}
+            sorted-by={sortBy}
+            sorted-direction={sortDirection}>
+    </lightning-datatable>
+    </div>
+</template>

@@ -1,0 +1,73 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                controller="CEN_cls_Agregar_Lote_Interaccion">
+    <aura:attribute name="recordId" type="String" default=""/>
+    <aura:attribute name="lotesDelCaso" type="List" default=""/>  
+    <aura:attribute name="lotesBuscados" type="List" default=""/>  
+    <aura:attribute name="columns" type="List"/>    
+    <aura:attribute name="isModal" type="Boolean" default="false"/>    
+    <aura:attribute name="options" type="List" default="[]"/>
+    <aura:attribute name="value" type="String" default=""/>
+    <aura:attribute name="lotesBuscadosSize" type="Integer" default="0"/>
+
+    <aura:attribute name="lotesSeleccionado" type="List" default=""/>    
+    <aura:handler event="force:refreshView" action="{!c.forceRefreshViewHandler}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>    
+    <lightning:card title="Lotes relacionados" iconName="standard:product_item">
+        <aura:set attribute="actions">
+                <lightning:button label="Modificar" title="Modificar lista de lotes seleccionados" onclick="{! c.openModal }"/>
+         </aura:set>
+        <p class="slds-p-horizontal_small">
+           <ul class="slds-has-dividers_bottom-space">
+               <li class="slds-item">
+                    <aura:iteration items="{!v.lotesDelCaso}" var="item">
+                       <lightning:tile label="{!item.Name}" href="{!item.Url}">
+                           <aura:set attribute="media">
+                               <lightning:avatar size="x-small" fallbackIconName="standard:product" alternativeText="{!item.Name}"/>
+                           </aura:set>
+                           <ul class="slds-list_horizontal slds-has-dividers_right">
+                               <li class="slds-item">Origen: {!item.Origen}</li>
+                           </ul>
+                       </lightning:tile>
+                   </aura:iteration>
+               </li>
+            </ul>
+        </p>
+    </lightning:card>
+    <aura:if isTrue="{!v.isModal}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+          <div class="slds-modal__container">
+            <header class="slds-modal__header">
+              <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Actualizar Lotes de la Interacción</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                <lightning:radioGroup name="radioGroup"
+                                      label="Elige al cliente"
+                                      options="{! v.options }"
+                                      value="{! v.value }"
+                                      onchange="{! c.changeRb }"
+                                      type="radio"/>
+                <br/>
+                
+                <div>
+                    <aura:if isTrue="{!v.lotesBuscadosSize==0}">
+                        <p>No hay lote encontrados</p>
+                        <aura:set attribute="else">
+                            <lightning:datatable columns="{! v.columns }"
+                                     data="{! v.lotesBuscados }"
+                                     keyField="id"
+                                     onrowaction="{! c.handleRowAction }"
+                                     onrowselection="{!c.onrowselection}"/>
+                        </aura:set>                    
+                    </aura:if>                
+                </div>
+            </div>
+            <footer class="slds-modal__footer">
+                <lightning:button label="Cancelar" title="Cancelar" onclick="{! c.closeModal }"/>
+                <lightning:button variant="brand" label="Guardar" title="Guardar lotes" onclick="{! c.setLotesSelected }" />
+            </footer>
+          </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>        
+      
+    </aura:if>
+</aura:component>

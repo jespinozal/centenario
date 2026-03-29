@@ -1,0 +1,47 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="CEN_busquedaDNI" >
+		
+    	<aura:attribute name="searchResult" type="List" description="use for store and display account list return from server"/>
+    	<aura:attribute name="isModaldoc" type="boolean" default="false"/>
+    	<aura:attribute name="tipo" type="string" default="false"/>
+		<aura:handler name="init" value="{! this }" action="{! c.doInit }" />  		
+    
+    	<br/><br/>
+    
+        <div align="center" onkeypress="{!c.formPress}" class="slds-m-left_xx-large"  style="background-color: white;border-radius:20px; margin: 0 400px 0 400px">
+            <br/><br/>
+          	<lightning:layoutItem size="9" padding="around-medium">    
+                        <lightning:select name="documento"                                            
+                                          label="Tipo de Documento"
+                                          required="true"
+                                          onchange="{!c.changeitem}"
+                                          aura:id="documento">                            			  
+                        <option value="DNI">DNI</option>
+                        <option value="RUC">RUC</option>
+                        <option value="PTP">PTP</option>
+                        <option value="Pasaporte">Pasaporte</option>
+                        <option value="Carnet de extranjeria">Carnet de extranjeria</option>
+                        <option value="Sin especificar">Sin especificar</option>
+                        
+                        </lightning:select>
+        	</lightning:layoutItem>                 
+            
+            <lightning:layoutItem size="9" padding="around-small">
+                        <lightning:input name="numero"										                                        
+                                         required="true"
+                                         placeholder="Ingresar Nº de documento ..."
+                                         aura:id="numero"                                         
+                                         onchange="{!c.changevalor}"
+                                         label="Nº de documento"/>
+        	</lightning:layoutItem>
+            
+            <lightning:layoutItem size="7" padding="around-small">
+                        <lightning:button onclick="{!c.Search}"
+                                          variant="brand"
+                                          label="Buscar"
+                                          iconName="utility:search"/> 
+          	</lightning:layoutItem>
+            <br/><br/>
+      	</div>
+   
+    
+</aura:component>

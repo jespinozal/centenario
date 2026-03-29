@@ -1,0 +1,22 @@
+<template>
+    <lightning-card title="Milestones" icon-name="custom:custom18" class="cardClass">
+        <lightning-layout vertical-align="center" class="x-large">
+            <lightning-layout-item flexibility="auto" padding="around-small">
+      
+        <template  for:each={hsx} for:item="hx">
+            <table key={hx} style="border-bottom:1px solid #ccc">
+    
+            <template for:each={hx} for:item="x">
+                <tr key={x}>
+                    <td><b>{x.k}</b>:</td>
+                    <td>{x.v}</td>
+                    
+                </tr>
+            </template>
+        </table>
+    
+        </template>
+    </lightning-layout-item>
+    </lightning-layout>
+</lightning-card>
+</template>

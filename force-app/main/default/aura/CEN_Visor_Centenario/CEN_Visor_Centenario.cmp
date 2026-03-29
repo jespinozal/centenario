@@ -1,0 +1,39 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                access="global" 
+                controller="CEN_Visor_Centenario">
+    <aura:attribute name="idProyecto" type="String"/>
+    <aura:attribute name="nombreProyecto" type="String"/>
+    <aura:attribute name="mensaje" type="String"/>
+    <aura:attribute name="existeProyecto" type="Boolean" default="false"/>
+
+   <force:recordData aura:id="record"
+    		layoutType="FULL"
+    		recordId="{!v.recordId}"
+    		targetError="{!v.recordError}"
+    		targetRecord="{!v.record}"
+    		targetFields ="{!v.simpleRecord}"
+    mode="VIEW"/>
+   <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+  	<div aura:id="msg0">
+        <p>Se está conectando al visor. Asegurese de haber seleccionado un proyecto en la Oportunidad y no tener las pestañas emergentes bloqueados en su navegador.</p>
+        <br/><p>Luego de dar en <b>cotizar</b> en algún lote del visor. Se redirigirá a esta Oportunidad.</p>
+    </div>
+ 
+    <div aura:id="msg" class="slds-hide">
+        <p><lightning:formattedText value="{!v.mensaje}"/></p>
+    </div>
+    
+   <div aura:id="msg1" class="slds-hide">
+    <p>Se está abriendo el Visor de lotes para el proyecto <b><lightning:formattedText value="{!v.nombreProyecto}"/></b> en un nueva pestaña.</p>
+    <br/><p>Luego de dar en <b>cotizar</b> en algún lote del visor. Se redirigirá a esta Oportunidad.</p>
+   </div>
+    
+   <div aura:id="msg2" class="slds-hide">
+        <p>No se puede abrir el Visor porque no tiene un proyecto seleccionado.</p>
+   </div>
+    
+   <div aura:id="msg3" class="slds-hide">
+        <p>No hay acceso. <lightning:formattedText value="{!v.mensaje}"/></p>
+   </div>
+   
+</aura:component>

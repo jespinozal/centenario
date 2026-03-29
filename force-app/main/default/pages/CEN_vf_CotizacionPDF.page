@@ -1,0 +1,418 @@
+<apex:page applyHtmlTag="false" showHeader="false" renderAs="PDF" standardController="Opportunity" extensions="CEN_cls_CotizacionController" >
+    
+    <style>
+    /* cuando vayamos a imprimir ... */
+    @media print{
+    /* indicamos el salto de pagina */
+    .saltoDePagina{
+    display:block;
+    page-break-before:always;
+    }
+    }
+    </style>
+     
+    <style type="text/css" media="print">
+            @page {            
+              size: A4;
+              margin-top: 30px;
+              margin-bottom: 30px;
+            
+              margin-left: 20px;
+              margin-right: 20px;
+            
+              @top-right {
+                font-size:80%;
+                content: "Página " counter(page)  " de " counter(pages);
+
+              }
+            
+              @top-left {
+                font-size:80%;
+                content: element(header);
+              }
+            
+              @top-center{
+                content: element(header);
+              }
+            }
+            
+            body{
+                counter-reset: page;
+            }
+
+            #pageNumber::before{ 
+                counter-increment: page;
+                content: counter(page);
+            }
+
+            .anidado::before{
+                counter-increment: ani;
+                content: counter(ani) ;
+            }
+            
+            .planTrabajo{
+                counter-reset: p;
+            }
+            
+            .indice::before{
+                counter-increment: p;
+                content: counter(p) " ";
+            }
+
+            p.saltodepagina
+            
+            {
+                page-break-after: always;
+            }
+
+            dt {
+                float: left;
+                clear: left;
+                width: 25px;
+                text-align: right;
+                font-weight: bold;    
+            }
+            
+            dt::after {
+                content: "";
+            }
+  
+            dd {    
+                padding: 0 0 0.1em 0;
+                margin-left: 60px;
+            }
+
+            .contenidos {
+                display: table-row;
+                border: 0px solid #000;
+            }
+            
+            .columna1, .columna2, .columna3 {
+                display: table-cell;
+                border: 0px solid #000;
+                vertical-align: bottom;
+                padding:0.9px;
+                text-align: left;
+                margin-left: 0.5px;
+            }
+         
+            .inner {
+                display: table;
+                margin: 0 auto;
+                border: 1px solid black;
+            }
+
+            .outer {
+                border: 1px solid red;
+                width:100%
+            }
+            
+            #footer{
+             position:fixed;
+             bottom:0;
+             left:0;
+            }
+           
+        .alcuadrado{vertical-align: super; font-size: 6px;}
+        
+        </style>  
+    
+<style type="text/css">
+        
+    @import url('https://fonts.googleapis.com/css?family=Ubuntu');        
+    
+        
+</style>  
+    
+<div style="width: 100%; height: 20%;">
+        
+        <div style="width: 30%; float:left;">            
+            <div style="border: 1px dashed black; width: 100%; padding: 1% 0% 1% 0%; -webkit-border-radius: 10px; -moz-border-radius: 10px; border-radius: 10px">
+                <span style="color:#000; font-family: 'Ubuntu', sans-serif; padding:5%">Fecha: </span>    
+                <apex:outputText value="{0,date,dd'/'MM'/'yyyy}"><apex:param value="{!TODAY()}" /></apex:outputText>
+            </div>                                                                       
+        </div>        
+        
+        <div style="width: 20%; display:inline-block">
+            
+        </div>
+    
+        <div style="width: 50%; float: right; padding: 0% 0% 0% 0%;">            
+            <img src="{!$Resource.CEN_sr_logoCentenario_2020}" style="margin-top: -13%; margin-left:115px" width="250" height="115"/> 
+        </div>
+    
+</div>    
+
+    <br /><br /><br /><br />
+    
+<body>                              
+    
+    <apex:repeat value="{!Quote}" var="Quo" >                                                     
+    	
+        <div style="width:100%">
+            <div style="float:left; vertical-align: middle; width: 25%; height:30px;display:inline-block; padding-top: 0.8%">
+                <span style="font-family: 'Ubuntu', sans-serif;">Área <b>m<sup>2</sup></b>:</span>
+            </div>  
+            <div style="width:0.2%; vertical-align: middle; height:30px; display:inline-block; padding-top: 0.8%">                    
+            </div>
+            <div style="display:inline-block; float:right; width: 69%; height:25px; padding-top: 0%;">                        
+                <img src="{!$Resource.CEN_CirculoMediano_Cotizador_largo}" width="500" height="80" style="position: relative; margin-top:0%; margin-left:-2%" />
+                <span style="font-family: 'Ubuntu', sans-serif; position: absolute; top:118px; right: 60px; width: 300px;height: 50px; z-index:99999; left:225px">&nbsp;&nbsp;
+                   {!Quo.CEN_Area__c}
+                </span>
+            </div>                  
+        </div>
+        
+        <br />
+        
+        <div style="width:100%">
+            <div style="float:left; vertical-align: middle; width: 25%; height:30px;display:inline-block; padding-top: 0.8%">
+                <span style="font-family: 'Ubuntu', sans-serif;">Precio <b>por m<sup>2</sup></b> en soles:</span>
+            </div>  
+            <div style="width:0.2%; vertical-align: middle; height:30px; display:inline-block; padding-top: 1.5%"> 
+                <span style="font-family: 'Ubuntu', sans-serif;"><b>&nbsp;&nbsp;&nbsp;&nbsp;S/</b></span>
+            </div>
+            <div style="display:inline-block; float:right; width: 69%; height:25px; padding-top: 0%;">                        
+                <img src="{!$Resource.CEN_CirculoMediano_Cotizador_largo}" width="500" height="80" style="position: relative; margin-top:0%; margin-left:-2%" />
+                <span style="font-family: 'Ubuntu', sans-serif; position: absolute; top:170px; right: 60px; width: 300px;height: 50px; z-index:99999; left:225px">&nbsp;&nbsp;
+                     {!Quo.CEN_Precio_por_mt2__c}
+                </span>
+            </div>                  
+        </div>
+        
+        <br />
+        
+        <div style="width:100%">
+            <div style="float:left; vertical-align: middle; width: 25%; height:30px;display:inline-block; padding-top: 1.5%">
+                <span style="font-family: 'Ubuntu', sans-serif;">Precio <b>total</b> en soles:</span>
+            </div>  
+            <div style="width:0.2%; vertical-align: middle; height:30px; display:inline-block; padding-top: 1.5%"> 
+                <span style="font-family: 'Ubuntu', sans-serif;"><b>&nbsp;&nbsp;&nbsp;&nbsp;S/</b></span>
+            </div>
+            <div style="display:inline-block; float:right; width: 69%; height:25px; padding-top: 0%;">                        
+                <img src="{!$Resource.CEN_CirculoMediano_Cotizador_largo}" width="500" height="40" style="position: relative; margin-top:0%; margin-left:-2%" />
+                <span style="font-family: 'Ubuntu', sans-serif; position: absolute; top:230px; right: 60px; width: 300px;height: 50px; z-index:99999; left:225px">&nbsp;&nbsp;
+                   {!Quo.CEN_Precio_de_venta__c}
+                </span>
+            </div>                  
+        </div>
+        
+        <br/>
+        
+        <div style="width: 100%; margin-top:1%"> 
+            
+            <div style="width:20%; display:inline-block">
+                <div style="float:left; vertical-align: middle; width: 20%; height:30px;display:inline-block; padding-top: 0.8%">
+                    <span style="font-family: 'Ubuntu', sans-serif;"><b>Mz.</b></span>
+                </div>                
+                <div style="display:inline-block; float:right; width: 60%; height:25px; padding-top: 0%; margin-left:-2%">                        
+                    <img src="{!$Resource.CEN_CirculoMediano_Cotizador_mediano}" width="100" height="40" style="position: relative; margin-top:-8%; margin-left:-27%" />
+                    <span style="font-family: 'Ubuntu', sans-serif; position: absolute; top:285px; right: 85px; width: 300px;height: 50px; z-index:99999; left:50px">&nbsp;&nbsp;
+                       {!Quo.CEN_Manzana__c}
+                    </span>
+                </div>                  
+    </div>
+            
+            <div style="width:20%; display:inline-block; padding-right:10%; margin-left:15">
+                <div style="float:left; vertical-align: middle; width: 20%; height:30px; display:inline-block; padding-top: 0.8%; margin-left:20%">
+                    <span style="font-family: 'Ubuntu', sans-serif;"><b>Lote</b></span>
+                </div>                
+                <div style="display:inline-block; float:right; width: 60%; height:25px; padding-top: 0%;">                        
+                    <img src="{!$Resource.CEN_CirculoMediano_Cotizador_mediano}" width="100" height="40" style="position: relative; margin-top:-8%; margin-left:10%" />
+                    <span style="font-family: 'Ubuntu', sans-serif; position: absolute; top:285px; right: right: 85px; width: 300px;height: 50px; z-index:99999; left:225px">&nbsp;&nbsp;
+                        {!Quo.CEN_Lote__c}
+                    </span>
+                </div>                  
+    </div>
+            
+            <div style="width:30%; display:inline-block">
+                <div style="float:left; vertical-align: middle; width: 20%; height:30px; display:inline-block; padding-top: 0.8%; margin-left:-13%">
+                    <span style="font-family: 'Ubuntu', sans-serif;">
+                        <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tipología:</b>
+                    </span>
+                </div>                 
+                <div style="display:inline-block; float:right; width: 50%; height:25px; padding-top: 0%;">                        
+                    <img src="{!$Resource.CEN_CirculoMediano_Cotizador_chico}" width="267" height="40" style="position: relative; margin-top:-8%; margin-left:-20%" />
+                    <span style="font-family: 'Ubuntu', sans-serif; position: absolute; top:285px; right: 60px; width: 300px;height: 50px; z-index:99999; left:470px">
+                        &nbsp;&nbsp;{!Quo.CEN_Tipologia__c}
+                    </span>
+                </div>                  
+    </div>
+            
+        </div>
+        
+        <br/>              
+        
+        <div style="background-color:#DADADA; width:100%; height:550px">
+            
+            <br/>
+            
+            <div style="width: 100%">                    
+                <div style="width: 45%; float: left; background-color:#E60000; padding: 1% 0% 1% 0%;">
+                    <span style="color:#FFFFFF; font-family: 'Ubuntu', sans-serif; padding:15%"><b>Financiamiento a largo plazo</b></span>
+                </div>            
+            </div>
+            
+            <br/><br/>
+            
+            <div style="margin-left:5%; width: 90%; height:30px;">   
+                
+                <br/>
+                
+                <div style="width:100%; ">
+                    <div style="float:left; vertical-align: middle; width: 45%; height:30px;display:inline-block; padding-top: 0.8%">
+                        <span style="font-family: 'Ubuntu', sans-serif;"><b>Inicial:</b></span>
+                    </div>  
+                    <div style="width:0.2%; vertical-align: middle; height:30px; display:inline-block; padding-top: 0.8%">
+                        <span style="font-family: 'Ubuntu', sans-serif;"><b>S/</b></span>  
+                    </div>
+                    <div style="display:inline-block; float:right; width: 51%; height:25px; padding-top: 0%;">                        
+                        <img src="{!$Resource.CEN_CirculoMediano_Cotizador2}" width="410" height="80" style="position: relative; margin-top:-8%; margin-left:-13%" />
+                        <span style="font-family: 'Ubuntu', sans-serif; position: absolute; top:413px; right: 60px; width: 300px;height: 50px; z-index:99999">&nbsp;&nbsp;
+                            {!Quo.CEN_Inicial__c}
+                        </span>
+                    </div>                  
+                </div>
+                
+                <br/>
+                
+                <div style="width:100%; ">
+                    <div style="float:left; vertical-align: middle; width: 45%; height:30px;display:inline-block; padding-top: 0.8%">
+                        <span style="font-family: 'Ubuntu', sans-serif;"><b>Inicial porcentaje (%):</b></span>
+                    </div>  
+                    <div style="width:0.2%; vertical-align: middle; height:30px; display:inline-block; padding-top: 0.8%">
+                        
+                    </div>
+                    <div style="display:inline-block; float:right; width: 51%; height:25px; padding-top: 0%;">                        
+                        <img src="{!$Resource.CEN_CirculoMediano_Cotizador2}" width="410" height="80" style="position: relative; margin-top:-8%; margin-left:-13%" />
+                        <span style="font-family: 'Ubuntu', sans-serif; position: absolute; top:467px; right: 60px; width: 300px;height: 50px; z-index:99999">&nbsp;&nbsp;
+                            {!Quo.CEN_Inicial_porct__c}
+                        </span>
+                    </div>                  
+                </div>
+                
+                <br/>
+                
+                <div style="width:100%; ">
+                    <div style="float:left; vertical-align: middle; width: 45%; height:30px;display:inline-block; padding-top: 0.8%">
+                        <span style="font-family: 'Ubuntu', sans-serif;"><b>Número de cuotas inicial:</b></span>
+                    </div>  
+                    <div style="width:0.2%; vertical-align: middle; height:30px; display:inline-block; padding-top: 0.8%">
+                        
+                    </div>
+                    <div style="display:inline-block; float:right; width: 51%; height:25px; padding-top: 0%;">                        
+                        <img src="{!$Resource.CEN_CirculoMediano_Cotizador2}" width="410" height="80" style="position: relative; margin-top:-8%; margin-left:-13%" />
+                        <span style="font-family: 'Ubuntu', sans-serif; position: absolute; top:520px; right: 60px; width: 300px;height: 50px; z-index:99999">&nbsp;&nbsp;
+                            {!Quo.CEN_N_cuotas_de_inicial_de_precio__c}
+                        </span>
+                    </div>                  
+                </div>
+                
+                <br/>
+                
+                <div style="width:100%; ">
+                    <div style="float:left; vertical-align: middle; width: 45%; height:30px;display:inline-block; padding-top: 0.8%">
+                        <span style="font-family: 'Ubuntu', sans-serif;"><b>Monto cuotas:</b></span>
+                    </div>  
+                    <div style="width:0.2%; vertical-align: middle; height:30px; display:inline-block; padding-top: 0.8%">
+                        <span style="font-family: 'Ubuntu', sans-serif;"><b>S/</b></span> 
+                    </div>
+                    <div style="display:inline-block; float:right; width: 51%; height:25px; padding-top: 0%;">                        
+                        <img src="{!$Resource.CEN_CirculoMediano_Cotizador2}" width="410" height="80" style="position: relative; margin-top:-8%; margin-left:-13%" />
+                        <span style="font-family: 'Ubuntu', sans-serif; position: absolute; top:568px; right: 60px; width: 300px;height: 50px; z-index:99999">&nbsp;&nbsp;
+                            {!Quo.CEN_Monto_cuota_de_inicial_de_precio__c}
+                        </span>
+                    </div>                  
+                </div>
+                
+                <br />
+                
+                <div style="border: 0.5px dashed black;  width: 100%; height:0px; float:left"></div>
+                
+                <br />
+                
+                <div style="width:100%; ">
+                    <div style="float:left; vertical-align: middle; width: 45%; height:30px;display:inline-block; padding-top: 0.8%">
+                        <span style="font-family: 'Ubuntu', sans-serif;"><b>Monto a financiar:</b></span>
+                    </div>  
+                    <div style="width:0.2%; vertical-align: middle; height:30px; display:inline-block; padding-top: 0.8%">
+                        <span style="font-family: 'Ubuntu', sans-serif;"><b>S/</b></span> 
+                    </div>
+                    <div style="display:inline-block; float:right; width: 51%; height:25px; padding-top: 0%;">                        
+                        <img src="{!$Resource.CEN_CirculoMediano_Cotizador2}" width="410" height="80" style="position: relative; margin-top:-8%; margin-left:-13%" />
+                        <span style="font-family: 'Ubuntu', sans-serif; position: absolute; top:643px; right: 60px; width: 300px;height: 50px; z-index:99999">&nbsp;&nbsp;
+                            {!Quo.CEN_Saldo_del_precio__c}
+                        </span>
+                    </div>                  
+                </div>
+                
+                <br />                        
+                
+                <div style="width:100%; ">
+                    <div style="float:left; vertical-align: middle; width: 45%; height:30px;display:inline-block; padding-top: 0.8%">
+                        <span style="font-family: 'Ubuntu', sans-serif;"><b>Número de cuotas a financiar:</b></span>
+                    </div>  
+                    <div style="width:0.2%; vertical-align: middle; height:30px; display:inline-block; padding-top: 0.8%">
+                        
+                    </div>
+                    <div style="display:inline-block; float:right; width: 51%; height:25px; padding-top: 0%;">                        
+                        <img src="{!$Resource.CEN_CirculoMediano_Cotizador2}" width="410" height="80" style="position: relative; margin-top:-8%; margin-left:-13%" />
+                        <span style="font-family: 'Ubuntu', sans-serif; position: absolute; top:697px; right: 60px; width: 300px;height: 50px; z-index:99999">&nbsp;&nbsp;
+                            {!Quo.CEN_Numero_de_cuotas_a_financiar__c}
+                        </span>
+                    </div>                  
+                </div>
+                
+                <br />
+                
+                <div style="width:100%; ">
+                    <div style="float:left; vertical-align: middle; width: 45%; height:30px;display:inline-block; padding-top: 0.8%">
+                        <span style="font-family: 'Ubuntu', sans-serif;"><b>Tasa de interés compensatorio anual:</b></span>
+                    </div>  
+                    <div style="width:0.2%; vertical-align: middle; height:30px; display:inline-block; padding-top: 0.8%">
+                        
+                    </div>
+                    <div style="display:inline-block; float:right; width: 51%; height:25px; padding-top: 0%;">                        
+                        <img src="{!$Resource.CEN_CirculoMediano_Cotizador2}" width="410" height="80" style="position: relative; margin-top:-8%; margin-left:-13%" />
+                        <span style="font-family: 'Ubuntu', sans-serif; position: absolute; top:745px; right: 60px; width: 300px;height: 50px; z-index:99999">&nbsp;&nbsp;
+                            {!Quo.CEN_Tasa_de_Interes_compensatorio_anual__c}
+                        </span>
+                    </div>                  
+                </div>
+                
+                <br />
+                
+                <div style="width:100%; ">
+                    <div style="float:left; vertical-align: middle; width: 45%; height:30px;display:inline-block; padding-top: 0.8%">
+                        <span style="font-family: 'Ubuntu', sans-serif;"><b>Monto de cuotas:</b></span>
+                    </div>  
+                    <div style="width:0.2%; vertical-align: middle; height:30px; display:inline-block; padding-top: 0.8%">
+                        <span style="font-family: 'Ubuntu', sans-serif;"><b>S/</b></span> 
+                    </div>
+                    <div style="display:inline-block; float:right; width: 51%; height:25px; padding-top: 0%;">                        
+                        <img src="{!$Resource.CEN_CirculoMediano_Cotizador2}" width="410" height="80" style="position: relative; margin-top:-8%; margin-left:-13%" />
+                        <span style="font-family: 'Ubuntu', sans-serif; position: absolute; top:800px; right: 60px; width: 300px;height: 50px; z-index:99999">&nbsp;&nbsp;
+                            {!Quo.CEN_Monto_cuota_del_saldo_de_precio__c}
+                        </span>
+                    </div>                  
+                </div>
+                
+                <br />
+                
+            </div>  
+            
+        </div>
+        
+     </apex:repeat>  
+    
+    <footer class="footer">
+            <div style="width:100%; background-color:#432418;">
+            <p style="color:#fff; font-family: 'Ubuntu', sans-serif; padding: 1.5%; font-size: 7pt; text-align: justify;">
+           	Vigencia: Precio válido en el día de la emisión de la presente cotización. Se garantiza en precio por metro cuadrado según la tipología del lote más no la disponibilidad del lote materia de cotización.       
+            </p> 
+            </div>                      
+        </footer>
+    
+</body> 
+    
+</apex:page>

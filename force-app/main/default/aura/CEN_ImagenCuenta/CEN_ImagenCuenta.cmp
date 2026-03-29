@@ -1,0 +1,222 @@
+<aura:component controller="CEN_ImagenCuenta" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:hasSObjectName,forceCommunity:availableForAllPageTypes" access="global" description="Lightning component to display a contact image and name on contact object lightning record page, uses Picture_URL__c from contact">
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="imagenSrc" type="String" default="https://s3-us-west-1.amazonaws.com/sfdc-demo/image-placeholder.png"/>
+    <aura:attribute name="message" type="String" default=""/>
+
+    
+    <aura:attribute name="contact_image_url" type="String" access="global"/>
+    <aura:attribute name="image_size" type="String" access="global"/>
+    <aura:attribute name="Phone_To_Display" type="String" access="global"/>
+    <aura:attribute name="Display_Activity_Indicator" type="String" access="global"/>
+    <aura:attribute name="Display_CSAT" type="String" access="global"/>
+    <aura:attribute name="Display_NPS" type="String" access="global"/>
+    <aura:attribute name="Display_Case_Origin" type="String" access="global"/>
+    <aura:attribute name="Icon_Template" type="String" access="global"/>
+    <aura:attribute name="GaugeLineWidth" type="String" access="global"/>  
+    <aura:attribute name="Padding" type="String" access="global"/>
+    <aura:attribute name="chc" type="LCH_ContactHighlightContainer"/>
+    <aura:attribute type="String" name="CleanGID" />
+    <aura:attribute type="String" name="SilvercCard" default="{!'https://image.ibb.co/kVDAGn/ohana_Silver.png'}" access="global" />
+    <aura:attribute type="String" name="GoldCard" default="{!'https://image.ibb.co/nrTjSH/ohana_Gold.png'}" access="global"/>
+    <aura:attribute type="String" name="PlatinumCard" default="{!'https://image.ibb.co/dMRtMc/ohana_Platinum.png'}" access="global"/>
+    <aura:attribute type="Integer" name="LoyaltyProgressMiles" access="global"/>
+    <aura:attribute type="Integer" name="LoyaltyProgressFlights" access="global"/>
+    
+    
+    <ltng:require scripts="{!$Resource.LCH_Gauge}" afterScriptsLoaded="{!c.doInit}"/>
+    
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+
+    <article class="{!'slds-card slds-p-around_'+v.Padding}">
+        <div class="slds-container slds-has-flexi-truncate">
+            
+      
+            <br/>
+           
+            
+            <!-- Container for Contact Name __________________________________________________________________________________ -->
+             
+            <div class="slds-align--absolute-center slds-m-around--xxx-small">
+                <div class="slds-text-heading--large slds-hyphenate slds-text-align--center figureAligned">
+                    <div class="slds-media__body figureAligned">
+                        <a href="javascript:void(0)"  id="{!v.chc.Account.Name}">{!v.chc.Account.Name}</a>
+                    </div>	
+                    <div class="{!v.Display_Activity_Indicator == 'Yes' ? 'slds-media__figure figureAligned' : 'slds-media__figure slds-hide'}">
+                        <ui:outputRichText value="{!v.chc.Contact.Activity_Indicator__c}" class="ActivityIndicator"/>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="container slds-has-flexi-truncate" style="display: flex;margin-left:25px">
+  			
+                
+                <!-- Container for Contact Image __________________________________________________________________________________ -->
+                <div class="slds-align--absolute-center" style="min-width: 130px;" >
+                    <div class="image" >
+                       
+                                                        
+                        
+                        <div ondragover="{!c.onDragOver}" ondrop="{!c.onDrop}">
+                            <img src="{!v.imagenSrc}"/>
+                            <p>{!v.message}</p>
+                        </div>
+                        
+                        <!-- Lurdes
+                        <aura:if isTrue="{!(v.chc == null)}">
+                            <img src="{!$Resource.LightningContactImage + '/LightningContactImage/Blank.png'}" alt="Contact Image" style="{! 'width:' + (v.image_size) + ';height:' + (v.image_size) + ';border-radius:50%'}" />                  
+                            <aura:set attribute="else">
+                                <aura:if isTrue="{!(v.contact_image_url == 'ChatterUser')}">
+                                    <img src="{!v.chc.photoURL}" alt="Contact Image" style="{! 'width:' + (v.image_size) + ';height:' + (v.image_size) + ';border-radius:50%'}" />                  
+                                    <aura:set attribute="else">
+                                        <img src="{!$Resource.LCH_LightningContactImage + '/LightningContactImage/' + v.contact_image_url}" alt="Contact Image" style="{! 'width:' + (v.image_size) + ';height:' + (v.image_size) + ';border-radius:50%'}" />                  
+                                    </aura:set>
+                                </aura:if>
+                            </aura:set>
+                        </aura:if>
+
+	
+						 -->
+                        
+                    </div>
+                </div>
+                
+                
+                <!-- Container for Contact Information __________________________________________________________________________________ -->
+                <div class="slds-col--padded slds-align-middle slds-has-flexi-truncate" style="min-width: 200px;">
+                    <div class="slds-grid slds-grid--align-spread slds-grid--vertical slds-has-flexi-truncate">
+				   
+						<!--   <div class="slds-truncate" title="Tipo de cliente">Tipo de Documento</div> -->
+						<div class="slds-media__figure slds-text-align--center figureAligned">
+							<aura:set attribute="popoverBody">
+								<div class="slds-grid slds-grid--align-spread slds-grid--vertical slds-text-align--left">
+									<div class="slds-media slds-tile" style="display: inline-block;">
+										
+										<div class="slds-media__body figureAligned popover-body-email">
+											<p class="tile__title">
+											<aura:if isTrue="{!or(v.chc == null, and(or(v.chc.Account.CEN_Tipo_de_documento__pc == null, v.chc.Account.CEN_Tipo_de_documento__pc == '')))}">
+														No se registró.
+													<!--No se encontró Correo.!-->
+												<aura:set attribute="else">
+														{!v.chc.Account.CEN_Tipo_de_documento__pc}
+												</aura:set>
+											</aura:if>
+											
+											</p>
+										</div>
+									</div>
+								</div>
+							</aura:set>
+						</div>
+							<p class="tile__title slds-truncate">
+								<aura:if isTrue="{!or(v.chc == null, and(or(v.chc.Account.CEN_Tipo_de_documento__pc == null, v.chc.Account.CEN_Tipo_de_documento__pc == '')))}">
+												No se registró
+									<!--No se encontró Correo.!-->
+									<aura:set attribute="else">
+											{!v.chc.Account.CEN_Tipo_de_documento__pc}
+									</aura:set>
+								</aura:if>    
+							</p>
+								
+					<!-- 	<div class="slds-truncate" title="Tipo de cliente">Documento</div> -->
+						<div class="slds-media__figure slds-text-align--center figureAligned">
+							<aura:set attribute="popoverBody">
+								<div class="slds-grid slds-grid--align-spread slds-grid--vertical slds-text-align--left">
+									<div class="slds-media slds-tile" style="display: inline-block;">
+										
+										<div class="slds-media__body figureAligned popover-body-email">
+											<p class="tile__title">
+											<aura:if isTrue="{!or(v.chc == null, and(or(v.chc.Account.CEN_N_mero_de_documento__pc == null, v.chc.Account.CEN_N_mero_de_documento__pc == '')))}">
+														No se registró.
+													<!--No se encontró Correo.!-->
+												<aura:set attribute="else">
+														{!v.chc.Account.CEN_N_mero_de_documento__pc}
+												</aura:set>
+											</aura:if>
+											
+											</p>
+										</div>
+									</div>
+								</div>
+							</aura:set>
+						</div>
+							<p class="tile__title slds-truncate">
+								<aura:if isTrue="{!or(v.chc == null, and(or(v.chc.Account.CEN_N_mero_de_documento__pc == null, v.chc.Account.CEN_N_mero_de_documento__pc == '')))}">
+												No se registró
+									<!--No se encontró Correo.!-->
+									<aura:set attribute="else">
+											{!v.chc.Account.CEN_N_mero_de_documento__pc}
+									</aura:set>
+								</aura:if>    
+							</p>
+						<br></br>
+
+				<div class="slds-media__figure slds-text-align--center figureAligned">
+					<aura:set attribute="popoverBody">
+						<div class="slds-grid slds-grid--align-spread slds-grid--vertical slds-text-align--left">
+							<div class="slds-media slds-tile" style="display: inline-block;">
+								<div class="slds-media__body figureAligned popover-body-email">
+									<p class="tile__title">
+									<aura:if isTrue="{!or(v.chc == null, and(or(v.chc.Account.PersonLeadSource == null, v.chc.Account.PersonLeadSource == '')))}">
+												 No se registró
+											<!--No se encontró valor NPS.!-->
+										<aura:set attribute="else">
+												Canal {!v.chc.Account.PersonLeadSource}
+										</aura:set>
+									</aura:if>
+									</p>
+								</div>
+							</div>
+						</div>
+					</aura:set>
+				</div>
+					<p class="tile__title slds-truncate">
+						<aura:if isTrue="{!or(v.chc == null, and(or(v.chc.Account.PersonLeadSource == null, v.chc.Account.PersonLeadSource == '')))}">
+									No se registró
+							<!--No se encontró Correo.!-->
+							<aura:set attribute="else">
+								   Canal {!v.chc.Account.PersonLeadSource}
+							</aura:set>
+						</aura:if>    
+					</p>
+				
+					<!--	<div class="slds-truncate" title="Tipo de cliente">NPS</div> -->
+						<div class="slds-media__figure slds-text-align--center figureAligned">
+							<aura:set attribute="popoverBody">
+								<div class="slds-grid slds-grid--align-spread slds-grid--vertical slds-text-align--left">
+									<div class="slds-media slds-tile" style="display: inline-block;">
+										<div class="slds-media__body figureAligned popover-body-email">
+											<p class="tile__title">
+											<aura:if isTrue="{!or(v.chc == null, and(or(v.chc.Account.CEN_Origen__c == null, v.chc.Account.CEN_Origen__c == '')))}">
+														ORIGEN (No se registró)
+													<!--No se encontró valor NPS.!-->
+												<aura:set attribute="else">
+														Origen {!v.chc.Account.CEN_Origen__c}
+												</aura:set>
+											</aura:if>
+											</p>
+										</div>
+									</div>
+								</div>
+							</aura:set>
+						</div>
+							<p class="tile__title slds-truncate">
+								<aura:if isTrue="{!or(v.chc == null, and(or(v.chc.Account.CEN_Origen__c == null, v.chc.Account.CEN_Origen__c == '')))}">
+											ORIGEN (No se registró)
+									<!--No se encontró Correo.!-->
+									<aura:set attribute="else">
+										Origen {!v.chc.Account.CEN_Origen__c}
+									</aura:set>
+								</aura:if>    
+							</p>
+							
+
+                    </div>
+				</div>
+	  			
+
+            </div>   
+            <br/>
+        </div>
+    </article>
+</aura:component>

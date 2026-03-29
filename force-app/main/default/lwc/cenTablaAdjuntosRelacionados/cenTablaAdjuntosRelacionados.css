@@ -1,0 +1,22 @@
+/*
+Developer: Jose Miguel Espinoza Mestanza
+Email: josemiguel.espinozamestanza@emeal.nttdata.com
+*/
+.cen-fixed { 
+  table-layout: fixed;
+  width: 100%;
+}
+
+.col-archivo   { width: 26%; }
+.col-documento { width: 10%; }
+.col-tipo      { width: 20%; }
+.col-estado    { width: 18%; }
+.col-archivado { width:  13%; }
+.col-migrado   { width:  13%; }
+
+.wrap-overflow {
+  white-space: normal !important;
+  overflow: visible  !important;
+  text-overflow: unset !important;
+  word-break: break-word;
+}

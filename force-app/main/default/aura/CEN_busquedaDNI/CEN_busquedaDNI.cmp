@@ -1,0 +1,869 @@
+<!--
+  @name               : 
+  @author             : Luis Maldonado
+  @creation date      : 
+  @modification date  : 22-10-2024
+  @last modified by   : Luis Maldonado
+  @description        : 
+  @versions           : version 1.0: clase apex inicial 
+  Modifications Log
+  Ver   Date         Author           Modification
+  1.0   21-10-2024   Luis Maldonado   Initial Version
+-->
+<aura:component
+  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,lightning:availableForFlowScreens"
+  access="global"
+  controller="CEN_busquedaDNI"
+>
+  <aura:attribute
+    name="searchResult"
+    type="List"
+    description="use for store and display account list return from server"
+  />
+  <aura:attribute
+    name="Cuentaorgs"
+    type="List"
+    description="use for store and display Cuentaorgs list return from server"
+  />
+  <aura:attribute name="visitante" type="object" />
+  <aura:attribute name="selectedCount" type="Integer" default="0" />
+  <aura:attribute name="isModaldoc" type="boolean" default="false" />
+  <aura:attribute name="tipo" type="string" default="false" />
+  <aura:attribute name="tipoDoc" type="string" />
+  <aura:attribute name="tipoVisitante" type="string" />
+  <aura:attribute name="enlace" type="string" default="false" />
+  <aura:attribute name="display" type="string" default="false" />
+  <aura:attribute name="selectedLookUpRecord" type="sObject" default="{}" />
+  <aura:attribute name="disableIrAlregistro" type="Boolean" default="false" />
+
+  <aura:attribute name="showIrAlEvento" type="Boolean" default="false" />
+  <aura:attribute name="showNoHayEventos" type="Boolean" default="false" />
+  <aura:attribute name="showInfoRegistrada" type="Boolean" default="false" />
+  <aura:attribute name="showModalAsesor" type="Boolean" default="false" />
+  <aura:attribute name="formattedDate" type="String"/>
+  <aura:attribute name="formattedTime" type="String"/>
+  <aura:attribute name="ownerName" type="String"/>
+  <aura:attribute name="events" type="List" />
+
+  <!-- PARA OACs -->
+  <aura:attribute name="optionsOAC" type="List" />
+  <aura:attribute name="optionsMedio" type="List" />
+  <aura:attribute name="selectedOAC" type="String" />
+  <aura:attribute name="selectedMedio" type="String" />
+  <aura:attribute name="selectedMediolabel" type="String" />
+  <aura:attribute name="selectedOAClabel" type="String" />
+  <aura:attribute name="selectedOACdefault" type="Object" />
+  <aura:attribute name="selectedMediodefault" type="Object" />
+  <aura:attribute name="eventKeyCode" type="Object" />
+  <aura:attribute name="requeridoOAC" type="Boolean" default="true" />
+  <aura:attribute name="confirmarOAC" type="Boolean" default="false" />
+  <aura:attribute name="requeridoMedio" type="Boolean" default="true" />
+  <aura:attribute name="confirmarMedio" type="Boolean" default="false" />
+
+  <aura:handler name="init" value="{! this }" action="{! c.doInit }" />
+  <aura:attribute name="url" type="String"/>
+  <aura:attribute name="pageReference" type="Object"/>
+  <lightning:navigation aura:id="navService"/>
+
+  <!-- <div
+    align="center"
+    class="slds-m-left_xx-large"
+    style="
+      background-color: white;
+      border-radius: 20px;
+      margin: 0 400px 0 400px;
+    "
+  >
+    <br /><br /> -->
+    <article class="slds-card">
+      <div class="slds-card__body slds-card__body_inner">
+    <aura:if isTrue="{!v.requeridoOAC}">
+      <lightning:layoutItem size="9" padding="around-medium">
+        <lightning:select
+          aura:id="slcOAC"
+          name="slc_oac"
+          label="Elige tu OAC"
+          title="Seleccione su Oficina de Venta"
+          value="{!v.selectedOAC}"
+          required="{!v.requeridoOAC}"
+          messageWhenValueMissing="OAC requerido"
+        >
+          <option
+            text="- Seleccione su OAC -"
+            value="{!v.selectedOACdefault}"
+            selected="true"
+          />
+          <aura:iteration items="{!v.optionsOAC}" var="option">
+            <option
+              text="{!option.label}"
+              value="{!option.value}"
+              selected="{!option.selected}"
+            />
+          </aura:iteration>
+        </lightning:select>
+      </lightning:layoutItem>
+    </aura:if>
+    <lightning:layoutItem size="9" padding="around-medium">
+      <lightning:select
+        name="documento"
+        label="Tipo de Documento"
+        required="true"
+        onchange="{!c.changeitem}"
+        aura:id="documento"
+      >
+        <option value="DNI">DNI</option>
+        <option value="RUC">RUC</option>
+        <option value="P.T.P.">PTP</option>
+        <option value="Pasaporte">Pasaporte</option>
+        <option value="CAREXTRAN">Carnet de extranjeria</option>
+        <option value="Sin especificar">Sin especificar</option>
+      </lightning:select>
+    </lightning:layoutItem>
+
+    <lightning:layoutItem size="9" padding="around-small">
+      <lightning:input
+        name="numero"
+        required="true"
+        placeholder="Ingresar Nº de documento ..."
+        aura:id="numero"
+        onchange="{!c.changevalor}"
+        label="Nº de documento"
+      />
+    </lightning:layoutItem>
+
+    <div style="display: inline">
+      <lightning:layoutItem size="9" padding="around-medium">
+        <lightning:select
+          name="visita"
+          label="Tipo de Visita"
+          required="true"
+          aura:id="visita"
+        >
+          <option value="Venta">Venta</option>
+          <option value="Postventa">Postventa</option>
+          <option value="Citado">Citado</option>
+        </lightning:select>
+      </lightning:layoutItem>
+
+      <lightning:layoutItem size="9" padding="around-medium">
+        <lightning:select
+          name="atencion"
+          label="Tipo de Atención"
+          required="true"
+          aura:id="atencion"
+        >
+          <option value="Regular">Regular</option>
+          <option value="Preferencial">Preferencial</option>
+        </lightning:select>
+      </lightning:layoutItem>
+
+      <aura:if isTrue="{!v.requeridoMedio}">
+        <lightning:layoutItem size="9" padding="around-medium">
+          <lightning:select
+            aura:id="Medio"
+            name="Medio"
+            label="Elige Medio"
+            title="Seleccione Medio"
+            value="{!v.selectedMedio}"
+            required="{!v.requeridoMedio}"
+            messageWhenValueMissing="Medio requerido"
+          >
+            <option
+              text="- Seleccione Medio -"
+              value="{!v.selectedMediodefault}"
+              selected="true"
+            />
+            <aura:iteration items="{!v.optionsMedio}" var="option">
+              <option
+                text="{!option.label}"
+                value="{!option.value}"
+                selected="{!option.selected}"
+              />
+            </aura:iteration>
+          </lightning:select>
+        </lightning:layoutItem>
+      </aura:if>
+    </div>
+
+    <lightning:layoutItem size="7" padding="around-small">
+      <lightning:button
+        onclick="{!c.ejecutarBusqueda}"
+        variant="brand"
+        label="Buscar"
+        iconName="utility:search"
+      />
+    </lightning:layoutItem>
+    <!-- <br /><br />
+  </div> -->
+  </div>
+  </article>
+  <!--************************************************************************  MODAL Nº Doc Encontrado  *********************************************************************-->
+  <!--Use aura:if tag to display/hide popup based on isModalOpen value-->
+  <aura:if isTrue="{!v.isModaldoc}">
+    <!-- Modal/Popup Box starts here-->
+    <section
+      role="dialog"
+      tabindex="-1"
+      aria-labelledby="modal-heading-01"
+      aria-modal="true"
+      aria-describedby="modal-content-id-1"
+      class="slds-modal slds-fade-in-open"
+    >
+      <div class="slds-modal__container">
+        <!-- Modal/Popup Box Header Starts here-->
+        <header class="slds-modal__header">
+          <lightning:buttonIcon
+            iconName="utility:close"
+            onclick="{! c.closeModelDoc }"
+            alternativeText="close"
+            variant="bare-inverse"
+            class="slds-modal__close"
+          />
+          <aura:if isTrue="{!v.tipoVisitante!='tercero'}">
+            <h2
+              id="modal-heading-01"
+              class="slds-text-heading_medium slds-hyphenate"
+            >
+              <strong>Nro de Documento Registrado</strong>
+            </h2>
+            <aura:set attribute="else">
+              <h2
+                id="modal-heading-01"
+                class="slds-text-heading_medium slds-hyphenate"
+              >
+                <strong>Nro de Documento Tercero</strong>
+              </h2>
+            </aura:set>
+          </aura:if>
+        </header>
+
+        <!--Modal/Popup Box Body Starts here-->
+        
+          <!--****************************************************** Cabecera del Componente *****************************************************************-->
+          <aura:if isTrue="{!and(v.tipoDoc!='RUC',v.tipoVisitante!='tercero')}">
+            <aura:iteration items="{!v.searchResult}" var="acc">
+                
+                  <!--El Nº de documento ya se encuentra registrado le pertenece al
+                  {!v.tipo}:-->
+                  <aura:if isTrue="{!v.showIrAlEvento}">
+                    <div class="slds-modal__content slds-p-around_medium content-modal-verde" id="modal-content-id-1">
+                      <td class="info-prospecto-cita">
+                        <p class="titulo-prospecto-cuenta">El {!v.tipo} <b>{!acc.Name}</b> tiene las siguientes citas programadas:<br/></p>
+                        <aura:iteration items="{!v.events}" var="event">
+                          <div class="container">
+                            <div class="column left">
+                              Fecha y Hora de Creación: <b>{!event.CreatedDate}</b> - <b>{!event.CreatedTime}</b><br/>
+                              Nombre del Creador: <b>{!event.CreatedBy}</b><br/>
+                              Asunto del Evento: <b>{!event.Subject}</b><br/>
+                              Fecha y Hora de Inicio: <b>{!event.StartDate}</b> - <b>{!event.StartTime}</b><br/>
+                              Origen: <b>{!event.Origen}</b>
+                            </div>
+                            <div class="column right">
+                              <aura:if isTrue="{!event.CEN_Asistio_a_Cita__c}">
+                                <lightning:button 
+                                  label="Ir al Evento"
+                                  onclick="{!c.redEventLead}"
+                                  value="{!event.Id}"
+                                  class="slds-button slds-button_neutral custom-button"
+                                  variant="brand"
+                                  iconName="utility:event_ext"
+                                />
+                              <aura:set attribute="else">
+                                <lightning:button 
+                                label="Confirmar Asistencia"
+                                onclick="{!c.confirmarAsistencia}"
+                                value="{!event.Id}"
+                                class="slds-button slds-button_neutral custom-button"
+                                variant="success"
+                                iconName="utility:checkin"
+                              />
+                              </aura:set>
+                              </aura:if>
+                            </div>
+                          </div>
+                        </aura:iteration>
+                      </td>
+                    </div>
+                  </aura:if>
+
+
+                  <aura:if isTrue="{!v.showNoHayEventos}">
+                    <div class="slds-modal__content slds-p-around_medium slds-grid slds-grid_align-center" id="modal-content-id-1">
+                      <td class="info-prospecto-no-cita">
+                        El {!v.tipo} <b>{!acc.Name}</b> no tiene ninguna cita o evento agendado en la última semana o la próxima.
+                      </td>
+                    </div>
+                  </aura:if>
+
+                  <aura:if isTrue="{!v.showModalAsesor}">
+                    <div class="slds-modal__content slds-p-around_medium slds-grid slds-grid_align-center" id="modal-content-id-1">
+                      <td class="info-prospecto-asignacion">
+                        El prospecto <b>{!acc.Name}</b> está asignado al asesor <b>{!v.ownerName}</b>.<br/>
+                        Fecha y hora de registro: <b>{!v.formattedDate}</b> - <b>{!v.formattedTime}</b><br/>
+                      </td>
+                    </div>
+                  </aura:if>
+
+                <!--<div id="Detalle" style="{!v.display}">-->
+                <aura:if isTrue="{!v.showInfoRegistrada}">
+                  <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                  <div class="actualizar-info-post-venta">
+                  <p style="text-align: center">
+                    <b> La información registrada es la siguiente </b>
+                  </p>
+
+                  <br />
+                  <br />
+                  <table>
+                    <tr class="slds-text-color_default">
+                      <td>
+                        <ui:outputText class="slds-output" value="Nombres" />
+                      </td>
+                      <td colspan="2">
+                        <ui:inputText
+                          disabled="true"
+                          aura:id="NombreRegistrado"
+                          class="slds-input slds-m-top_x-small"
+                          value="{!acc.FirstName}"
+                        />
+                      </td>
+                    </tr>
+
+                    <tr class="slds-text-color_default">
+                      <td>
+                        <ui:outputText class="slds-output" value="Apellidos" />
+                      </td>
+                      <td colspan="2">
+                        <ui:inputText
+                          disabled="true"
+                          aura:id="ApellidoRegistrado"
+                          class="slds-input slds-m-top_x-small"
+                          value="{!acc.LastName}"
+                        />
+                      </td>
+                    </tr>
+
+                    <tr class="slds-text-color_default">
+                      <td>
+                        <ui:outputText class="slds-output" value="Dirección" />
+                      </td>
+                      <td colspan="2">
+                        <ui:inputText
+                          disabled="true"
+                          aura:id="DireccionRegistrado"
+                          class="slds-input slds-m-top_x-small"
+                          value="{!acc.CEN_Direccion__pc}"
+                        />
+                      </td>
+                    </tr>
+
+                    <tr class="slds-text-color_default slds-m-top_x-small">
+                      <td>
+                        <ui:outputText
+                          class="slds-output slds-m-top_x-small"
+                          value="Distrito"
+                        />
+                      </td>
+                      <td colspan="2">
+                        <div class="color-background">
+                          <div
+                            aura:id="distrito_lookup_1"
+                            class="slds-p-top_x-small slds-hide"
+                          >
+                            <c:CEN_lookup_Distrito
+                              objectAPIName="Tabla_maestra__c "
+                              IconName="standard:store_group"
+                              selectedRecord="{!v.selectedLookUpRecord}"
+                            />
+                          </div>
+                          <div aura:id="distrito_lookup_2" class="slds-show">
+                            <ui:inputText
+                              disabled="true"
+                              class="slds-input slds-m-top_x-small"
+                              value="{!v.selectedLookUpRecord.Name +' - '+v.selectedLookUpRecord.Provincia__c+' - '+v.selectedLookUpRecord.Departamento__c}"
+                            />
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr class="slds-text-color_default">
+                      <td>
+                        <ui:outputText class="slds-output" value="Correo" />
+                      </td>
+                      <td colspan="2">
+                        <ui:inputText
+                          disabled="true"
+                          aura:id="CorreoRegistrado"
+                          class="slds-input slds-m-top_x-small"
+                          value="{!acc.PersonEmail}"
+                        />
+                      </td>
+                    </tr>
+
+                    <tr class="slds-text-color_default">
+                      <td>
+                        <ui:outputText class="slds-output" value="Celular" />
+                      </td>
+                      <td colspan="2">
+                        <ui:inputText
+                          disabled="true"
+                          aura:id="CelularRegistrado"
+                          class="slds-input slds-m-top_x-small"
+                          value="{!acc.PersonMobilePhone}"
+                        />
+                      </td>
+                    </tr>
+
+                    <tr class="slds-text-color_default" style="display: none">
+                      <td>
+                        <b
+                          ><u
+                            ><span onclick="{!c.ClickSpan}"
+                              >¿Desea actualizar su información?</span
+                            ></u
+                          ></b
+                        >
+                      </td>
+                      <td colspan="2">
+                        <ui:inputCheckbox
+                          aura:id="checkbox"
+                          class="slds-m-top_x-small"
+                          label=""
+                          change="{!c.onCheck}"
+                        />
+                      </td>
+                    </tr>
+                  </table>
+                  </div>
+                  </div>
+                </aura:if>
+                <!--</div>-->
+                
+              
+            </aura:iteration>
+          </aura:if>
+          <aura:if isTrue="{!and(v.tipoDoc=='RUC',v.tipoVisitante!='tercero')}">
+            <aura:iteration items="{!v.Cuentaorgs}" var="corgs">
+              <td>
+                El Nº de documento ya se encuentra registrado le pertenece al
+                {!v.tipo}:
+                <b
+                  ><a
+                    href="{!'/lightning/r/' + corgs.cuentap.Id + v.enlace }"
+                    onclick="{!c.redModelDoc}"
+                    target="_blank"
+                    >{!corgs.cuentap.Name}</a
+                  ></b
+                >
+                <br /> <br />
+                <!--<div id="Detalle" style="{!v.display}">-->
+                <aura:if isTrue="{!v.showInfoRegistrada}">
+                  <p>Los representanes del {!v.tipo} son:</p>
+                  <br />
+                  <table>
+                    <tr>
+                      <th>Tipo Documento</th>
+                      <th>N° Documento</th>
+                      <th>Nombre Completo</th>
+                      <th></th>
+                      <th>¿Actualizar datos?</th>
+                    </tr>
+                    <aura:iteration
+                      items="{!corgs.contactos}"
+                      var="corg_contacto"
+                    >
+                      <tr>
+                        <td>{!corg_contacto.CEN_Tipo_de_documento__c}</td>
+                        <td>{!corg_contacto.CEN_N_mero_de_documento__c}</td>
+                        <td colspan="2">
+                          <b
+                            ><a
+                              href="{!'/lightning/r/' + corg_contacto.Id + '/view' }"
+                              onclick="{!c.redModelDoc}"
+                              target="_blank"
+                              >{!corg_contacto.Name}</a
+                            ></b
+                          >
+                        </td>
+                        <td>
+                          <div
+                            class="slds-form-element slds-align_absolute-center"
+                          >
+                            <div class="slds-form-element__control">
+                              <label class="slds-checkbox">
+                                <ui:inputCheckbox
+                                  text="{!corg_contacto.Id}"
+                                  value="{!corg_contacto.isChecked}"
+                                  change="{!c.checkboxSelect}"
+                                />
+                                <span class="slds-checkbox_faux"></span>
+                                <span
+                                  class="slds-form-element__label text"
+                                ></span>
+                              </label>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </aura:iteration>
+                  </table>
+
+                  <br />
+                  <aura:if isTrue="{!v.visitante!=null}">
+                    <p style="text-align: center">
+                      <b> La información registrada es la siguiente </b>
+                    </p>
+                    <table>
+                      <tr class="slds-text-color_default">
+                        <td>
+                          <ui:outputText class="slds-output" value="Nombres" />
+                        </td>
+                        <td colspan="2">
+                          <ui:inputText
+                            disabled="true"
+                            aura:id="NombreRegistrado"
+                            class="slds-input slds-m-top_x-small"
+                            value="{!v.visitante.FirstName}"
+                          />
+                        </td>
+                      </tr>
+
+                      <tr class="slds-text-color_default">
+                        <td>
+                          <ui:outputText
+                            class="slds-output"
+                            value="Apellidos"
+                          />
+                        </td>
+                        <td colspan="2">
+                          <ui:inputText
+                            disabled="true"
+                            aura:id="ApellidoRegistrado"
+                            class="slds-input slds-m-top_x-small"
+                            value="{!v.visitante.LastName}"
+                          />
+                        </td>
+                      </tr>
+
+                      <tr class="slds-text-color_default">
+                        <td>
+                          <ui:outputText
+                            class="slds-output"
+                            value="Dirección"
+                          />
+                        </td>
+                        <td colspan="2">
+                          <ui:inputText
+                            disabled="true"
+                            aura:id="DireccionRegistrado"
+                            class="slds-input slds-m-top_x-small"
+                            value="{!v.visitante.CEN_Direccion__c}"
+                          />
+                        </td>
+                      </tr>
+
+                      <tr class="slds-text-color_default slds-m-top_x-small">
+                        <td>
+                          <ui:outputText
+                            class="slds-output slds-m-top_x-small"
+                            value="Distrito"
+                          />
+                        </td>
+                        <td colspan="2">
+                          <div class="color-background">
+                            <div
+                              aura:id="distrito_lookup_1"
+                              class="slds-p-top_x-small slds-hide"
+                            >
+                              <c:CEN_lookup_Distrito
+                                objectAPIName="Tabla_maestra__c "
+                                IconName="standard:store_group"
+                                selectedRecord="{!v.selectedLookUpRecord}"
+                              />
+                            </div>
+                            <div aura:id="distrito_lookup_2" class="slds-show">
+                              <ui:inputText
+                                disabled="true"
+                                class="slds-input slds-m-top_x-small"
+                                value="{!v.selectedLookUpRecord.Name +' - '+v.selectedLookUpRecord.Provincia__c+' - '+v.selectedLookUpRecord.Departamento__c}"
+                              />
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr class="slds-text-color_default">
+                        <td>
+                          <ui:outputText class="slds-output" value="Correo" />
+                        </td>
+                        <td colspan="2">
+                          <ui:inputText
+                            disabled="true"
+                            aura:id="CorreoRegistrado"
+                            class="slds-input slds-m-top_x-small"
+                            value="{!v.visitante.Email}"
+                          />
+                        </td>
+                      </tr>
+
+                      <tr class="slds-text-color_default">
+                        <td>
+                          <ui:outputText class="slds-output" value="Celular" />
+                        </td>
+                        <td colspan="2">
+                          <ui:inputText
+                            disabled="true"
+                            aura:id="CelularRegistrado"
+                            class="slds-input slds-m-top_x-small"
+                            value="{!v.visitante.Phone}"
+                          />
+                        </td>
+                      </tr>
+
+                      <tr class="slds-text-color_default" style="display: none">
+                        <td>
+                          <b
+                            ><u
+                              ><span onclick="{!c.ClickSpan}"
+                                >¿Desea actualizar su información?</span
+                              ></u
+                            ></b
+                          >
+                        </td>
+                        <td colspan="2">
+                          <ui:inputCheckbox
+                            aura:id="checkbox"
+                            class="slds-m-top_x-small"
+                            label=""
+                            change="{!c.onCheck}"
+                          />
+                        </td>
+                      </tr>
+                    </table>
+                  </aura:if>
+                </aura:if>
+                <!--</div>-->
+              </td>
+            </aura:iteration>
+          </aura:if>
+          <aura:if isTrue="{!v.tipoVisitante=='tercero'}">
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+            <!--
+                           <center><p><b>Datos del visitante</b></p></center>
+							-->
+            <table>
+              <tr class="slds-text-color_default">
+                <td>
+                  <ui:outputText class="slds-output" value="Tipo Documento" />
+                </td>
+                <td colspan="2">
+                  <ui:inputText
+                    disabled="true"
+                    aura:id="TipoDocRegistrado"
+                    class="slds-input slds-m-top_x-small"
+                  />
+                </td>
+              </tr>
+              <tr class="slds-text-color_default">
+                <td>
+                  <ui:outputText class="slds-output" value="N° Documento" />
+                </td>
+                <td colspan="2">
+                  <ui:inputText
+                    disabled="true"
+                    aura:id="NdocRegistrado"
+                    class="slds-input slds-m-top_x-small"
+                  />
+                </td>
+              </tr>
+              <tr class="slds-text-color_default">
+                <td>
+                  <ui:outputText class="slds-output" value="Nombres" />
+                </td>
+                <td colspan="2">
+                  <ui:inputText
+                    aura:id="NombreRegistrado"
+                    class="slds-input slds-m-top_x-small"
+                  />
+                </td>
+              </tr>
+              <tr class="slds-text-color_default">
+                <td>
+                  <ui:outputText class="slds-output" value="Apellidos" />
+                </td>
+                <td colspan="2">
+                  <ui:inputText
+                    aura:id="ApellidoRegistrado"
+                    class="slds-input slds-m-top_x-small"
+                  />
+                </td>
+              </tr>
+              <tr class="slds-text-color_default">
+                <td>
+                  <ui:outputText class="slds-output" value="Dirección" />
+                </td>
+                <td colspan="2">
+                  <ui:inputText
+                    aura:id="DireccionRegistrado"
+                    class="slds-input slds-m-top_x-small"
+                  />
+                </td>
+              </tr>
+              <tr class="slds-text-color_default slds-m-top_x-small">
+                <td>
+                  <ui:outputText
+                    class="slds-output slds-m-top_x-small"
+                    value="Distrito"
+                  />
+                </td>
+                <td colspan="2">
+                  <div class="color-background">
+                    <div class="slds-p-top_x-small">
+                      <c:CEN_lookup_Distrito
+                        objectAPIName="Tabla_maestra__c "
+                        IconName="standard:store_group"
+                        selectedRecord="{!v.selectedLookUpRecord}"
+                      />
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr class="slds-text-color_default">
+                <td>
+                  <ui:outputText class="slds-output" value="Correo" />
+                </td>
+                <td colspan="2">
+                  <ui:inputText
+                    aura:id="CorreoRegistrado"
+                    class="slds-input slds-m-top_x-small"
+                  />
+                </td>
+              </tr>
+              <tr class="slds-text-color_default">
+                <td>
+                  <ui:outputText class="slds-output" value="Celular" />
+                </td>
+                <td colspan="2">
+                  <ui:inputText
+                    aura:id="CelularRegistrado"
+                    class="slds-input slds-m-top_x-small"
+                  />
+                </td>
+              </tr>
+            </table>
+            </div>
+          </aura:if>
+          <!--*************************************************************************************************************************************************-->
+        
+        <!--Modal/Popup Box Footer Starts here-->
+        <footer class="slds-modal__footer">
+          <aura:if isTrue="{!v.tipoVisitante!='tercero'}">
+            <!--<div style="{!v.display}">-->
+            <aura:if isTrue="{!v.showInfoRegistrada}">
+              <lightning:button
+                class="slds-float_left slds-button slds-button_neutral"
+                variant="brand"
+                label="Actualizar información"
+                title="Actualizar información"
+                onclick="{!c.ActualizarInformacionBoton}"
+              />
+            </aura:if>
+            <!--</div>-->
+            <aura:if isTrue="{!v.showInfoRegistrada}">
+            <lightning:button
+              class="slds-button slds-button_neutral"
+              disabled="{!v.disableIrAlregistro}"
+              variant="brand"
+              label="Ir al registro"
+              title="Ir al registro"
+              onclick="{!c.redModelDoc}"
+            />
+            </aura:if>
+            <!-- <a href="{!v.url}">Link</a> -->
+          </aura:if>
+          <aura:if isTrue="{!v.tipoVisitante=='tercero'}">
+            <lightning:button
+              class="slds-button slds-button_neutral"
+              variant="brand"
+              label="Registrar visita"
+              title="Registrar visita de la persona no cliente"
+              onclick="{!c.registrarVisitaTercero}"
+            />
+          </aura:if>
+          <aura:if isTrue="{!v.showNoHayEventos}">
+            <lightning:button
+              class="slds-button slds-button_neutral"
+              variant="brand"
+              label="Continuar"
+              title="Continuar"
+              onclick="{!c.continuarModalAsesor}"
+            />
+          </aura:if>
+          <aura:if isTrue="{!v.showModalAsesor}">
+            <lightning:button
+              class="slds-button slds-button_neutral"
+              variant="brand"
+              iconName="utility:event"
+              label="Crear Evento"
+              title="Crear Evento"
+              onclick="{!c.createNewAutomaticEvent}"
+            />
+            <lightning:button
+             class="slds-button slds-button_neutral"
+             variant="brand"
+             iconName="utility:add"
+             label="Crear Prospecto"
+             title="Crear Prospecto"
+             onclick="{!c.createLead}"
+           />
+          </aura:if>
+        </footer>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+  </aura:if>
+
+  <aura:if isTrue="{!v.confirmarOAC}">
+    <section
+      role="dialog"
+      tabindex="-1"
+      aria-labelledby="modal-heading-01"
+      aria-modal="true"
+      aria-describedby="modal-content-id-1"
+      class="slds-modal slds-fade-in-open"
+    >
+      <div class="slds-modal__container">
+        <header class="slds-modal__header">
+          <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+            Confirmar Oficina de Venta (OAC)
+          </h2>
+          <p class="slds-m-top_x-small"></p>
+        </header>
+        <div
+          class="slds-modal__content slds-p-around_medium"
+          id="modal-content-id-1"
+        >
+          <p>
+            ¿Está seguro(a) de usar la OAC:
+            <b><ui:outputText value="{!v.selectedOAClabel}" /></b>?
+          </p>
+        </div>
+        <footer class="slds-modal__footer">
+          <lightning:button
+            label="No"
+            title="No"
+            onclick="{! c.noAceptarOAC }"
+          />
+          <lightning:button
+            variant="brand"
+            label="Sí"
+            title="Sí"
+            onclick="{! c.aceptarOAC }"
+          />
+        </footer>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+  </aura:if>
+</aura:component>

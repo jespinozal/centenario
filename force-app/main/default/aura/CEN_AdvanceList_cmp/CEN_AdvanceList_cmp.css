@@ -1,0 +1,48 @@
+.THIS .Libre lightning-base-formatted-text{
+    color: #fff;
+    background-color: #2e844a;
+    white-space: nowrap;
+    padding: .12rem .5rem;
+    border: var(--sds-c-badge-sizing-border,1px) solid var(--sds-c-badge-color-border,transparent);
+    border-radius: var(--sds-c-badge-radius-border,15rem);
+    font-size: var(--sds-c-badge-font-size,.75rem);
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+}
+.THIS .Bloqueado lightning-base-formatted-text{
+    color: #fff;
+	background-color: #fe9339;
+    white-space: nowrap;
+    padding: .12rem .5rem;
+    border: var(--sds-c-badge-sizing-border,1px) solid var(--sds-c-badge-color-border,transparent);
+    border-radius: var(--sds-c-badge-radius-border,15rem);
+    font-size: var(--sds-c-badge-font-size,.75rem);
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+}
+.THIS .Exitoso lightning-base-formatted-text{
+    color: #fff;
+    background-color: #2e844a;
+    white-space: nowrap;
+    padding: .12rem .5rem;
+    border: var(--sds-c-badge-sizing-border,1px) solid var(--sds-c-badge-color-border,transparent);
+    border-radius: var(--sds-c-badge-radius-border,15rem);
+    font-size: var(--sds-c-badge-font-size,.75rem);
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+}
+.THIS .Error lightning-base-formatted-text{
+    color: #fff;
+    background-color: #ea001e;
+    white-space: nowrap;
+    padding: .12rem .5rem;
+    border: var(--sds-c-badge-sizing-border,1px) solid var(--sds-c-badge-color-border,transparent);
+    border-radius: var(--sds-c-badge-radius-border,15rem);
+    font-size: var(--sds-c-badge-font-size,.75rem);
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+}
